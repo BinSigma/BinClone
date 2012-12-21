@@ -1,0 +1,9 @@
+SCC = This is a Source Code Control file
+
+[BFLib.dsp]
+SCC_Aux_Path = "D:\My Documents\VSS"
+SCC_Project_Name = "$/Privacy/BFLib", GXAAAAAA
+
+[BFLib.vcproj]
+SCC_Aux_Path = "D:\My Documents\VSS"
+SCC_Project_Name = "$/Privacy/BFLib", GXAAAAAA

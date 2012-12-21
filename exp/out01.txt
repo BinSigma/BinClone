@@ -1,0 +1,27 @@
+Parsing folder: .\Data01
+.\Data01\iexploreSim1.asm has 10 lines.
+.\Data01\iexploreSim2.asm has 10 lines.
+CCDAssemblyFileMgr: empty file: .\Data01\test.asm
+Total number of functions: 4
+File: .\Data01\iexploreSim1.asm has 2 functions and 2 regions.
+File: .\Data01\iexploreSim2.asm has 2 functions and 2 regions.
+Total number of regions: 4
+Number of exact clone clusters after removing singletons: 1
+Number of exact clone clusters: 1
+Number of clone clusters after removing trivial clones: 1
+-: clone cluster #0 of 0 has 4 regions.Number of exact clone pairs: 4
+Number of inexact clone pairs: 2
+Total number of clone pairs: 6
+-: clone file pairs #0 of 0: pair #0 of 6.\: clone file pairs #0 of 0: pair #1 of 5.|: clone file pairs #0 of 0: pair #2 of 5./: clone file pairs #0 of 0: pair #3 of 4.Number of clone pairs after unification: 4
+Number of indexed constants = 5
+Number of indexed strings = 0
+Number of indexed imports = 0
+Spent: 0s on reading and preprocessing data.
+Spent: 0s on extracting exact clones.
+Spent: 0s on converting exact clone clusters to clone pairs.
+Spent: 0s on extracting inexact clones.
+Spent: 0s on unifying clones.
+Spent: 0s on writing the XML file.
+Spent: 0s in total (excluding unifying clones).
+Spent: 0s in total (including unifying clones).
+Bye!

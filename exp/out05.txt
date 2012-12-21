@@ -1,0 +1,11 @@
+Parsing folder: .\Data05
+.\Data05\ccl30.asm has 52191 lines.
+.\Data05\ccl35.asm has 62206 lines.
+Total number of functions: 4229
+File: .\Data05\ccl30.asm has 1902 functions and 41717 regions.
+File: .\Data05\ccl35.asm has 2327 functions and 49533 regions.
+Total number of regions: 91250
+Number of exact clone clusters: 12873
+Number of exact clone clusters: 12873
+Number of clone clusters after removing trivial clones: 12846
+Number of exact clone pairs: 458491

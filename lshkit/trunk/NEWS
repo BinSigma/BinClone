@@ -1,0 +1,44 @@
+lshkit snapshot - 2009-04-30
+Thanks to the Matlab scripts published by Y. Weiss, LSHKIT is now able to make use of
+externally trained spectral hash functions.  See the class lshkit::SpectralHash.
+
+lshkit snapshot - 2009-03-02
+
+Introduced experimental scanner interface.  Scanner is a unary functional object which is passed into
+LSH index to scan the candidate points and update the K-NN results.  There are several benefits of
+this change:
+1. The LSH index query method are now thread-safe (if scanners are thread-safe).  This makes parallel
+query execution possible.
+2. It makes implementation simpler.  LSH index classes no longer need to maintain accessor and metric
+objects.
+3. Without changing the LSH index API, one can now easily combine LSH indexing and sketch filtering
+(using skeches to quickly filter the LSH candidate, and then use raw data to rank reduced candidate set).
+This will further improve the query speed when LSH return a large number of candidates.  An example
+will be provided shortly.
+
+I'll release version 0.2 when MPLSH batch query with cache-aware scheduling is finished.
+
+lshkit 0.1.9 - 2009-03-02
+
+* Improved the MPLSH modeling algorithm to make it work with feature vectors with large absolute values.
+* Added a preliminary LSH Forest implementation with an example program tools/forest-run.cpp.
+* Added tools/embedder.cpp, a sample program of random histogram embedding.
+* Added R-NN (range query) support to Topk.  
+* Added R-NN support in tools/scan.cpp, tools/mplsh-run.cpp, tools/lsh-run.cpp, tools/sketch-run.cpp.  Set K = 0 for R-NN.
+* Added tools/txt2bin.cpp to convert text data file to binary.
+
+The current index implementation is not thread-safe.  I'm going to change the index API in next version (0.2).  This is a major change.  This is the last release with the old index API.
+
+lshkit 0.1.2 - 2009-02-15
+
+* Minor fix of the included boost distribution, no LSHKIT file touched.
+
+lshkit 0.1.1 - 2009-02-14
+ 
+* Added the required Boost source files to the package, so a standalone boost installation is not needed.
+* Reduced dependency on Boost.  Now only boost_program_option needs to be linked for the tools. The main LSHKIT library only depends on Boost header files.
+
+lshkit 0.1 - 2009-02-11
+
+* This is the initial versioned release of LSHKIT.
+* The project is migrated to sourceforge.

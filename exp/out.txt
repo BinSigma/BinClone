@@ -1,0 +1,3044 @@
+Parsing folder: ..\exp\Data02Debug
+..\exp\Data02Debug\btwhidcs.asm has 112 lines.
+..\exp\Data02Debug\BugHandler.asm has 533 lines.
+Total number of functions: 10
+File: ..\exp\Data02Debug\btwhidcs.asm has 4 functions and 95 regions.
+File: ..\exp\Data02Debug\BugHandler.asm has 6 functions and 422 regions.
+Total number of regions: 517
+1234542802:
+mov REG#0 REG#1
+mov REG#1 MEM#0
+mov REG#1 MEM#1
+mov dword ptr MEM#2 offset ??_7CBtHidExtRoot@@6B@
+
+3952303876:
+mov REG#0 REG#1
+mov REG#1 MEM#0
+mov REG#1 MEM#1
+mov dword ptr MEM#2 offset ??_7CBtHidExtRoot@@6B@
+mov MEM#3 REG#1
+
+2149943364:
+mov REG#1 MEM#0
+mov REG#1 MEM#1
+mov dword ptr MEM#2 offset ??_7CBtHidExtRoot@@6B@
+mov MEM#3 REG#1
+
+3383473325:
+mov REG#1 MEM#1
+mov dword ptr MEM#2 offset ??_7CBtHidExtRoot@@6B@
+mov MEM#3 REG#1
+
+1231478558:
+mov dword ptr MEM#2 offset ??_7CBtHidExtRoot@@6B@
+mov MEM#3 REG#1
+
+1508845609:
+mov MEM#3 REG#1
+
+187009291:
+mov REG#0 REG#1
+mov REG#1 MEM#0
+mov REG#1 MEM#1
+mov MEM#3 REG#1
+
+187009291:
+mov REG#0 REG#1
+mov REG#1 MEM#0
+mov REG#1 MEM#1
+mov MEM#3 REG#1
+
+1556097821:
+mov REG#1 MEM#0
+mov REG#1 MEM#1
+mov MEM#3 REG#1
+
+4217481770:
+mov REG#1 MEM#1
+mov MEM#3 REG#1
+
+1508845609:
+mov MEM#3 REG#1
+
+1111229701:
+push REG#2
+mov REG#3 MEM#4
+push REG#4
+mov REG#4 REG#1
+
+1111229701:
+push REG#2
+mov REG#3 MEM#4
+push REG#4
+mov REG#4 REG#1
+
+1497848728:
+mov REG#3 MEM#4
+push REG#4
+mov REG#4 REG#1
+jz short loc_10001055
+
+1649225333:
+push REG#4
+mov REG#4 REG#1
+jz short loc_10001055
+push REG#5
+
+3435594693:
+mov REG#4 REG#1
+jz short loc_10001055
+push REG#5
+lea REG#5 MEM#5
+
+3437464889:
+jz short loc_10001055
+push REG#5
+lea REG#5 MEM#5
+push offset ??1CBtHidExtRoot@@UAE@XZ
+
+2747890430:
+jz short loc_10001055
+push REG#5
+lea REG#5 MEM#5
+push offset ??1CBtHidExtRoot@@UAE@XZ
+push dword ptr MEM#6
+
+4028318704:
+push REG#5
+lea REG#5 MEM#5
+push offset ??1CBtHidExtRoot@@UAE@XZ
+push dword ptr MEM#6
+push VAL#2
+
+1974811938:
+lea REG#5 MEM#5
+push offset ??1CBtHidExtRoot@@UAE@XZ
+push dword ptr MEM#6
+push VAL#2
+push REG#4
+
+3288378864:
+push offset ??1CBtHidExtRoot@@UAE@XZ
+push dword ptr MEM#6
+push VAL#2
+push REG#4
+call ??_M@YGXPAXIHP6EX0@Z@Z
+
+1742689134:
+push dword ptr MEM#6
+push VAL#2
+push REG#4
+call ??_M@YGXPAXIHP6EX0@Z@Z
+
+3471038981:
+push VAL#2
+push REG#4
+call ??_M@YGXPAXIHP6EX0@Z@Z
+jz short loc_10001050
+
+4007483616:
+push REG#4
+call ??_M@YGXPAXIHP6EX0@Z@Z
+jz short loc_10001050
+push REG#5
+
+1819022658:
+call ??_M@YGXPAXIHP6EX0@Z@Z
+jz short loc_10001050
+push REG#5
+call ??3@YAXPAX@Z
+
+1329374292:
+jz short loc_10001050
+push REG#5
+call ??3@YAXPAX@Z
+pop REG#1
+
+1329374292:
+jz short loc_10001050
+push REG#5
+call ??3@YAXPAX@Z
+pop REG#1
+
+818706383:
+push REG#5
+call ??3@YAXPAX@Z
+pop REG#1
+mov REG#0 REG#5
+
+3957339961:
+call ??3@YAXPAX@Z
+pop REG#1
+mov REG#0 REG#5
+pop REG#5
+
+2996949592:
+pop REG#1
+mov REG#0 REG#5
+pop REG#5
+jmp short loc_1000106A
+
+2822022321:
+mov REG#0 REG#5
+pop REG#5
+jmp short loc_1000106A
+
+2925309575:
+mov REG#0 REG#5
+pop REG#5
+jmp short loc_1000106A
+mov REG#1 REG#4
+
+4024615767:
+pop REG#5
+jmp short loc_1000106A
+mov REG#1 REG#4
+call ??1CBtHidExtRoot@@UAE@XZ
+
+2908063640:
+jmp short loc_1000106A
+mov REG#1 REG#4
+call ??1CBtHidExtRoot@@UAE@XZ
+
+3387730593:
+mov REG#1 REG#4
+call ??1CBtHidExtRoot@@UAE@XZ
+jz short loc_10001068
+
+1191995747:
+mov REG#1 REG#4
+call ??1CBtHidExtRoot@@UAE@XZ
+jz short loc_10001068
+push REG#4
+
+1408953764:
+call ??1CBtHidExtRoot@@UAE@XZ
+jz short loc_10001068
+push REG#4
+call ??3@YAXPAX@Z
+
+1329374292:
+jz short loc_10001068
+push REG#4
+call ??3@YAXPAX@Z
+pop REG#1
+
+1329374292:
+jz short loc_10001068
+push REG#4
+call ??3@YAXPAX@Z
+pop REG#1
+
+818706383:
+push REG#4
+call ??3@YAXPAX@Z
+pop REG#1
+mov REG#0 REG#4
+
+656574813:
+call ??3@YAXPAX@Z
+pop REG#1
+mov REG#0 REG#4
+
+3850010616:
+pop REG#1
+mov REG#0 REG#4
+pop REG#4
+
+3884824704:
+mov REG#0 REG#4
+pop REG#4
+pop REG#2
+
+3884824704:
+mov REG#0 REG#4
+pop REG#4
+pop REG#2
+
+3233987215:
+pop REG#4
+pop REG#2
+
+3233987215:
+pop REG#4
+pop REG#2
+
+2613135642:
+pop REG#2
+
+72516597:
+mov REG#0 lParam
+push REG#4
+push VAL#4
+
+1063264866:
+mov REG#0 lParam
+push REG#4
+push VAL#4
+add REG#0 VAL#5
+
+567878131:
+mov REG#0 lParam
+push REG#4
+push VAL#4
+add REG#0 VAL#5
+push offset dword_100114B8
+
+594776245:
+push REG#4
+push VAL#4
+add REG#0 VAL#5
+push offset dword_100114B8
+push REG#0
+
+3579450731:
+push VAL#4
+add REG#0 VAL#5
+push offset dword_100114B8
+push REG#0
+call memcpy
+
+3960493605:
+add REG#0 VAL#5
+push offset dword_100114B8
+push REG#0
+call memcpy
+mov REG#0 lParam
+
+3429316950:
+push offset dword_100114B8
+push REG#0
+call memcpy
+mov REG#0 lParam
+mov REG#6 MEM#7
+
+22755763:
+push REG#0
+call memcpy
+mov REG#0 lParam
+mov REG#6 MEM#7
+push VAL#6
+
+2144065250:
+call memcpy
+mov REG#0 lParam
+mov REG#6 MEM#7
+push VAL#6
+push MEM#8
+
+1746192462:
+mov REG#0 lParam
+mov REG#6 MEM#7
+push VAL#6
+push MEM#8
+mov MEM#9 REG#6
+
+3260285994:
+mov REG#6 MEM#7
+push VAL#6
+push MEM#8
+mov MEM#9 REG#6
+mov REG#0 lParam
+
+3142205117:
+push VAL#6
+push MEM#8
+mov MEM#9 REG#6
+mov REG#0 lParam
+add REG#0 VAL#7
+
+1645625027:
+push MEM#8
+mov MEM#9 REG#6
+mov REG#0 lParam
+add REG#0 VAL#7
+push REG#0
+
+42433008:
+mov MEM#9 REG#6
+mov REG#0 lParam
+add REG#0 VAL#7
+push REG#0
+call memcpy
+
+1808206178:
+mov REG#0 lParam
+add REG#0 VAL#7
+push REG#0
+call memcpy
+add REG#7 VAL#8
+
+916777784:
+add REG#0 VAL#7
+push REG#0
+call memcpy
+add REG#7 VAL#8
+mov REG#4 offset dword_100186A0
+
+632243702:
+push REG#0
+call memcpy
+add REG#7 VAL#8
+mov REG#4 offset dword_100186A0
+
+3143267622:
+call memcpy
+add REG#7 VAL#8
+mov REG#4 offset dword_100186A0
+mov REG#0 MEM#10
+
+753387769:
+add REG#7 VAL#8
+mov REG#4 offset dword_100186A0
+mov REG#0 MEM#10
+
+2699200941:
+mov REG#4 offset dword_100186A0
+mov REG#0 MEM#10
+jz short loc_100010CF
+
+2638019229:
+mov REG#0 MEM#10
+jz short loc_100010CF
+mov REG#1 MEM#11
+
+2638019229:
+mov REG#0 MEM#10
+jz short loc_100010CF
+mov REG#1 MEM#11
+
+1948731174:
+jz short loc_100010CF
+mov REG#1 MEM#11
+jz short loc_100010CF
+
+113092015:
+jz short loc_100010CF
+mov REG#1 MEM#11
+jz short loc_100010CF
+push lParam
+
+2092363104:
+mov REG#1 MEM#11
+jz short loc_100010CF
+push lParam
+push VAL#9
+
+1664840870:
+jz short loc_100010CF
+push lParam
+push VAL#9
+push dword ptr MEM#12
+
+1063806831:
+jz short loc_100010CF
+push lParam
+push VAL#9
+push dword ptr MEM#12
+push REG#1
+
+2130556505:
+push lParam
+push VAL#9
+push dword ptr MEM#12
+push REG#1
+call ds:PostMessageA
+
+968839416:
+push VAL#9
+push dword ptr MEM#12
+push REG#1
+call ds:PostMessageA
+
+3119359824:
+push dword ptr MEM#12
+push REG#1
+call ds:PostMessageA
+add REG#4 VAL#0
+
+934480045:
+push REG#1
+call ds:PostMessageA
+add REG#4 VAL#0
+cmp REG#4 offset dword_100186E0
+
+3342455036:
+call ds:PostMessageA
+add REG#4 VAL#0
+cmp REG#4 offset dword_100186E0
+jb short loc_100010AD
+
+3848780455:
+add REG#4 VAL#0
+cmp REG#4 offset dword_100186E0
+jb short loc_100010AD
+add lParam VAL#10
+
+1257370553:
+add REG#4 VAL#0
+cmp REG#4 offset dword_100186E0
+jb short loc_100010AD
+add lParam VAL#10
+mov REG#0 lParam
+
+2159375894:
+cmp REG#4 offset dword_100186E0
+jb short loc_100010AD
+add lParam VAL#10
+mov REG#0 lParam
+add REG#0 VAL#10
+
+3245392020:
+jb short loc_100010AD
+add lParam VAL#10
+mov REG#0 lParam
+add REG#0 VAL#10
+pop REG#4
+
+1736824992:
+add lParam VAL#10
+mov REG#0 lParam
+add REG#0 VAL#10
+pop REG#4
+cmp REG#0 offset hEvent
+
+1869040619:
+mov REG#0 lParam
+add REG#0 VAL#10
+pop REG#4
+cmp REG#0 offset hEvent
+jbe short locret_100010FB
+
+2854604829:
+add REG#0 VAL#10
+pop REG#4
+cmp REG#0 offset hEvent
+jbe short locret_100010FB
+mov lParam offset dword_100186E0
+
+3055005263:
+pop REG#4
+cmp REG#0 offset hEvent
+jbe short locret_100010FB
+mov lParam offset dword_100186E0
+
+1399443209:
+cmp REG#0 offset hEvent
+jbe short locret_100010FB
+mov lParam offset dword_100186E0
+
+1310146711:
+jbe short locret_100010FB
+mov lParam offset dword_100186E0
+
+1221350507:
+mov lParam offset dword_100186E0
+
+4057905292:
+push REG#8
+
+2463307425:
+push REG#8
+mov REG#8 REG#7
+
+3462362386:
+push REG#8
+mov REG#8 REG#7
+call _IsNT@0
+
+1037267856:
+push REG#8
+mov REG#8 REG#7
+call _IsNT@0
+cmp REG#0 VAL#3
+
+4281051890:
+push REG#8
+mov REG#8 REG#7
+call _IsNT@0
+cmp REG#0 VAL#3
+jnz short loc_60001104
+
+190900809:
+mov REG#8 REG#7
+call _IsNT@0
+cmp REG#0 VAL#3
+jnz short loc_60001104
+mov REG#0 MEM#13
+
+2679800215:
+call _IsNT@0
+cmp REG#0 VAL#3
+jnz short loc_60001104
+mov REG#0 MEM#13
+push REG#0
+
+623218310:
+cmp REG#0 VAL#3
+jnz short loc_60001104
+mov REG#0 MEM#13
+push REG#0
+mov REG#1 MEM#14
+
+2384836137:
+jnz short loc_60001104
+mov REG#0 MEM#13
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+
+4087086936:
+mov REG#0 MEM#13
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+mov REG#9 MEM#15
+
+657156890:
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+mov REG#9 MEM#15
+push REG#9
+
+3084709502:
+mov REG#1 MEM#14
+push REG#1
+mov REG#9 MEM#15
+push REG#9
+mov REG#0 MEM#16
+
+657156890:
+push REG#1
+mov REG#9 MEM#15
+push REG#9
+mov REG#0 MEM#16
+push REG#0
+
+1548191083:
+mov REG#9 MEM#15
+push REG#9
+mov REG#0 MEM#16
+push REG#0
+call sub_60005DD0
+
+228731764:
+push REG#9
+mov REG#0 MEM#16
+push REG#0
+call sub_60005DD0
+jmp short loc_60001119
+
+970337549:
+mov REG#0 MEM#16
+push REG#0
+call sub_60005DD0
+jmp short loc_60001119
+
+1927435352:
+push REG#0
+call sub_60005DD0
+jmp short loc_60001119
+mov REG#1 MEM#13
+
+3606293721:
+call sub_60005DD0
+jmp short loc_60001119
+mov REG#1 MEM#13
+push REG#1
+
+1913558902:
+jmp short loc_60001119
+mov REG#1 MEM#13
+push REG#1
+mov REG#9 MEM#14
+
+3951788083:
+mov REG#1 MEM#13
+push REG#1
+mov REG#9 MEM#14
+push REG#9
+
+3084709502:
+mov REG#1 MEM#13
+push REG#1
+mov REG#9 MEM#14
+push REG#9
+mov REG#0 MEM#15
+
+657156890:
+push REG#1
+mov REG#9 MEM#14
+push REG#9
+mov REG#0 MEM#15
+push REG#0
+
+912318821:
+mov REG#9 MEM#14
+push REG#9
+mov REG#0 MEM#15
+push REG#0
+mov REG#1 MEM#16
+
+657156890:
+push REG#9
+mov REG#0 MEM#15
+push REG#0
+mov REG#1 MEM#16
+push REG#1
+
+229323514:
+mov REG#0 MEM#15
+push REG#0
+mov REG#1 MEM#16
+push REG#1
+call sub_60001120
+
+2147796601:
+push REG#0
+mov REG#1 MEM#16
+push REG#1
+call sub_60001120
+
+3021280514:
+mov REG#1 MEM#16
+push REG#1
+call sub_60001120
+pop REG#8
+
+449078812:
+push REG#1
+call sub_60001120
+pop REG#8
+
+2269651600:
+call sub_60001120
+pop REG#8
+
+2613135632:
+pop REG#8
+
+2613135632:
+pop REG#8
+
+4057905292:
+push REG#8
+
+2463307425:
+push REG#8
+mov REG#8 REG#7
+
+1273902510:
+push REG#8
+mov REG#8 REG#7
+sub REG#7 VAL#18
+
+4106802410:
+push REG#8
+mov REG#8 REG#7
+sub REG#7 VAL#18
+mov REG#0 MEM#13
+
+1222854887:
+push REG#8
+mov REG#8 REG#7
+sub REG#7 VAL#18
+mov REG#0 MEM#13
+push REG#0
+
+2237306800:
+mov REG#8 REG#7
+sub REG#7 VAL#18
+mov REG#0 MEM#13
+push REG#0
+mov REG#1 MEM#14
+
+356281720:
+sub REG#7 VAL#18
+mov REG#0 MEM#13
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+
+397099772:
+mov REG#0 MEM#13
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+call ds:IsBadWritePtr
+
+2880096726:
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+call ds:IsBadWritePtr
+cmp REG#0 VAL#3
+
+1759003285:
+mov REG#1 MEM#14
+push REG#1
+call ds:IsBadWritePtr
+cmp REG#0 VAL#3
+jnz short loc_6000114B
+
+3773553197:
+push REG#1
+call ds:IsBadWritePtr
+cmp REG#0 VAL#3
+jnz short loc_6000114B
+push VAL#19
+
+2039395866:
+call ds:IsBadWritePtr
+cmp REG#0 VAL#3
+jnz short loc_6000114B
+push VAL#19
+call ds:SetLastError
+
+1850927789:
+cmp REG#0 VAL#3
+jnz short loc_6000114B
+push VAL#19
+call ds:SetLastError
+xor REG#0 REG#0
+
+1253731684:
+jnz short loc_6000114B
+push VAL#19
+call ds:SetLastError
+xor REG#0 REG#0
+jmp loc_6000126B
+
+2209391185:
+push VAL#19
+call ds:SetLastError
+xor REG#0 REG#0
+jmp loc_6000126B
+
+1581274544:
+call ds:SetLastError
+xor REG#0 REG#0
+jmp loc_6000126B
+push VAL#20
+
+586376354:
+xor REG#0 REG#0
+jmp loc_6000126B
+push VAL#20
+lea REG#9 MEM#17
+
+1263482415:
+jmp loc_6000126B
+push VAL#20
+lea REG#9 MEM#17
+push REG#9
+
+3819584239:
+push VAL#20
+lea REG#9 MEM#17
+push REG#9
+mov REG#0 MEM#15
+
+1652033116:
+push VAL#20
+lea REG#9 MEM#17
+push REG#9
+mov REG#0 MEM#15
+push REG#0
+
+1687096272:
+lea REG#9 MEM#17
+push REG#9
+mov REG#0 MEM#15
+push REG#0
+call ds:GetModuleFileNameA
+
+2498725391:
+push REG#9
+mov REG#0 MEM#15
+push REG#0
+call ds:GetModuleFileNameA
+mov MEM#18 REG#0
+
+4003300969:
+mov REG#0 MEM#15
+push REG#0
+call ds:GetModuleFileNameA
+mov MEM#18 REG#0
+cmp MEM#18 VAL#21
+
+2074151248:
+push REG#0
+call ds:GetModuleFileNameA
+mov MEM#18 REG#0
+cmp MEM#18 VAL#21
+jnz short loc_60001171
+
+3038249449:
+call ds:GetModuleFileNameA
+mov MEM#18 REG#0
+cmp MEM#18 VAL#21
+jnz short loc_60001171
+xor REG#0 REG#0
+
+961802940:
+mov MEM#18 REG#0
+cmp MEM#18 VAL#21
+jnz short loc_60001171
+xor REG#0 REG#0
+jmp loc_6000126B
+
+3774082657:
+cmp MEM#18 VAL#21
+jnz short loc_60001171
+xor REG#0 REG#0
+jmp loc_6000126B
+
+3916794850:
+jnz short loc_60001171
+xor REG#0 REG#0
+jmp loc_6000126B
+push VAL#22
+
+586376354:
+xor REG#0 REG#0
+jmp loc_6000126B
+push VAL#22
+lea REG#1 MEM#17
+
+1263482415:
+jmp loc_6000126B
+push VAL#22
+lea REG#1 MEM#17
+push REG#1
+
+3194575228:
+push VAL#22
+lea REG#1 MEM#17
+push REG#1
+call sub_60001500
+
+1925029268:
+push VAL#22
+lea REG#1 MEM#17
+push REG#1
+call sub_60001500
+add REG#7 VAL#2
+
+2135073333:
+lea REG#1 MEM#17
+push REG#1
+call sub_60001500
+add REG#7 VAL#2
+mov MEM#19 REG#0
+
+600113584:
+push REG#1
+call sub_60001500
+add REG#7 VAL#2
+mov MEM#19 REG#0
+cmp MEM#19 VAL#21
+
+2750849583:
+call sub_60001500
+add REG#7 VAL#2
+mov MEM#19 REG#0
+cmp MEM#19 VAL#21
+jz short loc_600011FC
+
+2050197424:
+add REG#7 VAL#2
+mov MEM#19 REG#0
+cmp MEM#19 VAL#21
+jz short loc_600011FC
+mov REG#9 MEM#19
+
+2541069151:
+mov MEM#19 REG#0
+cmp MEM#19 VAL#21
+jz short loc_600011FC
+mov REG#9 MEM#19
+add REG#9 VAL#3
+
+3356189733:
+cmp MEM#19 VAL#21
+jz short loc_600011FC
+mov REG#9 MEM#19
+add REG#9 VAL#3
+mov MEM#19 REG#9
+
+4202478421:
+jz short loc_600011FC
+mov REG#9 MEM#19
+add REG#9 VAL#3
+mov MEM#19 REG#9
+mov REG#0 MEM#19
+
+2026648758:
+mov REG#9 MEM#19
+add REG#9 VAL#3
+mov MEM#19 REG#9
+mov REG#0 MEM#19
+push REG#0
+
+1870288196:
+add REG#9 VAL#3
+mov MEM#19 REG#9
+mov REG#0 MEM#19
+push REG#0
+call ds:lstrlenA
+
+1931408360:
+mov MEM#19 REG#9
+mov REG#0 MEM#19
+push REG#0
+call ds:lstrlenA
+add REG#0 VAL#3
+
+2268787392:
+mov REG#0 MEM#19
+push REG#0
+call ds:lstrlenA
+add REG#0 VAL#3
+cmp MEM#13 REG#0
+
+992593787:
+push REG#0
+call ds:lstrlenA
+add REG#0 VAL#3
+cmp MEM#13 REG#0
+jge short loc_600011C0
+
+750911674:
+call ds:lstrlenA
+add REG#0 VAL#3
+cmp MEM#13 REG#0
+jge short loc_600011C0
+mov REG#1 MEM#13
+
+3735377688:
+add REG#0 VAL#3
+cmp MEM#13 REG#0
+jge short loc_600011C0
+mov REG#1 MEM#13
+mov MEM#20 REG#1
+
+1934094295:
+cmp MEM#13 REG#0
+jge short loc_600011C0
+mov REG#1 MEM#13
+mov MEM#20 REG#1
+jmp short loc_600011D6
+
+3611646404:
+jge short loc_600011C0
+mov REG#1 MEM#13
+mov MEM#20 REG#1
+jmp short loc_600011D6
+
+953418514:
+mov REG#1 MEM#13
+mov MEM#20 REG#1
+jmp short loc_600011D6
+mov REG#9 MEM#19
+
+3470542398:
+mov MEM#20 REG#1
+jmp short loc_600011D6
+mov REG#9 MEM#19
+push REG#9
+
+1236415599:
+jmp short loc_600011D6
+mov REG#9 MEM#19
+push REG#9
+call ds:lstrlenA
+
+1528601610:
+mov REG#9 MEM#19
+push REG#9
+call ds:lstrlenA
+add REG#0 VAL#3
+
+561576901:
+mov REG#9 MEM#19
+push REG#9
+call ds:lstrlenA
+add REG#0 VAL#3
+mov MEM#20 REG#0
+
+728291959:
+push REG#9
+call ds:lstrlenA
+add REG#0 VAL#3
+mov MEM#20 REG#0
+
+2212920795:
+call ds:lstrlenA
+add REG#0 VAL#3
+mov MEM#20 REG#0
+mov REG#0 MEM#20
+
+3337810270:
+add REG#0 VAL#3
+mov MEM#20 REG#0
+mov REG#0 MEM#20
+mov MEM#21 REG#0
+
+2383127990:
+mov MEM#20 REG#0
+mov REG#0 MEM#20
+mov MEM#21 REG#0
+mov REG#1 MEM#21
+
+1935223217:
+mov REG#0 MEM#20
+mov MEM#21 REG#0
+mov REG#1 MEM#21
+push REG#1
+
+676395703:
+mov REG#0 MEM#20
+mov MEM#21 REG#0
+mov REG#1 MEM#21
+push REG#1
+mov REG#9 MEM#19
+
+3733325233:
+mov MEM#21 REG#0
+mov REG#1 MEM#21
+push REG#1
+mov REG#9 MEM#19
+push REG#9
+
+3084709502:
+mov REG#1 MEM#21
+push REG#1
+mov REG#9 MEM#19
+push REG#9
+mov REG#0 MEM#14
+
+657156890:
+push REG#1
+mov REG#9 MEM#19
+push REG#9
+mov REG#0 MEM#14
+push REG#0
+
+1833410655:
+mov REG#9 MEM#19
+push REG#9
+mov REG#0 MEM#14
+push REG#0
+call ds:lstrcpynA
+
+2685201144:
+push REG#9
+mov REG#0 MEM#14
+push REG#0
+call ds:lstrcpynA
+jmp short loc_60001256
+
+73293798:
+mov REG#0 MEM#14
+push REG#0
+call ds:lstrcpynA
+jmp short loc_60001256
+
+1316263896:
+push REG#0
+call ds:lstrcpynA
+jmp short loc_60001256
+lea REG#1 MEM#17
+
+2374837612:
+call ds:lstrcpynA
+jmp short loc_60001256
+lea REG#1 MEM#17
+push REG#1
+
+969253607:
+jmp short loc_60001256
+lea REG#1 MEM#17
+push REG#1
+call ds:lstrlenA
+
+4146884067:
+lea REG#1 MEM#17
+push REG#1
+call ds:lstrlenA
+add REG#0 VAL#3
+
+1097894430:
+lea REG#1 MEM#17
+push REG#1
+call ds:lstrlenA
+add REG#0 VAL#3
+cmp MEM#13 REG#0
+
+145780732:
+push REG#1
+call ds:lstrlenA
+add REG#0 VAL#3
+cmp MEM#13 REG#0
+jge short loc_6000121C
+
+1522682144:
+call ds:lstrlenA
+add REG#0 VAL#3
+cmp MEM#13 REG#0
+jge short loc_6000121C
+mov REG#9 MEM#13
+
+3735377688:
+add REG#0 VAL#3
+cmp MEM#13 REG#0
+jge short loc_6000121C
+mov REG#9 MEM#13
+mov MEM#22 REG#9
+
+1934094295:
+cmp MEM#13 REG#0
+jge short loc_6000121C
+mov REG#9 MEM#13
+mov MEM#22 REG#9
+jmp short loc_60001232
+
+3611646404:
+jge short loc_6000121C
+mov REG#9 MEM#13
+mov MEM#22 REG#9
+jmp short loc_60001232
+
+289579436:
+mov REG#9 MEM#13
+mov MEM#22 REG#9
+jmp short loc_60001232
+lea REG#0 MEM#17
+
+2461603767:
+mov MEM#22 REG#9
+jmp short loc_60001232
+lea REG#0 MEM#17
+push REG#0
+
+2842390818:
+jmp short loc_60001232
+lea REG#0 MEM#17
+push REG#0
+call ds:lstrlenA
+
+4146884067:
+lea REG#0 MEM#17
+push REG#0
+call ds:lstrlenA
+add REG#0 VAL#3
+
+3363143907:
+lea REG#0 MEM#17
+push REG#0
+call ds:lstrlenA
+add REG#0 VAL#3
+mov MEM#22 REG#0
+
+728291959:
+push REG#0
+call ds:lstrlenA
+add REG#0 VAL#3
+mov MEM#22 REG#0
+
+2112242861:
+call ds:lstrlenA
+add REG#0 VAL#3
+mov MEM#22 REG#0
+mov REG#1 MEM#22
+
+3337810270:
+add REG#0 VAL#3
+mov MEM#22 REG#0
+mov REG#1 MEM#22
+mov MEM#21 REG#1
+
+839734259:
+mov MEM#22 REG#0
+mov REG#1 MEM#22
+mov MEM#21 REG#1
+mov REG#9 MEM#21
+
+2204945049:
+mov REG#1 MEM#22
+mov MEM#21 REG#1
+mov REG#9 MEM#21
+push REG#9
+
+172301000:
+mov REG#1 MEM#22
+mov MEM#21 REG#1
+mov REG#9 MEM#21
+push REG#9
+lea REG#0 MEM#17
+
+3733325233:
+mov MEM#21 REG#1
+mov REG#9 MEM#21
+push REG#9
+lea REG#0 MEM#17
+push REG#0
+
+912318821:
+mov REG#9 MEM#21
+push REG#9
+lea REG#0 MEM#17
+push REG#0
+mov REG#1 MEM#14
+
+657156890:
+push REG#9
+lea REG#0 MEM#17
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+
+543293793:
+lea REG#0 MEM#17
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+call ds:lstrcpynA
+
+1124361770:
+push REG#0
+mov REG#1 MEM#14
+push REG#1
+call ds:lstrcpynA
+
+1795219123:
+mov REG#1 MEM#14
+push REG#1
+call ds:lstrcpynA
+mov REG#9 MEM#14
+
+2778076311:
+push REG#1
+call ds:lstrcpynA
+mov REG#9 MEM#14
+add REG#9 MEM#21
+
+465713563:
+call ds:lstrcpynA
+mov REG#9 MEM#14
+add REG#9 MEM#21
+mov byte ptr MEM#23 VAL#21
+
+843913535:
+mov REG#9 MEM#14
+add REG#9 MEM#21
+mov byte ptr MEM#23 VAL#21
+mov REG#0 MEM#21
+
+2064144219:
+mov REG#9 MEM#14
+add REG#9 MEM#21
+mov byte ptr MEM#23 VAL#21
+mov REG#0 MEM#21
+sub REG#0 VAL#3
+
+1323745706:
+add REG#9 MEM#21
+mov byte ptr MEM#23 VAL#21
+mov REG#0 MEM#21
+sub REG#0 VAL#3
+
+129799146:
+mov byte ptr MEM#23 VAL#21
+mov REG#0 MEM#21
+sub REG#0 VAL#3
+mov REG#7 REG#8
+
+566702030:
+mov REG#0 MEM#21
+sub REG#0 VAL#3
+mov REG#7 REG#8
+pop REG#8
+
+2648451549:
+sub REG#0 VAL#3
+mov REG#7 REG#8
+pop REG#8
+
+3143093291:
+mov REG#7 REG#8
+pop REG#8
+
+3143093291:
+mov REG#7 REG#8
+pop REG#8
+
+2613135632:
+pop REG#8
+
+4057905292:
+push REG#8
+
+2463307425:
+push REG#8
+mov REG#8 REG#7
+
+1273902510:
+push REG#8
+mov REG#8 REG#7
+sub REG#7 VAL#29
+
+3039463698:
+push REG#8
+mov REG#8 REG#7
+sub REG#7 VAL#29
+call _IsNT@0
+
+1975182199:
+push REG#8
+mov REG#8 REG#7
+sub REG#7 VAL#29
+call _IsNT@0
+cmp REG#0 VAL#3
+
+3356837305:
+mov REG#8 REG#7
+sub REG#7 VAL#29
+call _IsNT@0
+cmp REG#0 VAL#3
+jz short loc_60001299
+
+1293576354:
+sub REG#7 VAL#29
+call _IsNT@0
+cmp REG#0 VAL#3
+jz short loc_60001299
+cmp MEM#24 VAL#21
+
+1317302902:
+call _IsNT@0
+cmp REG#0 VAL#3
+jz short loc_60001299
+cmp MEM#24 VAL#21
+jnz short loc_600012B5
+
+2591690116:
+cmp REG#0 VAL#3
+jz short loc_60001299
+cmp MEM#24 VAL#21
+jnz short loc_600012B5
+
+2449941394:
+jz short loc_60001299
+cmp MEM#24 VAL#21
+jnz short loc_600012B5
+mov REG#0 MEM#24
+
+2651336281:
+cmp MEM#24 VAL#21
+jnz short loc_600012B5
+mov REG#0 MEM#24
+push REG#0
+
+4091942255:
+jnz short loc_600012B5
+mov REG#0 MEM#24
+push REG#0
+mov REG#1 MEM#25
+
+1840068504:
+mov REG#0 MEM#24
+push REG#0
+mov REG#1 MEM#25
+push REG#1
+
+4087086936:
+mov REG#0 MEM#24
+push REG#0
+mov REG#1 MEM#25
+push REG#1
+mov REG#9 MEM#26
+
+657156890:
+push REG#0
+mov REG#1 MEM#25
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+
+451609014:
+mov REG#1 MEM#25
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+call ds:SymInitialize
+
+1908045632:
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+call ds:SymInitialize
+jmp loc_600014AA
+
+3589974158:
+mov REG#9 MEM#26
+push REG#9
+call ds:SymInitialize
+jmp loc_600014AA
+jmp loc_600014A5
+
+582941040:
+push REG#9
+call ds:SymInitialize
+jmp loc_600014AA
+jmp loc_600014A5
+
+4245302830:
+call ds:SymInitialize
+jmp loc_600014AA
+jmp loc_600014A5
+mov REG#0 MEM#24
+
+4210465734:
+jmp loc_600014AA
+jmp loc_600014A5
+mov REG#0 MEM#24
+push REG#0
+
+3134019525:
+jmp loc_600014A5
+mov REG#0 MEM#24
+push REG#0
+mov REG#1 MEM#25
+
+1840068504:
+mov REG#0 MEM#24
+push REG#0
+mov REG#1 MEM#25
+push REG#1
+
+4087086936:
+mov REG#0 MEM#24
+push REG#0
+mov REG#1 MEM#25
+push REG#1
+mov REG#9 MEM#26
+
+657156890:
+push REG#0
+mov REG#1 MEM#25
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+
+451609014:
+mov REG#1 MEM#25
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+call ds:SymInitialize
+
+1908045602:
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+call ds:SymInitialize
+mov MEM#27 REG#0
+
+2944537106:
+mov REG#9 MEM#26
+push REG#9
+call ds:SymInitialize
+mov MEM#27 REG#0
+cmp MEM#27 VAL#21
+
+97411413:
+push REG#9
+call ds:SymInitialize
+mov MEM#27 REG#0
+cmp MEM#27 VAL#21
+jnz short loc_600012DD
+
+1809669716:
+call ds:SymInitialize
+mov MEM#27 REG#0
+cmp MEM#27 VAL#21
+jnz short loc_600012DD
+xor REG#0 REG#0
+
+961802940:
+mov MEM#27 REG#0
+cmp MEM#27 VAL#21
+jnz short loc_600012DD
+xor REG#0 REG#0
+jmp loc_600014AA
+
+1277106989:
+cmp MEM#27 VAL#21
+jnz short loc_600012DD
+xor REG#0 REG#0
+jmp loc_600014AA
+
+3775857255:
+jnz short loc_600012DD
+xor REG#0 REG#0
+jmp loc_600014AA
+lea REG#0 MEM#18
+
+3604024754:
+xor REG#0 REG#0
+jmp loc_600014AA
+lea REG#0 MEM#18
+push REG#0
+
+1518716116:
+jmp loc_600014AA
+lea REG#0 MEM#18
+push REG#0
+push VAL#21
+
+1600903347:
+lea REG#0 MEM#18
+push REG#0
+push VAL#21
+push VAL#21
+
+4104720865:
+lea REG#0 MEM#18
+push REG#0
+push VAL#21
+push VAL#21
+mov REG#1 MEM#28
+
+494025217:
+push REG#0
+push VAL#21
+push VAL#21
+mov REG#1 MEM#28
+push REG#1
+
+2662710882:
+push VAL#21
+push VAL#21
+mov REG#1 MEM#28
+push REG#1
+call _GetLoadedModules@16
+
+3116706772:
+push VAL#21
+mov REG#1 MEM#28
+push REG#1
+call _GetLoadedModules@16
+
+298678490:
+mov REG#1 MEM#28
+push REG#1
+call _GetLoadedModules@16
+jnz short loc_60001303
+
+1834864338:
+push REG#1
+call _GetLoadedModules@16
+jnz short loc_60001303
+mov REG#9 MEM#26
+
+4017796802:
+call _GetLoadedModules@16
+jnz short loc_60001303
+mov REG#9 MEM#26
+push REG#9
+
+3232459494:
+jnz short loc_60001303
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+
+2762787382:
+jnz short loc_60001303
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+xor REG#0 REG#0
+
+3979389863:
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+xor REG#0 REG#0
+jmp loc_600014AA
+
+2695643069:
+push REG#9
+call ds:SymCleanup
+xor REG#0 REG#0
+jmp loc_600014AA
+
+3109543682:
+call ds:SymCleanup
+xor REG#0 REG#0
+jmp loc_600014AA
+xor REG#1 REG#1
+
+3403582129:
+xor REG#0 REG#0
+jmp loc_600014AA
+xor REG#1 REG#1
+mov REG#0 MEM#18
+
+1304016148:
+jmp loc_600014AA
+xor REG#1 REG#1
+mov REG#0 MEM#18
+mov REG#9 VAL#0
+
+792615791:
+xor REG#1 REG#1
+mov REG#0 MEM#18
+mov REG#9 VAL#0
+mul REG#9
+
+792615791:
+xor REG#1 REG#1
+mov REG#0 MEM#18
+mov REG#9 VAL#0
+mul REG#9
+
+2145057370:
+mov REG#0 MEM#18
+mov REG#9 VAL#0
+mul REG#9
+neg REG#1
+
+2138970757:
+mov REG#9 VAL#0
+mul REG#9
+neg REG#1
+or REG#1 REG#0
+
+3982812121:
+mul REG#9
+neg REG#1
+or REG#1 REG#0
+push REG#1
+
+3533392115:
+neg REG#1
+or REG#1 REG#0
+push REG#1
+call unknown_libname_6
+
+2048908306:
+neg REG#1
+or REG#1 REG#0
+push REG#1
+call unknown_libname_6
+add REG#7 VAL#0
+
+2762627955:
+or REG#1 REG#0
+push REG#1
+call unknown_libname_6
+add REG#7 VAL#0
+mov MEM#29 REG#0
+
+3264056291:
+push REG#1
+call unknown_libname_6
+add REG#7 VAL#0
+mov MEM#29 REG#0
+mov REG#0 MEM#29
+
+1592470469:
+call unknown_libname_6
+add REG#7 VAL#0
+mov MEM#29 REG#0
+mov REG#0 MEM#29
+mov MEM#30 REG#0
+
+1172407881:
+add REG#7 VAL#0
+mov MEM#29 REG#0
+mov REG#0 MEM#29
+mov MEM#30 REG#0
+lea REG#1 MEM#18
+
+237795958:
+mov MEM#29 REG#0
+mov REG#0 MEM#29
+mov MEM#30 REG#0
+lea REG#1 MEM#18
+push REG#1
+
+3172618438:
+mov REG#0 MEM#29
+mov MEM#30 REG#0
+lea REG#1 MEM#18
+push REG#1
+mov REG#9 MEM#30
+
+3965381903:
+mov MEM#30 REG#0
+lea REG#1 MEM#18
+push REG#1
+mov REG#9 MEM#30
+push REG#9
+
+2051082377:
+lea REG#1 MEM#18
+push REG#1
+mov REG#9 MEM#30
+push REG#9
+mov REG#0 MEM#18
+
+657156890:
+push REG#1
+mov REG#9 MEM#30
+push REG#9
+mov REG#0 MEM#18
+push REG#0
+
+912318821:
+mov REG#9 MEM#30
+push REG#9
+mov REG#0 MEM#18
+push REG#0
+mov REG#1 MEM#28
+
+657156890:
+push REG#9
+mov REG#0 MEM#18
+push REG#0
+mov REG#1 MEM#28
+push REG#1
+
+3058244833:
+mov REG#0 MEM#18
+push REG#0
+mov REG#1 MEM#28
+push REG#1
+call _GetLoadedModules@16
+
+572781793:
+push REG#0
+mov REG#1 MEM#28
+push REG#1
+call _GetLoadedModules@16
+
+298678490:
+mov REG#1 MEM#28
+push REG#1
+call _GetLoadedModules@16
+jnz short loc_60001379
+
+1834864338:
+push REG#1
+call _GetLoadedModules@16
+jnz short loc_60001379
+mov REG#9 MEM#26
+
+4017796802:
+call _GetLoadedModules@16
+jnz short loc_60001379
+mov REG#9 MEM#26
+push REG#9
+
+3232459494:
+jnz short loc_60001379
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+
+2829897978:
+jnz short loc_60001379
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+mov REG#0 MEM#30
+
+2368738372:
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+mov REG#0 MEM#30
+mov MEM#31 REG#0
+
+1451178490:
+push REG#9
+call ds:SymCleanup
+mov REG#0 MEM#30
+mov MEM#31 REG#0
+mov REG#1 MEM#31
+
+3094425200:
+call ds:SymCleanup
+mov REG#0 MEM#30
+mov MEM#31 REG#0
+mov REG#1 MEM#31
+push REG#1
+
+2070360758:
+mov REG#0 MEM#30
+mov MEM#31 REG#0
+mov REG#1 MEM#31
+push REG#1
+call ??_V@YAXPAX@Z
+
+4167200314:
+mov MEM#31 REG#0
+mov REG#1 MEM#31
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+
+444625815:
+mov REG#1 MEM#31
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+
+2042214549:
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp loc_600014AA
+
+64063217:
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp loc_600014AA
+
+360968334:
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp loc_600014AA
+mov MEM#20 VAL#21
+
+3599764795:
+xor REG#0 REG#0
+jmp loc_600014AA
+mov MEM#20 VAL#21
+jmp short loc_60001394
+
+3082187690:
+jmp loc_600014AA
+mov MEM#20 VAL#21
+jmp short loc_60001394
+
+3735244806:
+mov MEM#20 VAL#21
+jmp short loc_60001394
+mov REG#9 MEM#20
+
+4031624087:
+mov MEM#20 VAL#21
+jmp short loc_60001394
+mov REG#9 MEM#20
+add REG#9 VAL#3
+
+1004730911:
+jmp short loc_60001394
+mov REG#9 MEM#20
+add REG#9 VAL#3
+mov MEM#20 REG#9
+
+374995025:
+mov REG#9 MEM#20
+add REG#9 VAL#3
+mov MEM#20 REG#9
+
+877629388:
+mov REG#9 MEM#20
+add REG#9 VAL#3
+mov MEM#20 REG#9
+mov REG#0 MEM#20
+
+3438475944:
+add REG#9 VAL#3
+mov MEM#20 REG#9
+mov REG#0 MEM#20
+cmp REG#0 MEM#18
+
+3871983052:
+mov MEM#20 REG#9
+mov REG#0 MEM#20
+cmp REG#0 MEM#18
+jnb loc_6000148A
+
+3538284063:
+mov REG#0 MEM#20
+cmp REG#0 MEM#18
+jnb loc_6000148A
+push VAL#20
+
+191753190:
+mov REG#0 MEM#20
+cmp REG#0 MEM#18
+jnb loc_6000148A
+push VAL#20
+lea REG#1 MEM#32
+
+3682964303:
+cmp REG#0 MEM#18
+jnb loc_6000148A
+push VAL#20
+lea REG#1 MEM#32
+push REG#1
+
+2899086916:
+jnb loc_6000148A
+push VAL#20
+lea REG#1 MEM#32
+push REG#1
+mov REG#9 MEM#20
+
+3896136472:
+push VAL#20
+lea REG#1 MEM#32
+push REG#1
+mov REG#9 MEM#20
+mov REG#0 MEM#30
+
+3791453256:
+lea REG#1 MEM#32
+push REG#1
+mov REG#9 MEM#20
+mov REG#0 MEM#30
+mov REG#1 MEM#33
+
+1304473051:
+push REG#1
+mov REG#9 MEM#20
+mov REG#0 MEM#30
+mov REG#1 MEM#33
+push REG#1
+
+976690908:
+mov REG#9 MEM#20
+mov REG#0 MEM#30
+mov REG#1 MEM#33
+push REG#1
+call ds:GetModuleFileNameA
+
+3764045642:
+mov REG#0 MEM#30
+mov REG#1 MEM#33
+push REG#1
+call ds:GetModuleFileNameA
+
+3926595728:
+mov REG#1 MEM#33
+push REG#1
+call ds:GetModuleFileNameA
+jnz short loc_600013F5
+
+596078790:
+push REG#1
+call ds:GetModuleFileNameA
+jnz short loc_600013F5
+mov REG#9 MEM#26
+
+3134961862:
+call ds:GetModuleFileNameA
+jnz short loc_600013F5
+mov REG#9 MEM#26
+push REG#9
+
+3232459494:
+jnz short loc_600013F5
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+
+2829897978:
+jnz short loc_600013F5
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+mov REG#0 MEM#30
+
+2368738372:
+mov REG#9 MEM#26
+push REG#9
+call ds:SymCleanup
+mov REG#0 MEM#30
+mov MEM#34 REG#0
+
+1451178490:
+push REG#9
+call ds:SymCleanup
+mov REG#0 MEM#30
+mov MEM#34 REG#0
+mov REG#1 MEM#34
+
+503979575:
+call ds:SymCleanup
+mov REG#0 MEM#30
+mov MEM#34 REG#0
+mov REG#1 MEM#34
+push REG#1
+
+2070360758:
+mov REG#0 MEM#30
+mov MEM#34 REG#0
+mov REG#1 MEM#34
+push REG#1
+call ??_V@YAXPAX@Z
+
+1922967129:
+mov MEM#34 REG#0
+mov REG#1 MEM#34
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+
+444625815:
+mov REG#1 MEM#34
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+
+2042214549:
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp loc_600014AA
+
+64063217:
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp loc_600014AA
+
+2185009927:
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp loc_600014AA
+push VAL#21
+
+1380840636:
+xor REG#0 REG#0
+jmp loc_600014AA
+push VAL#21
+push VAL#21
+
+2863706546:
+jmp loc_600014AA
+push VAL#21
+push VAL#21
+push VAL#30
+
+943167847:
+push VAL#21
+push VAL#21
+push VAL#30
+push VAL#21
+
+1868088716:
+push VAL#21
+push VAL#21
+push VAL#30
+push VAL#21
+push VAL#3
+
+3967015359:
+push VAL#21
+push VAL#30
+push VAL#21
+push VAL#3
+push 80000000h
+
+604917518:
+push VAL#30
+push VAL#21
+push VAL#3
+push 80000000h
+lea REG#9 MEM#32
+
+585557960:
+push VAL#21
+push VAL#3
+push 80000000h
+lea REG#9 MEM#32
+push REG#9
+
+4131455108:
+push VAL#3
+push 80000000h
+lea REG#9 MEM#32
+push REG#9
+call ds:CreateFileA
+
+2785506731:
+push 80000000h
+lea REG#9 MEM#32
+push REG#9
+call ds:CreateFileA
+mov MEM#35 REG#0
+
+2598029123:
+lea REG#9 MEM#32
+push REG#9
+call ds:CreateFileA
+mov MEM#35 REG#0
+push VAL#21
+
+3969591203:
+push REG#9
+call ds:CreateFileA
+mov MEM#35 REG#0
+push VAL#21
+mov REG#0 MEM#20
+
+3357511275:
+call ds:CreateFileA
+mov MEM#35 REG#0
+push VAL#21
+mov REG#0 MEM#20
+mov REG#1 MEM#30
+
+2307725380:
+mov MEM#35 REG#0
+push VAL#21
+mov REG#0 MEM#20
+mov REG#1 MEM#30
+mov REG#9 MEM#36
+
+2617930745:
+push VAL#21
+mov REG#0 MEM#20
+mov REG#1 MEM#30
+mov REG#9 MEM#36
+push REG#9
+
+2582726459:
+mov REG#0 MEM#20
+mov REG#1 MEM#30
+mov REG#9 MEM#36
+push REG#9
+push VAL#21
+
+36843556:
+mov REG#1 MEM#30
+mov REG#9 MEM#36
+push REG#9
+push VAL#21
+lea REG#0 MEM#32
+
+1757147124:
+mov REG#9 MEM#36
+push REG#9
+push VAL#21
+lea REG#0 MEM#32
+push REG#0
+
+3329310698:
+push REG#9
+push VAL#21
+lea REG#0 MEM#32
+push REG#0
+mov REG#1 MEM#35
+
+1652033116:
+push VAL#21
+lea REG#0 MEM#32
+push REG#0
+mov REG#1 MEM#35
+push REG#1
+
+2037384399:
+lea REG#0 MEM#32
+push REG#0
+mov REG#1 MEM#35
+push REG#1
+mov REG#9 MEM#26
+
+657156890:
+push REG#0
+mov REG#1 MEM#35
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+
+451609016:
+mov REG#1 MEM#35
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+call ds:SymLoadModule
+
+3973207879:
+push REG#1
+mov REG#9 MEM#26
+push REG#9
+call ds:SymLoadModule
+
+1448884157:
+mov REG#9 MEM#26
+push REG#9
+call ds:SymLoadModule
+jnz short loc_60001485
+
+1866403359:
+push REG#9
+call ds:SymLoadModule
+jnz short loc_60001485
+call ds:GetLastError
+
+4085159856:
+call ds:SymLoadModule
+jnz short loc_60001485
+call ds:GetLastError
+mov MEM#37 REG#0
+
+1705742415:
+jnz short loc_60001485
+call ds:GetLastError
+mov MEM#37 REG#0
+cmp MEM#37 VAL#21
+
+2964673124:
+jnz short loc_60001485
+call ds:GetLastError
+mov MEM#37 REG#0
+cmp MEM#37 VAL#21
+jz short loc_60001485
+
+4233662631:
+call ds:GetLastError
+mov MEM#37 REG#0
+cmp MEM#37 VAL#21
+jz short loc_60001485
+mov REG#0 MEM#26
+
+1490305961:
+mov MEM#37 REG#0
+cmp MEM#37 VAL#21
+jz short loc_60001485
+mov REG#0 MEM#26
+push REG#0
+
+926624002:
+cmp MEM#37 VAL#21
+jz short loc_60001485
+mov REG#0 MEM#26
+push REG#0
+call ds:SymCleanup
+
+662319673:
+jz short loc_60001485
+mov REG#0 MEM#26
+push REG#0
+call ds:SymCleanup
+mov REG#1 MEM#30
+
+2368738372:
+mov REG#0 MEM#26
+push REG#0
+call ds:SymCleanup
+mov REG#1 MEM#30
+mov MEM#38 REG#1
+
+3203117973:
+push REG#0
+call ds:SymCleanup
+mov REG#1 MEM#30
+mov MEM#38 REG#1
+mov REG#9 MEM#38
+
+1732297620:
+call ds:SymCleanup
+mov REG#1 MEM#30
+mov MEM#38 REG#1
+mov REG#9 MEM#38
+push REG#9
+
+2070360758:
+mov REG#1 MEM#30
+mov MEM#38 REG#1
+mov REG#9 MEM#38
+push REG#9
+call ??_V@YAXPAX@Z
+
+4183181781:
+mov MEM#38 REG#1
+mov REG#9 MEM#38
+push REG#9
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+
+2098255951:
+mov REG#9 MEM#38
+push REG#9
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+
+4258658235:
+push REG#9
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp short loc_600014AA
+
+1766715458:
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp short loc_600014AA
+
+3950920498:
+add REG#7 VAL#0
+xor REG#0 REG#0
+jmp short loc_600014AA
+jmp loc_60001385
+
+1145166883:
+xor REG#0 REG#0
+jmp short loc_600014AA
+jmp loc_60001385
+
+3397971684:
+jmp short loc_600014AA
+jmp loc_60001385
+mov REG#0 MEM#30
+
+1650688642:
+jmp loc_60001385
+mov REG#0 MEM#30
+mov MEM#39 REG#0
+
+4028970001:
+jmp loc_60001385
+mov REG#0 MEM#30
+mov MEM#39 REG#0
+mov REG#1 MEM#39
+
+2743874216:
+mov REG#0 MEM#30
+mov MEM#39 REG#0
+mov REG#1 MEM#39
+push REG#1
+
+2070360758:
+mov REG#0 MEM#30
+mov MEM#39 REG#0
+mov REG#1 MEM#39
+push REG#1
+call ??_V@YAXPAX@Z
+
+3922660386:
+mov MEM#39 REG#0
+mov REG#1 MEM#39
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+
+4174367907:
+mov REG#1 MEM#39
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+
+1975069834:
+push REG#1
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+mov REG#0 VAL#3
+
+2734003632:
+call ??_V@YAXPAX@Z
+add REG#7 VAL#0
+mov REG#0 VAL#3
+
+3547479374:
+add REG#7 VAL#0
+mov REG#0 VAL#3
+mov REG#7 REG#8
+
+447953623:
+mov REG#0 VAL#3
+mov REG#7 REG#8
+pop REG#8
+
+447953623:
+mov REG#0 VAL#3
+mov REG#7 REG#8
+pop REG#8
+
+3143093291:
+mov REG#7 REG#8
+pop REG#8
+
+3143093291:
+mov REG#7 REG#8
+pop REG#8
+
+2613135632:
+pop REG#8
+
+4057905292:
+push REG#8
+
+2463307425:
+push REG#8
+mov REG#8 REG#7
+
+3462362386:
+push REG#8
+mov REG#8 REG#7
+call _IsNT@0
+
+1037267856:
+push REG#8
+mov REG#8 REG#7
+call _IsNT@0
+cmp REG#0 VAL#3
+
+4281051890:
+push REG#8
+mov REG#8 REG#7
+call _IsNT@0
+cmp REG#0 VAL#3
+jnz short loc_600014D8
+
+190900809:
+mov REG#8 REG#7
+call _IsNT@0
+cmp REG#0 VAL#3
+jnz short loc_600014D8
+mov REG#0 MEM#40
+
+2679800215:
+call _IsNT@0
+cmp REG#0 VAL#3
+jnz short loc_600014D8
+mov REG#0 MEM#40
+push REG#0
+
+2465998894:
+cmp REG#0 VAL#3
+jnz short loc_600014D8
+mov REG#0 MEM#40
+push REG#0
+mov REG#1 MEM#41
+
+2384836137:
+jnz short loc_600014D8
+mov REG#0 MEM#40
+push REG#0
+mov REG#1 MEM#41
+push REG#1
+
+4087086936:
+mov REG#0 MEM#40
+push REG#0
+mov REG#1 MEM#41
+push REG#1
+mov REG#9 MEM#42
+
+657156890:
+push REG#0
+mov REG#1 MEM#41
+push REG#1
+mov REG#9 MEM#42
+push REG#9
+
+3084709502:
+mov REG#1 MEM#41
+push REG#1
+mov REG#9 MEM#42
+push REG#9
+mov REG#0 MEM#43
+
+657156890:
+push REG#1
+mov REG#9 MEM#42
+push REG#9
+mov REG#0 MEM#43
+push REG#0
+
+912318821:
+mov REG#9 MEM#42
+push REG#9
+mov REG#0 MEM#43
+push REG#0
+mov REG#1 MEM#16
+
+657156890:
+push REG#9
+mov REG#0 MEM#43
+push REG#0
+mov REG#1 MEM#16
+push REG#1
+
+229323514:
+mov REG#0 MEM#43
+push REG#0
+mov REG#1 MEM#16
+push REG#1
+call sub_60005E10
+
+2404478610:
+push REG#0
+mov REG#1 MEM#16
+push REG#1
+call sub_60005E10
+jmp short loc_600014F1
+
+3951899058:
+mov REG#1 MEM#16
+push REG#1
+call sub_60005E10
+jmp short loc_600014F1
+
+2829734091:
+push REG#1
+call sub_60005E10
+jmp short loc_600014F1
+mov REG#9 MEM#40
+
+1701552239:
+call sub_60005E10
+jmp short loc_600014F1
+mov REG#9 MEM#40
+push REG#9
+
+589410230:
+jmp short loc_600014F1
+mov REG#9 MEM#40
+push REG#9
+mov REG#0 MEM#41
+
+3790050452:
+mov REG#9 MEM#40
+push REG#9
+mov REG#0 MEM#41
+push REG#0
+
+912318821:
+mov REG#9 MEM#40
+push REG#9
+mov REG#0 MEM#41
+push REG#0
+mov REG#1 MEM#42
+
+657156890:
+push REG#9
+mov REG#0 MEM#41
+push REG#0
+mov REG#1 MEM#42
+push REG#1
+
+4087086936:
+mov REG#0 MEM#41
+push REG#0
+mov REG#1 MEM#42
+push REG#1
+mov REG#9 MEM#43
+
+657156890:
+push REG#0
+mov REG#1 MEM#42
+push REG#1
+mov REG#9 MEM#43
+push REG#9
+
+3084709502:
+mov REG#1 MEM#42
+push REG#1
+mov REG#9 MEM#43
+push REG#9
+mov REG#0 MEM#16
+
+657156890:
+push REG#1
+mov REG#9 MEM#43
+push REG#9
+mov REG#0 MEM#16
+push REG#0
+
+1548191083:
+mov REG#9 MEM#43
+push REG#9
+mov REG#0 MEM#16
+push REG#0
+call sub_600060F0
+
+2147796493:
+push REG#9
+mov REG#0 MEM#16
+push REG#0
+call sub_600060F0
+
+2585312731:
+mov REG#0 MEM#16
+push REG#0
+call sub_600060F0
+pop REG#8
+
+578099793:
+push REG#0
+call sub_600060F0
+pop REG#8
+
+3075101948:
+call sub_600060F0
+pop REG#8
+
+2613135632:
+pop REG#8
+
+2613135632:
+pop REG#8
+
+1156459179:
+push REG#8
+mov REG#8 REG#7
+mov REG#0 MEM#43
+
+1496908546:
+push REG#8
+mov REG#8 REG#7
+mov REG#0 MEM#43
+push REG#0
+
+1254144339:
+push REG#8
+mov REG#8 REG#7
+mov REG#0 MEM#43
+push REG#0
+mov REG#1 MEM#44
+
+962227505:
+mov REG#8 REG#7
+mov REG#0 MEM#43
+push REG#0
+mov REG#1 MEM#44
+push REG#1
+
+2235394146:
+mov REG#0 MEM#43
+push REG#0
+mov REG#1 MEM#44
+push REG#1
+call ds:strrchr
+
+1777136333:
+push REG#0
+mov REG#1 MEM#44
+push REG#1
+call ds:strrchr
+add REG#7 VAL#2
+
+2161892007:
+mov REG#1 MEM#44
+push REG#1
+call ds:strrchr
+add REG#7 VAL#2
+pop REG#8
+
+2406370284:
+push REG#1
+call ds:strrchr
+add REG#7 VAL#2
+pop REG#8
+
+2560610796:
+call ds:strrchr
+add REG#7 VAL#2
+pop REG#8
+
+2951489304:
+add REG#7 VAL#2
+pop REG#8
+
+2613135632:
+pop REG#8
+
+3084394482:
+push REG#8
+mov REG#8 REG#7
+cmp MEM#45 VAL#21
+jnz short loc_60001587
+
+4240245311:
+push REG#8
+mov REG#8 REG#7
+cmp MEM#45 VAL#21
+jnz short loc_60001587
+cmp lpTopLevelExceptionFilter VAL#21
+
+2994169716:
+mov REG#8 REG#7
+cmp MEM#45 VAL#21
+jnz short loc_60001587
+cmp lpTopLevelExceptionFilter VAL#21
+jz short loc_60001585
+
+445110720:
+cmp MEM#45 VAL#21
+jnz short loc_60001587
+cmp lpTopLevelExceptionFilter VAL#21
+jz short loc_60001585
+mov REG#0 lpTopLevelExceptionFilter
+
+3988763884:
+jnz short loc_60001587
+cmp lpTopLevelExceptionFilter VAL#21
+jz short loc_60001585
+mov REG#0 lpTopLevelExceptionFilter
+push REG#0
+
+1825209425:
+cmp lpTopLevelExceptionFilter VAL#21
+jz short loc_60001585
+mov REG#0 lpTopLevelExceptionFilter
+push REG#0
+call ds:SetUnhandledExceptionFilter
+
+1010566879:
+jz short loc_60001585
+mov REG#0 lpTopLevelExceptionFilter
+push REG#0
+call ds:SetUnhandledExceptionFilter
+mov lpTopLevelExceptionFilter VAL#21
+
+2645352651:
+mov REG#0 lpTopLevelExceptionFilter
+push REG#0
+call ds:SetUnhandledExceptionFilter
+mov lpTopLevelExceptionFilter VAL#21
+cmp lpMem VAL#21
+
+3424532638:
+push REG#0
+call ds:SetUnhandledExceptionFilter
+mov lpTopLevelExceptionFilter VAL#21
+cmp lpMem VAL#21
+jz short loc_6000157B
+
+3310720605:
+call ds:SetUnhandledExceptionFilter
+mov lpTopLevelExceptionFilter VAL#21
+cmp lpMem VAL#21
+jz short loc_6000157B
+mov REG#1 lpMem
+
+3612719974:
+mov lpTopLevelExceptionFilter VAL#21
+cmp lpMem VAL#21
+jz short loc_6000157B
+mov REG#1 lpMem
+push REG#1
+
+66350059:
+cmp lpMem VAL#21
+jz short loc_6000157B
+mov REG#1 lpMem
+push REG#1
+push VAL#21
+
+3541855606:
+jz short loc_6000157B
+mov REG#1 lpMem
+push REG#1
+push VAL#21
+call ds:GetProcessHeap
+
+1807638644:
+mov REG#1 lpMem
+push REG#1
+push VAL#21
+call ds:GetProcessHeap
+push REG#0
+
+1341931597:
+push REG#1
+push VAL#21
+call ds:GetProcessHeap
+push REG#0
+call ds:HeapFree
+
+2537678197:
+push VAL#21
+call ds:GetProcessHeap
+push REG#0
+call ds:HeapFree
+mov lpMem VAL#21
+
+630811026:
+call ds:GetProcessHeap
+push REG#0
+call ds:HeapFree
+mov lpMem VAL#21
+mov dword_6000A7E4 VAL#21
+
+1292460182:
+push REG#0
+call ds:HeapFree
+mov lpMem VAL#21
+mov dword_6000A7E4 VAL#21
+
+68355884:
+call ds:HeapFree
+mov lpMem VAL#21
+mov dword_6000A7E4 VAL#21
+mov lpfn VAL#21
+
+1421995202:
+mov lpMem VAL#21
+mov dword_6000A7E4 VAL#21
+mov lpfn VAL#21
+
+4153740855:
+mov dword_6000A7E4 VAL#21
+mov lpfn VAL#21
+jmp short loc_600015BB
+
+130927525:
+mov lpfn VAL#21
+jmp short loc_600015BB
+
+2538821860:
+mov lpfn VAL#21
+jmp short loc_600015BB
+mov REG#9 MEM#45
+
+2538723075:
+jmp short loc_600015BB
+mov REG#9 MEM#45
+push REG#9
+
+3232459456:
+jmp short loc_600015BB
+mov REG#9 MEM#45
+push REG#9
+call ds:IsBadCodePtr
+
+2805986922:
+mov REG#9 MEM#45
+push REG#9
+call ds:IsBadCodePtr
+cmp REG#0 VAL#3
+
+3559158486:
+mov REG#9 MEM#45
+push REG#9
+call ds:IsBadCodePtr
+cmp REG#0 VAL#3
+jnz short loc_6000159A
+
+3364036588:
+push REG#9
+call ds:IsBadCodePtr
+cmp REG#0 VAL#3
+jnz short loc_6000159A
+xor REG#0 REG#0
+
+2035503490:
+call ds:IsBadCodePtr
+cmp REG#0 VAL#3
+jnz short loc_6000159A
+xor REG#0 REG#0
+jmp short loc_600015C0
+
+1723333932:
+cmp REG#0 VAL#3
+jnz short loc_6000159A
+xor REG#0 REG#0
+jmp short loc_600015C0
+
+1762484954:
+jnz short loc_6000159A
+xor REG#0 REG#0
+jmp short loc_600015C0
+mov REG#0 MEM#45
+
+3004020675:
+xor REG#0 REG#0
+jmp short loc_600015C0
+mov REG#0 MEM#45
+mov lpfn REG#0
+
+2035219702:
+jmp short loc_600015C0
+mov REG#0 MEM#45
+mov lpfn REG#0
+cmp lpTopLevelExceptionFilter VAL#21
+
+914127964:
+mov REG#0 MEM#45
+mov lpfn REG#0
+cmp lpTopLevelExceptionFilter VAL#21
+jnz short loc_600015BB
+
+1732509441:
+mov REG#0 MEM#45
+mov lpfn REG#0
+cmp lpTopLevelExceptionFilter VAL#21
+jnz short loc_600015BB
+push offset _CrashHandlerExceptionFilter@4
+
+1477380792:
+mov lpfn REG#0
+cmp lpTopLevelExceptionFilter VAL#21
+jnz short loc_600015BB
+push offset _CrashHandlerExceptionFilter@4
+call ds:SetUnhandledExceptionFilter
+
+1705191416:
+cmp lpTopLevelExceptionFilter VAL#21
+jnz short loc_600015BB
+push offset _CrashHandlerExceptionFilter@4
+call ds:SetUnhandledExceptionFilter
+mov lpTopLevelExceptionFilter REG#0
+
+1150777262:
+jnz short loc_600015BB
+push offset _CrashHandlerExceptionFilter@4
+call ds:SetUnhandledExceptionFilter
+mov lpTopLevelExceptionFilter REG#0
+
+861649817:
+push offset _CrashHandlerExceptionFilter@4
+call ds:SetUnhandledExceptionFilter
+mov lpTopLevelExceptionFilter REG#0
+mov REG#0 VAL#3
+
+1926164744:
+call ds:SetUnhandledExceptionFilter
+mov lpTopLevelExceptionFilter REG#0
+mov REG#0 VAL#3
+
+3459847707:
+mov lpTopLevelExceptionFilter REG#0
+mov REG#0 VAL#3
+pop REG#8
+
+1580571684:
+mov REG#0 VAL#3
+pop REG#8
+
+1580571684:
+mov REG#0 VAL#3
+pop REG#8
+
+2613135632:
+pop REG#8
+
+2613135632:
+pop REG#8
+
+Number of exact clone clusters: 52
+Number of clone clusters after mereged: 52
+Number of clone clusters after removing trival clones: 44
+Number of exact clone pairs: 148
+Number of clone pairs after unification: 121
+Bye!

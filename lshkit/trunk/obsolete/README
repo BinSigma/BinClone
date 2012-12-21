@@ -1,0 +1,1 @@
+These files are originally to implement external LSH.  However, I believe that the current LSH technique require too many random access to make the external implementation useful.  Therefore I move those files here so that they don't cause confusion. 

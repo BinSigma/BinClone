@@ -1,0 +1,297 @@
+A C++ LSH Library
+
+NOTE:
+API DESCRIPTION IN THIS FILE MAY BE OUTDATED, SEE THE DOXYGEN GENERATED DOCUMENTATION FOR
+UP-TO-DATE DESCRIPTION.
+
+
+1. Introduction
+
+The goal of this library is to:
+	* Provide a general and flexible framework of creating and compositing LSH families.
+	* Put all our LSH related researches (LSH based index, sketch, set embedding) together.
+
+The library is currently made up of the following components:
+	1. a set of LSH families proposed by previous researches, including
+		- stable distribution (Gaussian, Cauchy) based LSH
+		- random hyperplane based LSH
+	2. a set of LSH composition methods to create new LSHs from existing ones
+	3. an LSH based indexing data structure (multi-probe LSH)
+	4. an LSH based sketch construction algorithm
+	5. an LSH based set embedding algorithm
+
+An LSH family is represented by a class.  An LSH composite class is a template class which takes in an LSH class as the template parameter and represents an LSH family built on top of the parameter LSH family.  The three LSH based algorithms are all template classes which can be customized with any well defined LSH family.
+
+
+2. The LSH Concept
+
+All LSH classes should implement the same interface, so they can be plugged into
+the composite class and algorithm templates.
+
+An LSH class should be of the following form:
+
+	class FooLsh {
+		......
+	public:
+		// The parameter to the LSH object
+		typedef ... Parameter;
+		// The domain of the hash function
+		typedef ... Domain;
+
+		// The default constructor.
+		FooLsh ();
+
+		// initialize /reset the function
+		// RNG &rng can be a random number generator of any type (from the Boost random number library).
+    		template <typename RNG>
+    		void reset (const Parameter &param, RNG &rng);
+		
+    		template <typename RNG>
+    		FooLsh (const Parameter &param, RNG &rng) {
+			reset(param, rng)
+		}
+
+		// get the range of the hash value
+		// if range > 0 then hash value can be 0 -- (range - 1)
+		// if range == 0 then hash value can be anything
+		unsigned getRange () const;
+		
+		// the actual hash function
+		unsigned operator () (Domain) const;
+	};
+
+
+Multi-probe LSH and asymmetric sketch rely on a special kind of LSH families called the DeltaLSH.  A DeltaLSH class is an LSH class with an extra member function.
+
+	class FooDeltaLsh {
+		......
+	public:
+		...... the basic LSH stuff ......
+
+		unsigned operator () (Domain, float *delta) const;
+	};
+
+DeltaLSH families are usually produced by rounding some real-valued function, say
+
+	h(x) = (unsigned)(int)floor(f(x))
+
+and delta can be considered as the rounded-off part:
+
+	delta = f(x) - floor(f(x)).
+		
+
+The library provides two concept classes: LshConcept and DeltaLshConcept to work with the Boost Concept Checking library.
+
+
+3. LSH Classes
+
+The library provides the following LSH classes.
+
+
+* Stable distribution based LSH, which is a DeltaLSH.  The hash function is defined on the D-dimensional vector space and is of the following form
+
+		h(x) = floor[ (a.x + b) / W ]
+
+where a is a D-dimensional random vector following a p-stable distribution, and W is the window size.
+
+
+	template <typename DIST>
+	class StableDistLsh
+	{
+		......
+	public:
+	    struct Parameter
+	    {
+		unsigned dim;
+		float W;
+	    };
+
+	    typedef const float *Domain;
+		......
+	};
+
+DIST can be any p-stable distribution, and following are two spacial cases:
+
+	typedef StableDistLsh<Cauchy> CauchyLsh;
+	typedef StableDistLsh<Gaussian> GaussianLsh;
+
+
+* Random hyperplane based.  This hash function is defined on the D-dimensional vector space:
+
+	h(x) = (a.x) >= 0 ? 1 : 0
+
+where a is a point sampled uniformly at random from the unit hypersphere.
+
+
+	template <typename DIST>
+	class HyperPlaneLsh
+	{
+		......
+	public:
+	    struct Parameter
+	    {
+		unsigned dim;
+	    };
+	    typedef const float *Domain;
+		......
+	};
+
+* More are to be added.
+
+
+4. LSH Composition
+
+The library provides the following LSH compositions.
+
+
+* Tail, modulo the given LSH function by N
+
+	template <typename LSH>
+	class Tail
+	{
+		......
+	public:
+	    struct Parameter: public LSH::Parameter  {
+		unsigned range;
+	    };
+
+	    typedef typename LSH::Domain Domain;
+		......
+	};
+
+* FixedTail, N given as a template parameter.
+
+	template <typename LSH, unsigned N>
+	class FixedTail
+	{
+		......
+	public:
+	    struct Parameter: public LSH::Parameter  {
+	    };
+	    typedef typename LSH::Domain Domain;
+		......
+	};
+
+A special case is LSB, which is the case where N=2.
+
+	template <typename LSH>
+	class LSB
+	{
+		......
+	public:
+    		typedef typename LSH::Parameter Parameter;
+    		typedef typename LSH::Domain Domain;
+		......
+	};
+
+And the DeltaLSH version of LSB.
+
+
+	template <typename LSH>
+	class DeltaLSB
+	{
+    	    BOOST_CONCEPT_ASSERT((LshConcept<LSH>));
+		......
+	};
+
+* Repeat, which concatenate N independent original hash functions.
+
+	template <typename LSH>
+	class Repeat
+	{
+		......
+	public:
+	    struct Parameter: public LSH::Parameter  {
+		unsigned repeat;
+	    };
+	    typedef typename LSH::Domain Domain;
+		......
+	};
+
+
+* XOR, which takes the XOR of N indepedent hash values.  Note the basic LSH must has a range of 2 (producing a 1 bit hash value).
+
+	template <typename LSH>
+	class Xor
+	{
+		......
+	public:
+	    struct Parameter: public LSH::Parameter  {
+		unsigned xor_;
+	    };
+	    typedef typename LSH::Domain Domain;
+		......
+	};
+
+
+There is also a DeltaLSH version of Xor, if the basic LSH is a DeltaLSH.
+
+	template <typename LSH>
+	class DeltaXor
+	{
+    	    BOOST_CONCEPT_ASSERT((LshConcept<LSH>));
+		......
+	public:
+	    struct Parameter: public LSH::Parameter  {
+		unsigned xor_;
+	    };
+	    typedef typename LSH::Domain Domain;
+		......
+	};
+
+5. Multi-probe LSH Index
+
+6. LSH Based Sketch 
+
+A bit vector is represented as an array of CHUNKs.
+
+	template <typename LSH, typename CHUNK = unsigned char>
+	class Sketch
+	{
+	    BOOST_CONCEPT_ASSERT((DeltaLshConcept<LSH>));
+
+	public:
+	    typedef typename LSH::Parameter Parameter;
+	    typedef typename LSH::Domain Domain;
+	    static const unsigned CHUNK_BIT = sizeof(CHUNK) * 8;
+
+	    template <typename Engine>
+	    Sketch(unsigned bits, Parameter param, Engine &engine);
+
+	    void apply (Domain in, CHUNK *out);
+
+	    void applyAsym (Domain in, float *sketch);
+	};
+ 
+7. LSH Based Set Embedding
+
+	template <typename LSH>
+	class Histogram
+	{
+	    BOOST_CONCEPT_ASSERT((LshConcept<LSH>));
+
+	public:
+	    typedef typename LSH::Parameter Parameter;
+	    typedef typename LSH::Domain Domain;
+
+	    template <typename RNG>
+	    Histogram(unsigned M, unsigned N, Parameter parameter, RNG &rng);
+
+	    int getDim () const;
+
+	    void zero (float *out) const;
+		
+	    void add (float *out, Domain in, float weight = 1.0) const;
+	};
+
+Embed a histogram by the following:
+	
+	float *out = new float[histogram.getDim()];
+	histogram.zero(out);
+	
+	for each set member M
+	{
+		histogram.add(out, M [, weight]);
+	}
+
+
