@@ -8,6 +8,7 @@
 #pragma once
 
 #include "CSParam.h"
+#include <vector>
 
 class CCSDatabaseMgr;
 class CCSTokenRefMgr;
