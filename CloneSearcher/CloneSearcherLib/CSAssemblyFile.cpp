@@ -294,9 +294,9 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
                 if (!region.countRegionFeatures(param.m_kThreshold, pAssemblyFileMgr))
                     return false;
 
-                // Farhadi: Step 1: update the medians. 
-                //if (!region.updateGlobalMedians(globalMedians))
-                //    return false;
+                // Farhadi: Step 1: update the medians. mfarhadi
+                if (!region.updateGlobalMedians(pAssemblyFileMgr->m_globalMedians, pAssemblyFileMgr))
+                    return false;
 
                 continue;
             }
