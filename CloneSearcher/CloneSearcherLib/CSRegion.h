@@ -8,6 +8,7 @@
 #pragma once
 
 #include "CSFeatureVector.h"
+#include <vector> //mfarhadi the vector library is needed to define a vector
 
 class CCSAssemblyFunction;
 class CCSRegionMgr;
@@ -27,6 +28,7 @@ public:
     bool countRegionFeatures(int kThreshold, CCSAssemblyFileMgr* pAssemblyFileMgr);
     bool constructVector(CStringArray& globaFeatures);
     bool constructBinaryVector(const CCSIntArray& globalMedians);
+	bool updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileMgr* pAssemblyFileMgr); //mfarhadi
 
     int m_dbRegionID;       // regionID in database
     int m_dbFcnID;          // fcnID in database
@@ -38,8 +40,11 @@ public:
 
     UINT m_hashValue;       // hash value of this funciton.    
 
+	static int m_cntRegion;    // mfarhadi keep track of numbeer of created regions so far
+
 private:
     int incFeatureCount(LPCTSTR featureStr);
+    int findMedian(const vector<int>& myVector); //mfarhadi 
 
     CCSAssemblyFunction* m_pFcn;            // function of this region
     CCSMapStringToInt m_featureCounts;      // keep track of the count of each feature. 

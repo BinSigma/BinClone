@@ -12,6 +12,7 @@
 CCSRegion::CCSRegion(CCSAssemblyFunction* pFcn, int startIdx, int endIdx, int rawStartIdx, int rawEndIdx)
     : m_pFcn(pFcn), m_dbFcnID(pFcn->m_dbFcnID), m_dbFileID(pFcn->getAssemblyFile()->m_dbFileID), m_startIdx(startIdx), m_endIdx(endIdx), m_rawStartIdx(rawStartIdx), m_rawEndIdx(rawEndIdx), m_hashValue(0)
 {
+      ++ m_cntRegion; //mfarhadi increament the counter when a region is created
 }
 
 CCSRegion::CCSRegion(int dbRegionID, int dbFcnID, int dbFileID, int startIdx, int endIdx, int rawStartIdx, int rawEndIdx)
@@ -21,8 +22,10 @@ CCSRegion::CCSRegion(int dbRegionID, int dbFcnID, int dbFileID, int startIdx, in
 
 CCSRegion::~CCSRegion()
 {
+    -- m_cntRegion; // mfarhadi decrement the counter when a region is destroyed
 }
 
+int CCSRegion::m_cntRegion = 0; // mfarhadi initilize the static variable
 
 //
 // Count features
@@ -159,6 +162,46 @@ bool CCSRegion::constructBinaryVector(const CCSIntArray& globalMedians)
     
     return true;
 }
+
+// mfarhadi3
+// update the m_globalMedian vector when each region is created
+//
+bool CCSRegion::updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileMgr* pAssemblyFileMgr)
+{
+    int cnt = -1;    
+    for (int i  = 0; i < pAssemblyFileMgr->m_globalMedians.GetSize(); ++i) {                  
+        if (!m_featureCounts.Lookup(pAssemblyFileMgr->m_globalFeatures.GetAt(i).GetString(), cnt))  // if a region has a feature with value X, incremet X in redundancyVetor                      
+            ++ pAssemblyFileMgr->m_redundancyVector[i][0]; //  this region does not have such feature, so just increase 0 (X = 0)
+        else {    
+                if (cnt > 100 ) {
+                    tcout << _T("CCSAssemblyFileMgr::constructRedundancyVector: incorrect vector size. increment the size to more than 100") <<  endl;
+                    ASSERT(false);
+                    return false;
+                }
+            ++ pAssemblyFileMgr->m_redundancyVector[i][cnt];  // this region has such feature, so incerase X (X = cnt)                          
+        }         
+        pAssemblyFileMgr->m_globalMedians.GetAt(i) = findMedian(pAssemblyFileMgr->m_redundancyVector[i]);   // find the median of this feature and update m_globalMedians     
+    }                
+    return true;
+}
+
+// mfarhadi4
+// find the median of an integer vector (this vector is sorted). Median is the middle nuymber when the numbers are sorted
+//
+int CCSRegion::findMedian(const vector<int>& myVector)
+{
+    int featureValue = 0;
+    int sum = 0;
+  
+     for (featureValue = 0; featureValue < myVector.size(); ++featureValue) {
+        sum += myVector[featureValue];
+        if (sum > m_cntRegion/2)
+            break;
+    }
+    return featureValue;
+}
+
+
 
 
 //*************
