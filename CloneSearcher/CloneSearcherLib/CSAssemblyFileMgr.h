@@ -38,7 +38,7 @@ public:
     bool getRawAssemblyFileLineStr(CString& str);
     void closeRawAssemblyFile();
 
-    bool parseFolder(LPCTSTR folderPath, const CCSParam& param, bool bConstructFeaturesOnly);
+    bool parseFolder(LPCTSTR folderPath, const CCSParam& param);
     bool createAssemblyFile(LPCTSTR content, CString& newAssemblyFilePath);
     bool constructBasicFeatures();
     bool addGlobalFeatureIfNew(LPCTSTR featureName);

@@ -238,7 +238,7 @@ bool CCSAssemblyFile::extractFunctions(CCSDatabaseMgr* pDBMgr, const CCSParam& p
                 if (!contentHashKey.IsEmpty()) {
                     // the function contains at least one mnemonic statements.
                     pNewFunction->m_hashValue = m_hashObject.HashKey((LPCTSTR) contentHashKey);
-
+                 
                     if (bStoreDB) {
                         // store function to DB
                         if (!pDBMgr->storeFunction(*pNewFunction, param)) {
@@ -267,7 +267,7 @@ bool CCSAssemblyFile::extractFunctions(CCSDatabaseMgr* pDBMgr, const CCSParam& p
 // If bStoreDb == true, then store the regions into the database.
 // If bFindExactClones == true or bFindExactClones == ture, then retrieve the clones from the database
 //
-bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& param, bool bFindExactClones, bool bFindInexactClones, bool bStoreDB, bool bConstructFeaturesOnly, CCSAssemblyFileMgr* pAssemblyFileMgr)
+bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& param, bool bFindExactClones, bool bFindInexactClones, bool bStoreDB, CCSAssemblyFileMgr* pAssemblyFileMgr)
 {
     // For each function
     int nRegionsInFile = 0;
@@ -290,7 +290,7 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
             int rawEidx = GetAt(eIdx)->getAsmFileLineIdx();
             CCSRegion region(pFcn, sIdx, eIdx, rawSidx, rawEidx);
 
-            if (bConstructFeaturesOnly) {
+            if (bStoreDB) {  //mfarhadi: multiple scan of the files is disabled. we will do it only if we want to store the features and medians in the database
                 if (!region.countRegionFeatures(param.m_kThreshold, pAssemblyFileMgr))
                     return false;
 
@@ -298,7 +298,7 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
                 //if (!region.updateGlobalMedians(globalMedians))
                 //    return false;
 
-                continue;
+            //    continue;
             }
 
             // create a hash of this region

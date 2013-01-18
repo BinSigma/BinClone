@@ -43,14 +43,14 @@ bool CCSController::populateAssemblyToDB(LPCTSTR assemblyFolderPath,
     // The first call is to construct the global features.
     // The second call is to do the actual feature countings.
     long startProgTime = getTime();
-    if (!m_assemblyFileMgr.parseFolder(assemblyFolderPath, param, true)) {
+    if (!m_assemblyFileMgr.parseFolder(assemblyFolderPath, param)) {
         tcout << _T("Error: failed to parse folder: ") << assemblyFolderPath << endl;
         return false;
     }
-    if (!m_assemblyFileMgr.parseFolder(assemblyFolderPath, param, false)) {
+   /* if (!m_assemblyFileMgr.parseFolder(assemblyFolderPath, param, false)) {  mfarhadi: multiple scan of the files is disabled.
         tcout << _T("Error: failed to parse folder: ") << assemblyFolderPath << endl;
         return false;
-    }
+    }*/
 
     long endProgTime = getTime();
     tcout << _T("Spent: ") << endProgTime - startProgTime << _T("s in total to populate the assembly files to the database.") << std::endl; 
@@ -147,7 +147,7 @@ bool CCSController::findFileClones(LPCTSTR targetAssemblyFilePath,
     tcout << _T("Number of functions: ") << m_pTargetAssemblyFile->getNumFunctions() << " in " << targetAssemblyFilePath << endl;
 
     // create regions.
-    if (!m_pTargetAssemblyFile->extractRegions(&m_dbMgr, param, bFindExactClones, bFindInexactClones, false, false, NULL))
+    if (!m_pTargetAssemblyFile->extractRegions(&m_dbMgr, param, bFindExactClones, bFindInexactClones, false, NULL))
         return false;
     tcout << _T("Number of regions: ") << m_pTargetAssemblyFile->getNumRegions() << _T(" in ") << targetAssemblyFilePath << endl;
        

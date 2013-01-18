@@ -1,0 +1,8 @@
+sub_fake proc near
+
+jnz	loc_673414DF
+and	[ebp+dwIndex], eax
+mov	[ebp+var_1C], offset cbData
+mov	[ebp+lpData], offset dword_67381900
+mov	[ebp+lpString1], offset	SubKey
+sub_fake endp

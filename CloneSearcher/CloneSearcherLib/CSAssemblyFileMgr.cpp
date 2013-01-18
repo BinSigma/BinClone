@@ -119,7 +119,7 @@ void CCSAssemblyFileMgr::closeRawAssemblyFile()
 //
 // Parse the whole input folder, including subfolders
 //
-bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, bool bConstructFeaturesOnly)
+bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param)
 {   
     tcout << _T("Parsing folder: ") << folderPath << endl;
     CString folderPathStr = folderPath;
@@ -135,7 +135,7 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
         if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {        
             // It is a directory.
             CString subFolderPath = folderPathStr + _T("\\") + fileName;
-            if (!parseFolder((LPCTSTR) subFolderPath, param, bConstructFeaturesOnly))
+            if (!parseFolder((LPCTSTR) subFolderPath, param))
                 return false;
         }
         else {
@@ -147,7 +147,7 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
                 // parse the assembly file
                 CString assemblyFilePath = folderPathStr + _T("\\") + fileName;
                 CCSAssemblyFile assemblyFile(assemblyFilePath, this);
-                if (!assemblyFile.parseFile(param, !bConstructFeaturesOnly))
+                if (!assemblyFile.parseFile(param, true))
                     return false;                
 
                 // normalize code
@@ -155,30 +155,30 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
                     return false;
 
                 // create functions in memory and store into DB.
-                if (!assemblyFile.extractFunctions(m_pDBMgr, param, !bConstructFeaturesOnly))
+                if (!assemblyFile.extractFunctions(m_pDBMgr, param, true))
                     return false;
-                if (!bConstructFeaturesOnly) {
+              //  if (!bConstructFeaturesOnly) {  mfarhadi: multiple scan of the files is disabled.
                     m_nTotalFunctions += assemblyFile.getNumFunctions();
                     tcout << _T("Number of functions: ") << assemblyFile.getNumFunctions() << _T(" in ") << assemblyFilePath << endl;
-                }
+             //   }
 
                 // create regions and store into DB.
-                if (!assemblyFile.extractRegions(m_pDBMgr, param, false, false, !bConstructFeaturesOnly, bConstructFeaturesOnly, this))
+                if (!assemblyFile.extractRegions(m_pDBMgr, param, false, false, true, this))
                     return false;
-                if (!bConstructFeaturesOnly) {
+               // if (!bConstructFeaturesOnly) {  mfarhadi: multiple scan of the files is disabled.
                     m_nTotalRegions += assemblyFile.getNumRegions();
                     tcout << _T("Number of regions: ") << assemblyFile.getNumRegions() << _T(" in ") << assemblyFilePath << endl;
                     ++m_nTotalFiles;
-                }
+            //    }
                 // assemblyFile will be deallocated.
             }
         }
     } while (::FindNextFile(hFile, &fileInfo));
 
-    if (bConstructFeaturesOnly) {
+  //  if (bConstructFeaturesOnly) {  mfarhadi: multiple scan of the files is disabled.
         if (!m_pDBMgr->storeGlobalFeatures(m_globalFeatures, param))
             return false;
-    }
+  //  }
     tcout << _T("Total number of files: ") << m_nTotalFiles << endl;
     tcout << _T("Total number of functions: ") << m_nTotalFunctions << endl;
     tcout << _T("Total number of regions: ") << m_nTotalRegions << endl;
