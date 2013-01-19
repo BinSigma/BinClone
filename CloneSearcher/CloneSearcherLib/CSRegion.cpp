@@ -163,6 +163,7 @@ bool CCSRegion::constructBinaryVector(const CCSIntArray& globalMedians)
     return true;
 }
 
+/*
 // mfarhadi3
 // update the m_globalMedian vector when each region is created
 //
@@ -200,7 +201,7 @@ int CCSRegion::findMedian(const vector<int>& myVector)
     }
     return featureValue;
 }
-
+*/
 
 
 

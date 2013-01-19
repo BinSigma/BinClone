@@ -47,7 +47,7 @@ public:
     CStringArray m_globalFeatures;
     CCSIntArray m_medians;
 	CCSIntArray m_globalMedians; //mfarhadi
-    vector<vector<int>> m_redundancyVector; //mfarhadi keep track of number of occurrence of each feature's value! (to find median with bucket sort algorithm)
+//    vector<vector<int>> m_redundancyVector; //mfarhadi keep track of number of occurrence of each feature's value! (to find median with bucket sort algorithm)
 
 private:    
     bool parseFunctions(CCSAssemblyFile* pAssemblyFile, const CCSParam& param);
@@ -56,8 +56,8 @@ private:
     bool constructMnemonicOpType0Features();
     bool constructOpType0Type1Features();
     bool addGlobalFeature(LPCTSTR featureName);
-	bool constructGlobalMedians(); //mfarhadi
-    bool constructRedundancyVector(); //mfarhadi
+	//bool constructGlobalMedians(); //mfarhadi
+    //bool constructRedundancyVector(); //mfarhadi
 
     Int64u m_nTotalFiles;
     Int64u m_nTotalFunctions;

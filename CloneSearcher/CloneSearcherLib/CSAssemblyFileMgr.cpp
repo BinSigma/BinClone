@@ -257,13 +257,13 @@ bool CCSAssemblyFileMgr::constructBasicFeatures()
 
     if (!constructOpType0Type1Features())
         return false;
-
+	/*
 	if (!constructGlobalMedians()) //mfarhadi1 
         return false;
 
     if (!constructRedundancyVector()) //mfarhadi2
         return false;
-    
+    */
     return true;
 }
 
@@ -350,7 +350,7 @@ bool CCSAssemblyFileMgr::addGlobalFeatureIfNew(LPCTSTR featureName)
     }
     return addGlobalFeature(featureName);
 }
-
+/*
 //mfarhadi
 // set the size of m_globalMedians vector equal to number of of features
 //
@@ -360,6 +360,7 @@ bool CCSAssemblyFileMgr::constructGlobalMedians()
       return true;  
     
 }
+
 
 //mfarhadi
 // construct a two dimensial vector, the first dimension shows each feature and the second dimension keeps track of "number of occurance of each feature's value" 
@@ -373,3 +374,4 @@ bool CCSAssemblyFileMgr::constructRedundancyVector()
 
     return true;
 }
+*/

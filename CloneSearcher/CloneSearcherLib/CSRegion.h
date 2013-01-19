@@ -8,7 +8,7 @@
 #pragma once
 
 #include "CSFeatureVector.h"
-#include <vector> //mfarhadi the vector library is needed to define a vector
+//#include <vector> //mfarhadi the vector library is needed to define a vector
 
 class CCSAssemblyFunction;
 class CCSRegionMgr;
@@ -44,7 +44,7 @@ public:
 
 private:
     int incFeatureCount(LPCTSTR featureStr);
-    int findMedian(const vector<int>& myVector); //mfarhadi 
+//    int findMedian(const vector<int>& myVector); //mfarhadi 
 
     CCSAssemblyFunction* m_pFcn;            // function of this region
     CCSMapStringToInt m_featureCounts;      // keep track of the count of each feature. 
