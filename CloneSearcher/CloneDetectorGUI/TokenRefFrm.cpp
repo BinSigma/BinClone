@@ -19,6 +19,7 @@ IMPLEMENT_DYNCREATE(CTokenRefFrm, CMDIChildWndEx)
 
 BEGIN_MESSAGE_MAP(CTokenRefFrm, CMDIChildWndEx)
 	ON_WM_SIZE()
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 // CTokenRefFrm construction/destruction
@@ -108,16 +109,16 @@ bool CTokenRefFrm::init(const CString & p_searchToken, const CString & p_dbName,
 
 		m_csController = new CCSController( p_dbName, p_dbUser, p_dbPwd);
 
-		if( p_searchType | SEARCH_TOKEN_STRING)
+		if( p_searchType & SEARCH_TOKEN_STRING)
 		{
 			CCSIndexedTokens idxStringTokens;
 			m_csController->searchStrings(p_searchToken,idxStringTokens);
 		}
-		if( p_searchType | SEARCH_TOKEN_CONSTANT)
+		if( p_searchType & SEARCH_TOKEN_CONSTANT)
 		{
 		    m_csController->searchConstants(p_searchToken,idxConstantTokens);
 		}
-		if( p_searchType | SEARCH_TOKEN_IMPORT)
+		if( p_searchType & SEARCH_TOKEN_IMPORT)
 		{
 		    m_csController->searchImports(p_searchToken,idxImportTokens);
 		}
@@ -203,4 +204,11 @@ void CTokenRefFrm::loadAsmFile(CString & p_filename, CString & p_content)
 	}
 	
 	m_csController->closeRawAssemblyFile();
+}
+
+void CTokenRefFrm::OnClose()
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CMDIChildWndEx::OnClose();
 }

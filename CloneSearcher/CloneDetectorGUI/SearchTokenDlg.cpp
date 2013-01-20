@@ -11,6 +11,8 @@ extern CString g_dbName;
 extern CString g_dbUser;
 extern CString g_dbPwd;
 
+static std::vector<CString> s_searchStrings;
+
 
 // SearchTokenDlg dialog
 
@@ -67,7 +69,17 @@ void SearchTokenDlg::OnBnClickedOk()
 		// user hit "ENTER"
 		m_comboBox.GetWindowText(strText);
 		if( strText.GetLength() > 0)
-			m_strVec.push_back(strText);
+		{
+			if( s_searchStrings.size() < 10)
+			{
+			    s_searchStrings.push_back(strText);
+			}
+			else
+			{
+				s_searchStrings.erase(s_searchStrings.begin());
+				s_searchStrings.push_back(strText);
+			}
+		}
 	}
 	else
 	{
@@ -83,7 +95,17 @@ void SearchTokenDlg::OnBnClickedOk()
 			// user typed in the new string
 			m_comboBox.GetWindowText(strText);
 			if( strText.GetLength() > 0)
-				m_strVec.push_back(strText);
+			{
+				if( s_searchStrings.size() < 10)
+				{
+					s_searchStrings.push_back(strText);
+				}
+				else
+				{
+					s_searchStrings.erase(s_searchStrings.begin());
+					s_searchStrings.push_back(strText);
+				}
+			}
 		}
 	}
 
@@ -116,8 +138,9 @@ BOOL SearchTokenDlg::OnInitDialog()
 	m_ok = false;
 
 	//load the previous strings
-	std::vector<CString>::iterator itr = m_strVec.begin();
-	for( ; itr != m_strVec.end(); ++itr)
+	std::vector<CString>::iterator itr = s_searchStrings.begin();
+	//for( ; itr != m_strVec.end(); ++itr)
+    for( ; itr != s_searchStrings.end(); ++itr)
 	{
 		m_comboBox.AddString(*itr);
 	}
