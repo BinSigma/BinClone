@@ -54,8 +54,6 @@ public:
 	CEdit   m_strideCtrl;
 	CEdit   m_maxkCtrl;
 	CEdit   m_maxovfCtrl;
-	CButton m_exactCtrl;
-	CButton m_inexactCtrl;
     CButton m_normTokCtrl;
 	CEdit   m_1stsegperCtrl;
 	CEdit   m_keyvectsizeCtrl;
@@ -86,6 +84,7 @@ public:
 	CString m_dbPwd;
 	CString m_dbName;
 	CString m_dbUser;
+	afx_msg void OnBnClickedChkinexact();
 };
 
 

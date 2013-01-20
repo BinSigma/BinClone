@@ -87,8 +87,6 @@ void NewDetectDialog::DoDataExchange(CDataExchange* pDX)
 	//	DDX_Control(pDX, IDC_MAXOVF_EDIT, m_maxovfCtrl);
 	//	DDX_Control(pDX, IDC_REGNLVL_COMBO, m_regNormLvl);
 	//    DDX_Control(pDX, IDC_INEXACTMTLVL_COMBO, m_inexactMTD); 
-	DDX_Control(pDX, IDC_CHKEXACT, m_exactCtrl);
-	DDX_Control(pDX, IDC_CHKINEXACT, m_inexactCtrl);
 	//	DDX_Control(pDX, IDC_CHKNORMTOK, m_normTokCtrl);    
 	//	DDX_Control(pDX, IDC_EDIT_KEYVECTSIZE, m_keyvectsizeCtrl);
 	//	DDX_Control(pDX, IDC_EDIT_OCCTHRS, m_occthrsCtrl);
@@ -117,6 +115,7 @@ BEGIN_MESSAGE_MAP(NewDetectDialog, CDialogEx)
     ON_EN_CHANGE(IDC_EDIT_KEYVECTSIZE, &NewDetectDialog::OnEnChangeEditKeyvectsize)
 	ON_EN_CHANGE(IDC_DB_PARAM_ID, &NewDetectDialog::OnEnChangeDbParamId)
 	ON_BN_CLICKED(IDCANCEL, &NewDetectDialog::OnBnClickedCancel)
+	ON_BN_CLICKED(IDC_CHKINEXACT, &NewDetectDialog::OnBnClickedChkinexact)
 END_MESSAGE_MAP()
 
 
@@ -375,6 +374,12 @@ BOOL NewDetectDialog::OnInitDialog()
 	m_targetAsmFileCtrl.SetWindowTextW(m_targetAsmFile);
 	UpdateData(FALSE);
 
+	CWnd * staticFileTxt = GetDlgItem(IDC_STATIC_FILES);
+	staticFileTxt->SetWindowTextW(_T("File"));
+
+	CWnd * staticTarAsmFileTxt = GetDlgItem(IDC_STATIC_TAR);
+	staticTarAsmFileTxt->SetWindowTextW(_T("target assembly file"));
+
 	CRect rcWnd, rcDefaultBox;
 	CWnd * wndDefaultBox=NULL;
 	if( !m_withSearchCode)
@@ -441,8 +446,6 @@ BOOL NewDetectDialog::OnInitDialog()
 		m_ToolTip.AddTool(&m_strideCtrl, _T("Step size of sliding window"));
 		m_ToolTip.AddTool(&m_maxkCtrl, _T("Maximum number of features for inexact clone detection"));
 		m_ToolTip.AddTool(&m_maxovfCtrl, _T("Maximum fraction of overlapping between two consecutive clones"));
-		m_ToolTip.AddTool(&m_exactCtrl, _T("Identify exact clones?"));
-		m_ToolTip.AddTool(&m_inexactCtrl, _T("Identify inexact clones?"));
         m_ToolTip.AddTool(&m_normTokCtrl, _T("Normalize all tokens to types?"));
 		m_ToolTip.AddTool(&m_1stsegperCtrl, _T("Fraction of important features for inexct clone detection to generate key vectors"));
 		m_ToolTip.AddTool(&m_keyvectsizeCtrl, _T("Maximum length of each key vector to be mapped to inexact hash tables"));
@@ -476,29 +479,6 @@ BOOL NewDetectDialog::OnInitDialog()
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
-
-/*
-void NewDetectDialog::OnBnClickedButtonPathSel()
-{
-	// TODO: Add your control notification handler code here
-	//m_asmFilePath.Empty();
-	CString tmpPath(m_asmFilePath);
-	//int len = m_asmFilePathCtrl.LineLength(m_asmFilePathCtrl.LineIndex(0));
-	if( len > 0)
-	{
-		//m_asmFilePathCtrl.GetLine(0,tmpPath.GetBuffer(len),len);
-	    tmpPath.ReleaseBuffer(len);
-	}
-
-	CFolderPickerDialog dlg(tmpPath, 0, NULL, 0);
-	if (dlg.DoModal())
-	{
-		m_asmFilePath = dlg.GetPathName();//  GetFolderPath();
-		//m_asmFilePathCtrl.SetWindowTextW(m_asmFilePath);
-        UpdateData(FALSE);
-	} 
-}
-*/
 
 
 void NewDetectDialog::OnBnClickedButtonXmlFile()
@@ -618,4 +598,13 @@ void NewDetectDialog::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
 	CDialogEx::OnCancel();
+}
+
+
+void NewDetectDialog::OnBnClickedChkinexact()
+{
+	// TODO: Add your control notification handler code here
+	UpdateData(TRUE);
+	CWnd *  occThrs = GetDlgItem(IDC_EDIT_OCCTHRS);
+	occThrs->EnableWindow(!m_bFindInexactClonesChk);
 }
