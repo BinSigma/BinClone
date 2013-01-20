@@ -378,7 +378,7 @@ BOOL NewDetectDialog::OnInitDialog()
 	staticFileTxt->SetWindowTextW(_T("File"));
 
 	CWnd * staticTarAsmFileTxt = GetDlgItem(IDC_STATIC_TAR);
-	staticTarAsmFileTxt->SetWindowTextW(_T("target assembly file"));
+	staticTarAsmFileTxt->SetWindowTextW(_T("Target assembly file"));
 
 	CRect rcWnd, rcDefaultBox;
 	CWnd * wndDefaultBox=NULL;
@@ -475,6 +475,10 @@ BOOL NewDetectDialog::OnInitDialog()
 		m_editSearchCodeFrag.SetEventMask(ENM_MOUSEEVENTS);
 		m_editSearchCodeFrag.SetSel(0,0);
 	}
+
+	CWnd *  occThrs = GetDlgItem(IDC_EDIT_OCCTHRS);
+	occThrs->EnableWindow(m_bFindInexactClonesChk);
+
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -606,5 +610,5 @@ void NewDetectDialog::OnBnClickedChkinexact()
 	// TODO: Add your control notification handler code here
 	UpdateData(TRUE);
 	CWnd *  occThrs = GetDlgItem(IDC_EDIT_OCCTHRS);
-	occThrs->EnableWindow(!m_bFindInexactClonesChk);
+	occThrs->EnableWindow(m_bFindInexactClonesChk);
 }
