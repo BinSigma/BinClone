@@ -1,8 +1,0 @@
-
-sub_fake proc near
-push	eax		; lpftLastWriteTime
-xor	eax, eax
-push	eax		; lpcchClass
-push	eax		; lpClass
-push	eax		; lpReserved
-sub_fake endp

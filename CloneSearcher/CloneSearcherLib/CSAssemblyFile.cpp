@@ -300,7 +300,7 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 
             //    continue;
             }
-
+                        
             // create a hash of this region
             const CString contentHashKey = composeContentHashKey(sIdx, eIdx);
             if (contentHashKey.IsEmpty())
