@@ -41,7 +41,7 @@ bool CCSAssemblyToken::isMnemonic(LPCTSTR str)
         if (gMnemonics[i].CompareNoCase(str) == 0)
             return true;
     }
-    return true;
+    return false;
 }
 
 
