@@ -10,15 +10,14 @@
 class CCSParam
 {
 public:
-    CCSParam(TCSRegNormalizeLevel regNormLevel, bool bNormalizeToken, int windowSize, int stride, int kThreshold);
+    CCSParam(TCSRegNormalizeLevel regNormLevel, int windowSize, int stride);
     virtual ~CCSParam();
 
     int m_dbParamID;
     TCSRegNormalizeLevel m_regNormLevel;
-    bool m_bNormalizeToken;
+   // bool m_bNormalizeToken; //mfarhadi : not used anymore!
     int m_windowSize;
-    int m_stride;
-    int m_kThreshold;
+    int m_stride;    
 };
 
 typedef CTypedPtrArray<CPtrArray, CCSParam*> CCSParamArray;

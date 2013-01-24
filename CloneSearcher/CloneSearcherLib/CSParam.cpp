@@ -5,13 +5,11 @@
 // CCSParam *
 //***********
 
-CCSParam::CCSParam(TCSRegNormalizeLevel regNormLevel, bool bNormalizeToken, int windowSize, int stride, int kThreshold)
+CCSParam::CCSParam(TCSRegNormalizeLevel regNormLevel, int windowSize, int stride)
     : m_dbParamID(-1), 
       m_regNormLevel(regNormLevel),
-      m_bNormalizeToken(bNormalizeToken),
       m_windowSize(windowSize), 
-      m_stride(stride), 
-      m_kThreshold(kThreshold)
+      m_stride(stride)
 {
 }
 

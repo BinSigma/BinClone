@@ -66,9 +66,9 @@ bool CCSDatabaseMgr::storeParam(CCSParam& param)
 	PGresult* pgresult; // result of the last query
 	CString csSqlCheckParam = _T("SELECT \"dbParamID\" from \"Parameter\" WHERE ");
 	CString csSqlVals;
-    CString csNormalizeToken;
-    CBFStrHelper::boolToStr(param.m_bNormalizeToken, csNormalizeToken);
-	csSqlVals.Format(_T("\"windowSize\"=%d AND \"stride\"=%d AND \"kThreshold\"=%d AND \"regNormLevel\"=%d AND \"bNormalizeToken\"=%s"), param.m_windowSize, param.m_stride, param.m_kThreshold, param.m_regNormLevel, csNormalizeToken.GetString());
+    CString csNormalizeToken; //  mfarhadi: not used anymore!
+    CBFStrHelper::boolToStr("temp", csNormalizeToken); // mfarhadi: not used anymore!
+	csSqlVals.Format(_T("\"windowSize\"=%d AND \"stride\"=%d AND \"kThreshold\"=%d AND \"regNormLevel\"=%d AND \"bNormalizeToken\"=%s"), param.m_windowSize, param.m_stride, 100, param.m_regNormLevel, csNormalizeToken.GetString());  //mfarhadi: kThreshold (100) and csNormalizeToken need to be removed
 	csSqlCheckParam += csSqlVals;
     CStringA csSqlCheckParamANSI;
 	if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckParam, csSqlCheckParamANSI)) {
@@ -101,7 +101,7 @@ bool CCSDatabaseMgr::storeParam(CCSParam& param)
 		CString csSqlValues;
         //CString csNormalizeToken;
         //CBFStrHelper::convertBoolToCString(param.m_bNormalizeToken, csNormalizeToken);
-		csSqlValues.Format(_T("%d, %d, %d, %d, %s,  DEFAULT)"), param.m_windowSize, param.m_stride, param.m_kThreshold, param.m_regNormLevel, csNormalizeToken.GetString());
+		csSqlValues.Format(_T("%d, %d, %d, %d, %s,  DEFAULT)"), param.m_windowSize, param.m_stride, 100, param.m_regNormLevel, csNormalizeToken.GetString());
 		csSqlInsertParam += csSqlValues;
 
         CStringA csSqlInsertParamANSI;
@@ -189,10 +189,8 @@ bool CCSDatabaseMgr::fetchParams(CCSParams& params)
         }
         // bfung: Add a boolean variable bNormalizeToken to the database table Parameter
         pNewParam = new CCSParam((TCSRegNormalizeLevel) CBFStrHelper::strToInt((LPCTSTR) regNormLevel), 
-                                  bNormalizeToken, 
                                   CBFStrHelper::strToInt((LPCTSTR) windowSize), 
-                                  CBFStrHelper::strToInt((LPCTSTR) stride), 
-                                  CBFStrHelper::strToInt((LPCTSTR) kThreshold));
+                                  CBFStrHelper::strToInt((LPCTSTR) stride));
         pNewParam->m_dbParamID = CBFStrHelper::strToInt((LPCTSTR) dbParamID);
         if (!params.addParam(pNewParam)) {
             ASSERT(false);

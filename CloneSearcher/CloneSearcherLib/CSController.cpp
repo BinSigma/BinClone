@@ -25,17 +25,18 @@ CCSController::~CCSController()
 //
 bool CCSController::populateAssemblyToDB(LPCTSTR assemblyFolderPath,
                                          TCSRegNormalizeLevel regNormLevel,
-                                         bool bNormalizeToken,
+                                      //   bool bNormalizeToken, mfarhadi
                                          int windowSize,
-                                         int stride,
-                                         int kThreshold)
+                                         int stride
+                                      //   int kThreshold
+                                         )
 {
     // construct a list of feature strings.
     if (!m_assemblyFileMgr.constructBasicFeatures())
         return false;
 
     // Store parameters to database
-    CCSParam param(regNormLevel, bNormalizeToken, windowSize, stride, kThreshold);
+    CCSParam param(regNormLevel, windowSize, stride);
     if (!m_dbMgr.storeParam(param))
         return false;
     

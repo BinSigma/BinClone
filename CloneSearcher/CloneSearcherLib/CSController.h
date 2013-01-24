@@ -44,10 +44,8 @@ public:
     //
     bool populateAssemblyToDB(LPCTSTR assemblyFolderPath,
                               TCSRegNormalizeLevel regNormLevel,
-                              bool bNormalizeToken,
                               int windowSize,
-                              int stride,
-                              int kThreshold);
+                              int stride);
 
     //
     // Retrieve all combination of parameters from DB.

@@ -25,7 +25,7 @@ public:
     inline const CCSFeatureVector& getVector() const { return m_vector; };
     inline const CCSBoolArray& getBinaryVector() const { return m_binaryVector; };
 
-    bool countRegionFeatures(int kThreshold, CCSAssemblyFileMgr* pAssemblyFileMgr);
+    bool countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr);
     bool constructVector(CStringArray& globaFeatures);
     bool constructBinaryVector(const CCSIntArray& globalMedians);
 	bool updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileMgr* pAssemblyFileMgr); //mfarhadi

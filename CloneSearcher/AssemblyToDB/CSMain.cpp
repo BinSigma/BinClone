@@ -25,22 +25,23 @@ bool parseArgs(int                   nArgs,
                CString&              dbPwd,
                CString&              assemblyFolder,
                TCSRegNormalizeLevel& regNormLevel,
-               bool&                 bNormalizeToken,
+             //  bool&                 bNormalizeToken, mfarhadi : no need anymore
                int&                  windowSize,
-               int&                  stride,
-               int&                  kThreshold)
+               int&                  stride
+          //     int&                  kThreshold   mfarhadi : no need anymore
+               )
 {
-    if (nArgs != 10 || !argv) {
-        tcout << _T("Usage: AssemblyToDB <dbName> <dbUser> <dbPwd> <assemblyFolder> <regNormLevel> <bNormalizeToken> <window size> <stride> <maxKOperands>") << endl;
+    if (nArgs != 8 || !argv) {
+        tcout << _T("Usage: AssemblyToDB <dbName> <dbUser> <dbPwd> <assemblyFolder> <regNormLevel>  <window size> <stride>") << endl;
         tcout << _T("Format: <dbName:string>") << endl;
         tcout << _T("        <dbUser:string>") << endl;
         tcout << _T("        <dbPwd:string>") << endl;
         tcout << _T("        <assemblyFolder:string>:input folder of assembly files, e.g., C:\\temp\\sample") << endl;
         tcout << _T("        <regNormLevel:boolean>:register normalization level with 4 possible values: REG, TYPE, IDXPTR, or BITS") << endl;
-        tcout << _T("        <bNormalizeToken:boolean>:normalize token: TRUE or FALSE") << endl;
+     //   tcout << _T("        <bNormalizeToken:boolean>:normalize token: TRUE or FALSE") << endl;
         tcout << _T("        <windowSize:integer>:window size, e.g., 5") << endl;
         tcout << _T("        <stride:integer>:step size, e.g., 1") << endl;
-        tcout << _T("        <maxKOperands:integer>:maximum number of operands in feature vector, e.g., 5") << endl;
+    //    tcout << _T("        <maxKOperands:integer>:maximum number of operands in feature vector, e.g., 5") << endl;
         return false;
     }
 
@@ -62,7 +63,7 @@ bool parseArgs(int                   nArgs,
         ASSERT(false);
         return false;
     }
-
+/*   mfarhadi: no need anymore
 	if (_tcsicmp(argv[6], CS_TRUE_STR) == 0)
 	    bNormalizeToken = true;
 	else if (_tcsicmp(argv[6], CS_FALSE_STR) == 0)
@@ -72,10 +73,10 @@ bool parseArgs(int                   nArgs,
         ASSERT(false);
         return false;
     }
-
-	windowSize = StrToInt(argv[7]);
-	stride = StrToInt(argv[8]);
-    kThreshold = StrToInt(argv[9]);
+*/
+	windowSize = StrToInt(argv[6]);
+	stride = StrToInt(argv[7]);
+//    kThreshold = StrToInt(argv[9]);   mfarhadi: no need anymore
     return true;
 }
 
@@ -101,17 +102,17 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 			//tcout << (LPCTSTR)strHello << endl;
 
 			CString dbName, dbUser, dbPwd, assemblyFolderPath;
-            int windSize = 0, stride = 0, kThreshold = 0;
-            bool bNormalizeToken = false;
+            int windSize = 0, stride = 0; //kThreshold = 0;
+         //   bool bNormalizeToken = false; mfarhadi: no need anymore
             TCSRegNormalizeLevel regNormLevel = CS_NORM_REG_ROOT;
-			if (!parseArgs(argc, argv, dbName, dbUser, dbPwd, assemblyFolderPath, regNormLevel, bNormalizeToken, windSize, stride, kThreshold)) { 
+			if (!parseArgs(argc, argv, dbName, dbUser, dbPwd, assemblyFolderPath, regNormLevel, windSize, stride)) { 
 				tcout << _T("Input Error: invalid arguments") << endl;
 				return 1;
 			}
 
             // test population of assembly code to DB.
             CCSController controller(dbName, dbUser, dbPwd);
-            if (!controller.populateAssemblyToDB(assemblyFolderPath, regNormLevel, bNormalizeToken, windSize, stride, kThreshold)) {
+            if (!controller.populateAssemblyToDB(assemblyFolderPath, regNormLevel, windSize, stride)) {
 				tcout << _T("Error occured.") << endl;
 #ifdef _DEBUG
                 _getch();

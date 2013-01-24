@@ -190,13 +190,15 @@ bool CCSAssemblyFile::normalizeCode(const CCSParam& param)
                 return false;
             }
 
-            // Update the token string
-            CString opIdxStr;
+            // Update the token string   mfarhadi: we do not have idx any more (no normalize token any more!)
+/*            CString opIdxStr;
             if (param.m_bNormalizeToken)
                 opIdxStr = _T("0");                        
             else
                 CBFStrHelper::intToStr(opIdx, opIdxStr);
             pToken->setTokenStr(newTokenStr + CS_OPERAND_IDX_DELIMETER + opIdxStr); // e.g., REGGen32#457
+*/
+            pToken->setTokenStr(newTokenStr); // e.g., REG or REGGen32
         }
     }
     return true;
@@ -291,7 +293,7 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
             CCSRegion region(pFcn, sIdx, eIdx, rawSidx, rawEidx);
 
             if (bStoreDB) {  //mfarhadi: multiple scan of the files is disabled. we will do it only if we want to store the features and medians in the database
-                if (!region.countRegionFeatures(param.m_kThreshold, pAssemblyFileMgr))
+                if (!region.countRegionFeatures(pAssemblyFileMgr))
                     return false;
 
                 // Farhadi: Step 1: update the medians. mfarhadi
@@ -334,7 +336,7 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
                     return false;
 
                 // actually count the features.
-                if (!region.countRegionFeatures(param.m_kThreshold, pAssemblyFileMgr))
+                if (!region.countRegionFeatures(pAssemblyFileMgr))
                     return false;
                 if (!region.constructVector(pAssemblyFileMgr->m_globalFeatures))
                     return false;

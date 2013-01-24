@@ -30,7 +30,7 @@ int CCSRegion::m_cntRegion = 0; // mfarhadi initilize the static variable
 //
 // Count features
 //
-bool CCSRegion::countRegionFeatures(int kThreshold, CCSAssemblyFileMgr* pAssemblyFileMgr)
+bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
 {
     // For each line in the region
     CCSAssemblyLine* pLine = NULL;
@@ -65,7 +65,7 @@ bool CCSRegion::countRegionFeatures(int kThreshold, CCSAssemblyFileMgr* pAssembl
                 if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) opType))
                     return false;
                 incFeatureCount(opType);
-                
+/*     mfarhadi: no idx any more!           
                 // Get normalizedToken + idx number of operand. Assume tokenStr is in the format similar to REG16#234
                 // According to the algorithm, we use the token only if its index < k.
                 int delIdx = pToken->getTokenStr().Find(CS_OPERAND_IDX_DELIMETER);
@@ -86,6 +86,7 @@ bool CCSRegion::countRegionFeatures(int kThreshold, CCSAssemblyFileMgr* pAssembl
                         return false;
                     incFeatureCount(pToken->getTokenStr());
                 }
+*/             
             }
         }
 
