@@ -24,11 +24,9 @@ public:
               double oThreshold,
               bool bFindExactClones,
               bool bFindInexactClones,
-//              TCDRegNormalizeLevel regNormLevel,
               bool bNormalizeToken,
 	          int keyVectorsSize,
 	          double occurrenceThrs,
-//              CDInexactMethod inexactMethod, 
               LPCTSTR targetFragment=NULL)
 	{
 		m_folderPath = assemblyFolderPath;
@@ -39,11 +37,9 @@ public:
 		m_maxOverlapFraction =	oThreshold;
         m_bFindExactClones = bFindExactClones;
         m_FindInexactClones = bFindInexactClones;
-//        m_normalLevel = regNormLevel;
         m_bNormalizeToken = bNormalizeToken,
 	    m_keyVectorsSize = keyVectorsSize;
 	    m_occurrenceThrs = occurrenceThrs;
-//        m_inexactLevel = inexactMethod; 
       	m_targetCodefrag = targetFragment;
 		m_fragTmpFile = _T("");
 	
@@ -60,9 +56,6 @@ public:
 			   LPCTSTR targetFragment=NULL)
 
 	{
-		//m_dbName = dbName;
-		//m_dbUser = dbUser;
-		//m_dbPwd = dbPwd;
 		m_csController = csController;
         m_bFindExactClones = bFindExactClones;
         m_bFindInexactClones = bFindInexactClones;

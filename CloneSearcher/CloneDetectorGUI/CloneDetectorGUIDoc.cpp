@@ -60,15 +60,15 @@ BOOL CCloneDetectorGUIDoc::OnNewDocument()
 		CBFStrHelper strHelper;
 		try
 		{
-			int windSize                  = strHelper.strToInt(newDetectDlg.m_windSize);
-			int stride                    = strHelper.strToInt(newDetectDlg.m_stride);
-			int maxKOpLvl                 = strHelper.strToInt(newDetectDlg.m_maxKOP);
-			double ovLap                  = strHelper.strToFloat(newDetectDlg.m_maxOVF);
+			int windSize = 0; //                = strHelper.strToInt(newDetectDlg.m_windSize);
+			int stride = 0; //                    = strHelper.strToInt(newDetectDlg.m_stride);
+			int maxKOpLvl = 0; //                 = strHelper.strToInt(newDetectDlg.m_maxKOP);
+			double ovLap = 0; //                  = strHelper.strToFloat(newDetectDlg.m_maxOVF);
 			bool bfindExact               = newDetectDlg.m_bFindExactClonesChk ? true : false;
 			bool bfindInExact             = newDetectDlg.m_bFindInexactClonesChk ? true : false;
-			int keyVectorsSize            = strHelper.strToInt(newDetectDlg.m_keyVectorsSize);
+			int keyVectorsSize = 0; //            = strHelper.strToInt(newDetectDlg.m_keyVectorsSize);
 			double occurrenceThrs         = strHelper.strToFloat(newDetectDlg.m_occurrenceThrs);
-			int regNormLvl                = newDetectDlg.m_regNormalizedLevel;
+			int regNormLvl = 0; //                = newDetectDlg.m_regNormalizedLevel;
             bool bNormalizeToken          = newDetectDlg.m_bNormalizeTokenChk ? true : false;
             int inexactMTD                = newDetectDlg.m_inexactMethodLevel; 
 			LPCTSTR pSearchCodeFrag       = NULL;

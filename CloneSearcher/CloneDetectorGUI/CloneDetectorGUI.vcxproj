@@ -124,6 +124,7 @@
     <ClInclude Include="DControllerDialog.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="NewDetectDialog.h" />
+    <ClInclude Include="ParamsListDialog.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SearchTokenDlg.h" />
     <ClInclude Include="stdafx.h" />
@@ -145,6 +146,7 @@
     <ClCompile Include="DControllerDialog.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="NewDetectDialog.cpp" />
+    <ClCompile Include="ParamsListDialog.cpp" />
     <ClCompile Include="SearchTokenDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

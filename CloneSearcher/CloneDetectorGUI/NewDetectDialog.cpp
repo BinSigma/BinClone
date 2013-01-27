@@ -5,6 +5,8 @@
 #include "CloneDetectorGUI.h"
 #include "NewDetectDialog.h"
 #include "afxdialogex.h"
+#include "CSController.h"
+#include "ParamsListDialog.h"
 
 static TCHAR BASED_CODE szFilter[] = _T("XML Files (*.asm)|*.ASM|")
                                      _T("All Files (*.*)|*.*||");
@@ -12,22 +14,25 @@ static TCHAR BASED_CODE szFilter[] = _T("XML Files (*.asm)|*.ASM|")
 
 static CString g_asmFilePath(_T(""));
 static CString g_targetAsmFile(_T(""));
-static CString g_windSize(_T("40"));
-static CString g_stride(_T("1"));
-static CString g_maxKOP(_T("40"));
-static CString g_maxOVF(_T("0.5"));
 static BOOL    g_bFindExactClonesChk(TRUE);
 static BOOL    g_bFindInexactClonesChk(FALSE);
 static int     g_regNormalizedLevel(0);
 static BOOL    g_bNormalizeTokenChk(TRUE);
-static CString g_keyVectorsSize(_T("5"));
 static CString g_occurrenceThrs(_T("0.8"));
 static int     g_inexactMethodLevel(0);
-static CString g_dbParamID(_T("30"));
+static int     g_dbParamID(-1);
+static int     g_windSize(-1);
+static int     g_stride(-1);
+static int     g_regNormLvl(-1);
 
 CString g_dbName(_T("CSDataBase"));
 CString g_dbUser(_T("postgres"));
 CString g_dbPwd(_T(""));
+
+CString REG_NORM_LVL[4] = { _T("CD_NORM_REG_ROOT"), 
+                            _T("CD_NORM_REG_TYPE"), 
+							_T("CD_NORM_REG_IDXPTR"), 
+							_T("CD_NORM_REG_BITS") };
 
 
 IMPLEMENT_DYNAMIC(NewDetectDialog, CDialogEx)
@@ -36,16 +41,9 @@ NewDetectDialog::NewDetectDialog(bool p_searchCode, CWnd* pParent /*=NULL*/)
 	 : CDialogEx(NewDetectDialog::IDD, pParent)	 
 	 , m_withSearchCode(p_searchCode)
 	 , m_ok(false)
-	 , m_windSize(g_windSize)
-     , m_stride(g_stride) 
-     , m_maxKOP(g_maxKOP) 
-     , m_maxOVF(g_maxOVF) 
-     , m_regNormalizedLevel(g_regNormalizedLevel) 
      , m_bFindExactClonesChk(g_bFindExactClonesChk) 
      , m_bFindInexactClonesChk(g_bFindInexactClonesChk) 
-     , m_bNormalizeTokenChk(g_bNormalizeTokenChk)
      , m_targetAsmFile(g_targetAsmFile) 
-     , m_keyVectorsSize(g_keyVectorsSize) 
      , m_occurrenceThrs(g_occurrenceThrs) 
      , m_inexactMethodLevel(g_inexactMethodLevel) 
 	 , m_db_param_id(g_dbParamID)
@@ -54,6 +52,7 @@ NewDetectDialog::NewDetectDialog(bool p_searchCode, CWnd* pParent /*=NULL*/)
 	 , m_dbName(g_dbName)
 	 , m_dbUser(g_dbUser)
 	 , m_dbPwd(g_dbPwd)
+	 , m_paramsId(-1)
 {
 	if (g_asmFilePath.GetLength() <= 0) {
 	    TCHAR temp[MAX_PATH]; 
@@ -70,32 +69,13 @@ NewDetectDialog::~NewDetectDialog()
 void NewDetectDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	//	DDX_Text(pDX, IDC_WINDSZIE_EDIT, m_windSize);
-	//	DDX_Text(pDX, IDC_STRIDE_EDIT, m_stride);
-	//	DDX_Text(pDX, IDC_MAXKOP_EDIT, m_maxKOP);
-	//	DDX_Text(pDX, IDC_MAXOVF_EDIT, m_maxOVF);
 	DDX_Check(pDX, IDC_CHKEXACT, m_bFindExactClonesChk);
 	DDX_Check(pDX, IDC_CHKINEXACT, m_bFindInexactClonesChk);
-	//	DDX_Check(pDX, IDC_CHKNORMTOK, m_bNormalizeTokenChk);
 	DDX_Check(pDX, IDC_KEEP_TEMP_FILE_CHECK, m_keepTempFileChk);
-	//	DDX_Text(pDX, IDC_EDIT_KEYVECTSIZE, m_keyVectorsSize);
-	DDX_Text(pDX, IDC_EDIT_OCCTHRS, m_occurrenceThrs);
-
-	//	DDX_Control(pDX, IDC_WINDSZIE_EDIT, m_winSizeCtrl);
-	//	DDX_Control(pDX, IDC_STRIDE_EDIT, m_strideCtrl);
-	//	DDX_Control(pDX, IDC_MAXKOP_EDIT, m_maxkCtrl);
-	//	DDX_Control(pDX, IDC_MAXOVF_EDIT, m_maxovfCtrl);
-	//	DDX_Control(pDX, IDC_REGNLVL_COMBO, m_regNormLvl);
-	//    DDX_Control(pDX, IDC_INEXACTMTLVL_COMBO, m_inexactMTD); 
-	//	DDX_Control(pDX, IDC_CHKNORMTOK, m_normTokCtrl);    
-	//	DDX_Control(pDX, IDC_EDIT_KEYVECTSIZE, m_keyvectsizeCtrl);
-	//	DDX_Control(pDX, IDC_EDIT_OCCTHRS, m_occthrsCtrl);
+	DDX_Text(pDX, IDC_EDIT_OCCTHRS, m_occurrenceThrs); 
 	DDX_Control(pDX, IDC_RICHEDIT_SEARCH_CODE, m_editSearchCodeFrag);
-	//DDX_Control(pDX, IDC_EDIT_PATH_SEL, m_asmFilePathCtrl);
 	DDX_Control(pDX, IDC_EDIT_ASM_FILE, m_targetAsmFileCtrl);
 	DDX_Control(pDX, IDC_KEEP_TEMP_FILE_CHECK, m_keepTempFileChkCtrl);
-	DDX_Check(pDX, IDC_KEEP_TEMP_FILE_CHECK, m_keepTempFileChk);
-	DDX_Text(pDX, IDC_DB_PARAM_ID, m_db_param_id);
 	DDX_Text(pDX, IDC_DB_PWD, m_dbPwd);
 	DDX_Text(pDX, IDC_DB_NAME, m_dbName);
 	DDX_Text(pDX, IDC_DB_USER, m_dbUser);
@@ -104,22 +84,40 @@ void NewDetectDialog::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(NewDetectDialog, CDialogEx)
 	ON_BN_CLICKED(IDOK, &NewDetectDialog::OnBnClickedOk)
-//	ON_BN_CLICKED(IDC_BUTTON_PATH_SEL, &NewDetectDialog::OnBnClickedButtonPathSel)
 	ON_BN_CLICKED(IDC_BUTTON_XML_FILE, &NewDetectDialog::OnBnClickedButtonXmlFile)
 	ON_BN_CLICKED(IDOK2, &NewDetectDialog::OnBnClickedOk2)
 	ON_BN_CLICKED(IDCANCEL2, &NewDetectDialog::OnBnClickedCancel2)
 	ON_MESSAGE(ID_MENU_COPY,OnCopy)
 	ON_MESSAGE(ID_MENU_PASTE,OnPaste)
-    ON_CBN_SELCHANGE(IDC_REGNLVL_COMBO, &NewDetectDialog::OnCbnSelchangeRegnlvlCombo)
-    ON_STN_CLICKED(IDC_STATIC_KEY_VECT_SIZE, &NewDetectDialog::OnStnClickedStaticKeyVectSize)
-    ON_EN_CHANGE(IDC_EDIT_KEYVECTSIZE, &NewDetectDialog::OnEnChangeEditKeyvectsize)
-	ON_EN_CHANGE(IDC_DB_PARAM_ID, &NewDetectDialog::OnEnChangeDbParamId)
 	ON_BN_CLICKED(IDCANCEL, &NewDetectDialog::OnBnClickedCancel)
 	ON_BN_CLICKED(IDC_CHKINEXACT, &NewDetectDialog::OnBnClickedChkinexact)
+ON_BN_CLICKED(IDC_BUTTON_GET_PARAMS, &NewDetectDialog::OnBnClickedButtonGetParams)
 END_MESSAGE_MAP()
 
 
 // NewDetectDialog message handlers
+
+void NewDetectDialog::updateParametersStaticText(int windSize, int stride, int regNormsLvl)
+{
+	CString WinSizeStr(_T("Window Size : "));
+	WinSizeStr.Format(WinSizeStr + "%d", windSize);
+	CString StrideStr(_T("Stride : "));
+	StrideStr.Format(StrideStr + "%d", stride);
+	CString RegNormLvlStr(_T("Register Normalization Level : "));
+	if( regNormsLvl >= 0 && regNormsLvl < 4)
+	{
+		RegNormLvlStr.Format(RegNormLvlStr+ "%s", REG_NORM_LVL[regNormsLvl]);
+	}
+	CWnd * staticWinSizeTxt = GetDlgItem(IDC_WIND_SIZE);
+	staticWinSizeTxt->SetWindowTextW(WinSizeStr);
+
+	CWnd * staticStrideTxt = GetDlgItem(IDC_STRIDE);
+	staticStrideTxt->SetWindowTextW(StrideStr);
+
+    CWnd * staticRegNormLvlTxt = GetDlgItem(IDC_NORM_LEVEL);
+	staticRegNormLvlTxt->SetWindowTextW(RegNormLvlStr);
+
+}
 
 void NewDetectDialog::OnBnClickedBexactTrue()
 {
@@ -139,17 +137,7 @@ void NewDetectDialog::OnBnClickedOk()
 
 	CBFStrHelper strHelp;
 	m_asmFilePath.Empty();
-	//int len = m_asmFilePathCtrl.LineLength(m_asmFilePathCtrl.LineIndex(0));
-	//m_asmFilePathCtrl.GetLine(0,m_asmFilePath.GetBuffer(len),len);
-/*
-	m_asmFilePath.ReleaseBuffer(len);
-	if( m_asmFilePath.GetLength() == 0)
-	{
-		AfxMessageBox(_T("Assembly files path cannot be empty!"));
-		return;
-	}
-	g_asmFilePath = m_asmFilePath;
-*/
+	
 	if( !m_withSearchCode)
 	{
 		m_targetAsmFile.Empty();
@@ -164,110 +152,10 @@ void NewDetectDialog::OnBnClickedOk()
 		g_targetAsmFile = m_targetAsmFile;
 	}
 
-	if(m_windSize.GetLength() == 0)
-	{
-		AfxMessageBox(_T("Window size cannot be empty."));
-		return;
-	}
-	else
-	{
-		int tmp = strHelp.strToInt(m_windSize);
-		if (tmp < 1) {
-		    AfxMessageBox(_T("Window size must be positive integer."));
-		    return;
-		}
-	}
-	g_windSize = m_windSize;
-
-
-	if( m_stride.GetLength() == 0)
-	{
-		AfxMessageBox(_T("Step size cannot be empty."));
-		return;
-	}
-	else
-	{
-		int tmp = strHelp.strToInt(m_stride);
-        int tmpWndSze = strHelp.strToInt(m_windSize);
-		if (tmp < 1 || tmp > tmpWndSze) {
-		    AfxMessageBox(_T("Step size must be positive integer and smaller than the window size."));
-		    return;
-		}
-	}
-	g_stride = m_stride;
-
-
-	if( m_maxKOP.GetLength() == 0)
-	{
-		AfxMessageBox(_T("Feature Extraction Threshold cannot be empty!"));
-		return;
-	}
-	else
-	{
-		int tmp = strHelp.strToInt(m_maxKOP);
-		if (tmp < 1)
-		{
-		    AfxMessageBox(_T("The maximum number of features must be positive interger."));
-		    return;
-		}
-	}
-	g_maxKOP = m_maxKOP;
-
-	if( (m_maxOVF.GetLength() == 0) ||
-		!strHelp.isNumeric(m_maxOVF))
-	{
-		AfxMessageBox(_T("maxOverlapFraction is not valid!"));
-		return;
-	}
-	else
-	{
-		double tmp = strHelp.strToFloat(m_maxOVF);
-		if((tmp < 0.1) || (tmp > 1) )
-		{
-		    AfxMessageBox(_T("The 1-norm Distance Threshold must be 0.1 - 1.0 "));
-		    return;
-		}
-	}
-	g_maxOVF = m_maxOVF;
-
-/* OLD
-	m_regNormalizedLevel = m_regNormLvl.GetCurSel();
-	if ((m_regNormalizedLevel < CD_NORM_REG_ROOT) || (m_regNormalizedLevel > CD_NORM_REG_BITS))
-	{
-		AfxMessageBox(_T("RegNormalizeLevel is invalid!"));
-		return;
-	}
-	g_regNormalizedLevel = m_regNormalizedLevel;
-
-   
-    m_inexactMethodLevel = m_inexactMTD.GetCurSel();  
-    if (m_bFindInexactClonesChk && (m_inexactMethodLevel < CD_INEXACT_METHOD_RANDOM) || (m_inexactMethodLevel > CD_INEXACT_METHOD_TWOCOMBINATION))
-	{
-		AfxMessageBox(_T("inexactMethodLevel is invalid!"));
-		return;
-	}
-*/
     g_inexactMethodLevel = m_inexactMethodLevel;
 
 	g_bFindExactClonesChk = m_bFindExactClonesChk;
 	g_bFindInexactClonesChk = m_bFindInexactClonesChk;
-    g_bNormalizeTokenChk = m_bNormalizeTokenChk;
-
-	if( m_keyVectorsSize.GetLength() <= 0) 
-	{
-		AfxMessageBox(_T("Key vectors size cannot be empty."));
-		return;
-	}
-	else
-	{
-		int tmp = strHelp.strToInt(m_keyVectorsSize);
-		if (tmp < 2 || tmp > 10)
-		{
-		    AfxMessageBox(_T("Key vectors size must be 2 - 10."));
-		    return;
-		}
-	}	
-	g_keyVectorsSize = m_keyVectorsSize;
 	
 	if (m_occurrenceThrs.GetLength() <= 0 || !strHelp.isNumeric(m_occurrenceThrs))
 	{
@@ -285,23 +173,7 @@ void NewDetectDialog::OnBnClickedOk()
 	}
 	g_occurrenceThrs = m_occurrenceThrs;	
 
-
-	if (m_db_param_id.GetLength() <= 0 || !strHelp.isNumeric(m_db_param_id))
-	{
-		AfxMessageBox(_T("dbParamID is invalid."));
-		return;
-	}
-	else
-	{
-		int tmp = strHelp.strToInt(m_db_param_id);
-		if (tmp < 0 )
-		{
-		    AfxMessageBox(_T("dbParamID is invalid."));
-		    return;
-		}
-
-		g_dbParamID = m_db_param_id;
-	}
+	g_dbParamID = m_db_param_id;
 
 	if (m_dbName.GetLength() <= 0)
 	{
@@ -368,11 +240,12 @@ BOOL NewDetectDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	
-	//m_asmFilePathCtrl.SetWindowTextW(g_asmFilePath);
 	UpdateData(FALSE);
 
 	m_targetAsmFileCtrl.SetWindowTextW(m_targetAsmFile);
 	UpdateData(FALSE);
+
+	updateParametersStaticText(g_windSize,g_stride,g_regNormLvl);
 
 	CWnd * staticFileTxt = GetDlgItem(IDC_STATIC_FILES);
 	staticFileTxt->SetWindowTextW(_T("File"));
@@ -442,6 +315,7 @@ BOOL NewDetectDialog::OnInitDialog()
 	}
 	else
 	{
+		/*
 	    m_ToolTip.AddTool(&m_winSizeCtrl, _T("Size of sliding window"));
 		m_ToolTip.AddTool(&m_strideCtrl, _T("Step size of sliding window"));
 		m_ToolTip.AddTool(&m_maxkCtrl, _T("Maximum number of features for inexact clone detection"));
@@ -450,6 +324,7 @@ BOOL NewDetectDialog::OnInitDialog()
 		m_ToolTip.AddTool(&m_1stsegperCtrl, _T("Fraction of important features for inexct clone detection to generate key vectors"));
 		m_ToolTip.AddTool(&m_keyvectsizeCtrl, _T("Maximum length of each key vector to be mapped to inexact hash tables"));
 		m_ToolTip.AddTool(&m_occthrsCtrl, _T("Fraction of the number of hash tables which pairs are grouped together"));
+		*/
 	    m_ToolTip.Activate(TRUE);
 	}
 
@@ -563,41 +438,6 @@ LRESULT NewDetectDialog::OnPaste(WPARAM, LPARAM)
 }
 
 
-
-void NewDetectDialog::OnCbnSelchangeRegnlvlCombo()
-{
-    // TODO: Add your control notification handler code here
-}
-
-
-void NewDetectDialog::OnStnClickedStaticKeyVectSize()
-{
-    // TODO: Add your control notification handler code here
-}
-
-
-void NewDetectDialog::OnEnChangeEditKeyvectsize()
-{
-    // TODO:  If this is a RICHEDIT control, the control will not
-    // send this notification unless you override the CDialogEx::OnInitDialog()
-    // function and call CRichEditCtrl().SetEventMask()
-    // with the ENM_CHANGE flag ORed into the mask.
-
-    // TODO:  Add your control notification handler code here
-}
-
-
-void NewDetectDialog::OnEnChangeDbParamId()
-{
-	// TODO:  If this is a RICHEDIT control, the control will not
-	// send this notification unless you override the CDialogEx::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-	// TODO:  Add your control notification handler code here
-}
-
-
 void NewDetectDialog::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
@@ -611,4 +451,52 @@ void NewDetectDialog::OnBnClickedChkinexact()
 	UpdateData(TRUE);
 	CWnd *  occThrs = GetDlgItem(IDC_EDIT_OCCTHRS);
 	occThrs->EnableWindow(m_bFindInexactClonesChk);
+}
+
+
+void NewDetectDialog::OnBnClickedButtonGetParams()
+{
+	UpdateData(TRUE);
+
+	// TODO: Add your control notification handler code here
+	if (m_dbName.GetLength() <= 0)
+	{
+		AfxMessageBox(_T("Database name is invalid."));
+		return;
+	}
+
+	if (m_dbUser.GetLength() <= 0)
+	{
+		AfxMessageBox(_T("Database user is invalid."));
+		return;
+	}
+
+	if (m_dbPwd.GetLength() <= 0)
+	{
+		AfxMessageBox(_T("Database user password is invalid."));
+		return;
+	}
+
+	ParamsListDialog paramsListDialog;
+	paramsListDialog.init(m_dbName,m_dbUser,m_dbPwd);
+	paramsListDialog.DoModal();
+
+	if(paramsListDialog.m_result)
+	{
+		m_db_param_id = paramsListDialog.m_paramId;
+		g_windSize = paramsListDialog.m_selWndSize;
+		g_stride = paramsListDialog.m_selStride;
+		g_regNormLvl = paramsListDialog.m_selRegNormLvl;
+
+		updateParametersStaticText(paramsListDialog.m_selWndSize,
+			                       paramsListDialog.m_selStride,
+								   paramsListDialog.m_selRegNormLvl);
+	}
+	/*
+	else
+	{
+		AfxMessageBox(_T("Failed to get the parameters."));
+	}
+	*/
+
 }

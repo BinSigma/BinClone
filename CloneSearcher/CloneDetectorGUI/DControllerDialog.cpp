@@ -21,12 +21,7 @@ UINT RunCDControllerThread( LPVOID pParam )
 
    try 
    {    
-	   
-	   //CCSController controller(pcdControllerDlg->m_dbName, 
-		//                        pcdControllerDlg->m_dbUser, 
-		//						pcdControllerDlg->m_dbPwd);
-    
-         
+	            
 	   CCSParams params; 
 	   CCSController * pController = pcdControllerDlg->m_csController; 
 	   if( !pController)
@@ -50,7 +45,6 @@ UINT RunCDControllerThread( LPVOID pParam )
            return 1;
 	   }
 
-	   //const CCSClones* pClones = NULL;
 	   if( pcdControllerDlg->m_targetCodefrag != NULL)
 	   {
 		   CString tmpFile;
@@ -73,32 +67,6 @@ UINT RunCDControllerThread( LPVOID pParam )
 																	pcdControllerDlg->m_pClones); 
 		   
 	   }
-
-	   /* OLD
-	   CCDController cloneDetectorObj(pcdControllerDlg->m_folderPath,
-			                           pcdControllerDlg->m_clonePairFileName,
-								       pcdControllerDlg->m_windSize,
-								       pcdControllerDlg->m_stride,
-								       pcdControllerDlg->m_maxKOperands,
-								       pcdControllerDlg->m_maxOverlapFraction,
-								       pcdControllerDlg->m_bFindExactClones,
-								       pcdControllerDlg->m_FindInexactClones,
-								       pcdControllerDlg->m_normalLevel,
-                                       pcdControllerDlg->m_bNormalizeToken,
-								       pcdControllerDlg->m_keyVectorsSize,
-								       pcdControllerDlg->m_occurrenceThrs,
-                                       pcdControllerDlg->m_inexactLevel); 
-									   
-		if( pcdControllerDlg->m_targetCodefrag != NULL)
-		{
-			pcdControllerDlg->m_result = cloneDetectorObj.searchFragments(pcdControllerDlg->m_targetCodefrag,
-				                                                          pcdControllerDlg->m_tmpAsmFilePath);
-		}
-		else
-		{
-			pcdControllerDlg->m_result = cloneDetectorObj.detectClones();
-		}
-		*/
 			
 		if( !pcdControllerDlg->m_result)
 		{
@@ -106,8 +74,6 @@ UINT RunCDControllerThread( LPVOID pParam )
 
 			pcdControllerDlg->m_result = false;
 		}
-		//else
-		//	pcdControllerDlg->m_pClones = pClones;
    }
    catch (CException *e) {
       TCHAR msg[255];

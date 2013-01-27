@@ -33,6 +33,8 @@ ClonePairsAsmFrame::ClonePairsAsmFrame()
 
 ClonePairsAsmFrame::~ClonePairsAsmFrame()
 {
+	if(m_csController)
+		delete m_csController;
 }
 
 
@@ -123,18 +125,18 @@ bool ClonePairsAsmFrame::init()
 		CBFStrHelper strHelper;
 		try
 		{
-			int windSize                  = strHelper.strToInt(newDetectDlg.m_windSize);
-			int stride                    = strHelper.strToInt(newDetectDlg.m_stride);
-			int maxKOpLvl                 = strHelper.strToInt(newDetectDlg.m_maxKOP);
-			double ovLap                  = strHelper.strToFloat(newDetectDlg.m_maxOVF);
+			//int windSize                  = strHelper.strToInt(newDetectDlg.m_windSize);
+			//int stride                    = strHelper.strToInt(newDetectDlg.m_stride);
+			//int maxKOpLvl                 = strHelper.strToInt(newDetectDlg.m_maxKOP);
+			//double ovLap                  = strHelper.strToFloat(newDetectDlg.m_maxOVF);
 			bool bfindExact               = newDetectDlg.m_bFindExactClonesChk ? true : false;
 			bool bfindInExact             = newDetectDlg.m_bFindInexactClonesChk ? true : false;
-			int keyVectorsSize            = strHelper.strToInt(newDetectDlg.m_keyVectorsSize);
+			//int keyVectorsSize            = strHelper.strToInt(newDetectDlg.m_keyVectorsSize);
 			double occurrenceThrs         = strHelper.strToFloat(newDetectDlg.m_occurrenceThrs);
 			int regNormLvl                = newDetectDlg.m_regNormalizedLevel;
             bool bNormalizeToken          = newDetectDlg.m_bNormalizeTokenChk ? true : false;
             int inexactMTD                = newDetectDlg.m_inexactMethodLevel; 
-			int dbParamId                 = strHelper.strToInt(newDetectDlg.m_db_param_id);
+			int dbParamId                 = newDetectDlg.m_db_param_id;
 			LPCTSTR pSearchCodeFrag       = NULL;
 			bool keepTmpFile              = false;
 			CString dbName                = newDetectDlg.m_dbName;

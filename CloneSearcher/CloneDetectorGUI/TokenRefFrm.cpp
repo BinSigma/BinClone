@@ -32,6 +32,8 @@ CTokenRefFrm::CTokenRefFrm()
 
 CTokenRefFrm::~CTokenRefFrm()
 {
+	if(m_csController)
+		delete m_csController;
 }
 
 
