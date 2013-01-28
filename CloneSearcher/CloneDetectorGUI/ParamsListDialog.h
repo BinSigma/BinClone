@@ -44,6 +44,10 @@ public:
 		m_dbUser = dbUser;
 		m_dbPwd = dbPwd;
 	}
+
+	void updateParameters();
+
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
+	afx_msg void OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult);
 };

@@ -43,6 +43,7 @@ BEGIN_MESSAGE_MAP(ParamsListDialog, CDialogEx)
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, &ParamsListDialog::OnClickList1)
 	ON_BN_CLICKED(IDOK, &ParamsListDialog::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &ParamsListDialog::OnBnClickedCancel)
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST1, &ParamsListDialog::OnNMDblclkList1)
 END_MESSAGE_MAP()
 
 
@@ -67,7 +68,7 @@ BOOL ParamsListDialog::OnInitDialog()
 	// insert columns
 	m_params_list_ctrl.InsertColumn(0,_T("Window Size"),LVCFMT_LEFT,100);
 	m_params_list_ctrl.InsertColumn(1,_T("Stride"),LVCFMT_LEFT,100);
-	m_params_list_ctrl.InsertColumn(2,_T("Normalize Level"),LVCFMT_LEFT,250);
+	m_params_list_ctrl.InsertColumn(2,_T("Register Normalization Level"),LVCFMT_LEFT,250);
 
 	//return TRUE;
 
@@ -82,7 +83,7 @@ BOOL ParamsListDialog::OnInitDialog()
 
 		CString stride;
 		CBFStrHelper::intToStr(m_params.GetAt(i)->m_stride, stride);
-        m_params_list_ctrl.SetItemText(i, 1, windSize );
+        m_params_list_ctrl.SetItemText(i, 1, stride );
 		
 		CString regNormLvl;
 		int n = m_params.GetAt(i)->m_regNormLevel;
@@ -120,12 +121,10 @@ void ParamsListDialog::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+void ParamsListDialog::updateParameters()
 
-void ParamsListDialog::OnClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
-	POSITION pos = m_params_list_ctrl.GetFirstSelectedItemPosition();
+    POSITION pos = m_params_list_ctrl.GetFirstSelectedItemPosition();
 	int nItem = m_params_list_ctrl.GetNextSelectedItem(pos);
 	if( nItem >= 0 )
 	{
@@ -137,6 +136,14 @@ void ParamsListDialog::OnClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		m_selRegNormLvl = m_params.GetAt(nItem)->m_regNormLevel;
 		m_result = true;
 	}
+}
+
+
+void ParamsListDialog::OnClickList1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	updateParameters();
 
 	*pResult = 0;
 }
@@ -153,4 +160,22 @@ void ParamsListDialog::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
 	CDialogEx::OnCancel();
+}
+
+
+void ParamsListDialog::OnNMDblclkList1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	POSITION pos = m_params_list_ctrl.GetFirstSelectedItemPosition();
+	int nItem = m_params_list_ctrl.GetNextSelectedItem(pos);
+	if( nItem >= 0)
+	{
+		updateParameters();
+		*pResult = 0;
+		OnBnClickedOk();
+		return;
+	}
+
+	*pResult = 0;
 }

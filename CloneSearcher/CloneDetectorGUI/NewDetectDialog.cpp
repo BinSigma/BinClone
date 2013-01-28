@@ -146,7 +146,7 @@ void NewDetectDialog::OnBnClickedOk()
 		m_targetAsmFile.ReleaseBuffer(len);
 		if( m_targetAsmFile.GetLength() == 0)
 		{
-			AfxMessageBox(_T("The target assembly file name cannot be empty!"));
+			AfxMessageBox(_T("The Target assembly file name cannot be empty!"));
 			return;
 		}
 		g_targetAsmFile = m_targetAsmFile;
