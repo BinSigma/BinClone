@@ -12,7 +12,6 @@
 CCSRegion::CCSRegion(CCSAssemblyFunction* pFcn, int startIdx, int endIdx, int rawStartIdx, int rawEndIdx)
     : m_pFcn(pFcn), m_dbFcnID(pFcn->m_dbFcnID), m_dbFileID(pFcn->getAssemblyFile()->m_dbFileID), m_startIdx(startIdx), m_endIdx(endIdx), m_rawStartIdx(rawStartIdx), m_rawEndIdx(rawEndIdx), m_hashValue(0)
 {
-      ++ m_cntRegion; //mfarhadi increament the counter when a region is created
 }
 
 CCSRegion::CCSRegion(int dbRegionID, int dbFcnID, int dbFileID, int startIdx, int endIdx, int rawStartIdx, int rawEndIdx)
@@ -22,10 +21,9 @@ CCSRegion::CCSRegion(int dbRegionID, int dbFcnID, int dbFileID, int startIdx, in
 
 CCSRegion::~CCSRegion()
 {
-    -- m_cntRegion; // mfarhadi decrement the counter when a region is destroyed
 }
 
-int CCSRegion::m_cntRegion = 0; // mfarhadi initilize the static variable
+int CCSRegion::m_cntRegion = 0; // initilize the static variable to keep track of number of regions processed so far.
 
 //
 // Count features
@@ -52,7 +50,7 @@ bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
 
             if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) mnemonic))
                 return false;
-            incFeatureCount(mnemonic);
+            incFeatureCount(mnemonic.MakeLower());
         }
 
         // For each token
@@ -64,29 +62,7 @@ bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
                 opType = pLine->GetAt(tIdx)->getTokenTypeStr();
                 if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) opType))
                     return false;
-                incFeatureCount(opType);
-/*     mfarhadi: no idx any more!           
-                // Get normalizedToken + idx number of operand. Assume tokenStr is in the format similar to REG16#234
-                // According to the algorithm, we use the token only if its index < k.
-                int delIdx = pToken->getTokenStr().Find(CS_OPERAND_IDX_DELIMETER);
-                if (delIdx == -1)  {
-                    tcout << _T("Error: failed to extract idx of operand: ") << pToken->getTokenStr().GetString() << endl;
-                    ASSERT(false);
-                    continue;
-                }
-                idxStr = pToken->getTokenStr().Mid(delIdx + 1).GetString();
-                if (!CBFStrHelper::isNumeric(idxStr)) {
-                    tcout << _T("Error: failed to extract idx of operand: ") << pToken->getTokenStr().GetString() << endl;
-                    ASSERT(false);
-                    continue;
-                }
-                int idx = CBFStrHelper::strToInt(idxStr);
-                if (idx < kThreshold) {
-                    if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) pToken->getTokenStr()))
-                        return false;
-                    incFeatureCount(pToken->getTokenStr());
-                }
-*/             
+                incFeatureCount(opType.MakeLower());        
             }
         }
 
@@ -96,7 +72,7 @@ bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
             mnemonicOpType0 = mnemonic + pLine->GetAt(1)->getTokenTypeStr();
             if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) mnemonicOpType0))
                 return false;
-            incFeatureCount(mnemonicOpType0);
+            incFeatureCount(mnemonicOpType0.MakeLower());
         }
 
         // Get opType of the first and second operands
@@ -105,7 +81,7 @@ bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
             opType0OpType1 = pLine->GetAt(1)->getTokenTypeStr() + pLine->GetAt(2)->getTokenTypeStr();
             if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) opType0OpType1))
                 return false;
-            incFeatureCount(opType0OpType1);
+            incFeatureCount(opType0OpType1.MakeLower());
         }
     }
     return true;
@@ -130,12 +106,14 @@ int CCSRegion::incFeatureCount(LPCTSTR featureStr)
 //
 // Construct feature vector based on the global feature list
 //
-bool CCSRegion::constructVector(CStringArray& globaFeatures)
-{    
+bool CCSRegion::constructVector(CStringArray& globalFeatures)
+{   
     int cnt = -1;
-    m_vector.SetSize(globaFeatures.GetSize());
-    for (int f = 0; f < globaFeatures.GetSize(); ++f) {
-        if (!m_featureCounts.Lookup(globaFeatures.GetAt(f).GetString(), cnt))
+	CString pFeatureStr;
+    m_vector.SetSize(globalFeatures.GetSize());
+    for (int f = 0; f < globalFeatures.GetSize(); ++f) {
+		pFeatureStr = globalFeatures.GetAt(f).GetString();
+		if (!m_featureCounts.Lookup(pFeatureStr, cnt))    
             m_vector[f] = 0;    // this region does not have such feature
         else
             m_vector[f] = cnt;  // this region has such feature
@@ -164,15 +142,17 @@ bool CCSRegion::constructBinaryVector(const CCSIntArray& globalMedians)
     return true;
 }
 
-/*
-// mfarhadi3
+
+// 
 // update the m_globalMedian vector when each region is created
 //
 bool CCSRegion::updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileMgr* pAssemblyFileMgr)
 {
-    int cnt = -1;    
-    for (int i  = 0; i < pAssemblyFileMgr->m_globalMedians.GetSize(); ++i) {                  
-        if (!m_featureCounts.Lookup(pAssemblyFileMgr->m_globalFeatures.GetAt(i).GetString(), cnt))  // if a region has a feature with value X, incremet X in redundancyVetor                      
+    int cnt = -1;
+	CString pFeatureStr;
+    for (int i  = 0; i < globalMedians.GetSize(); ++i) {  
+		pFeatureStr = pAssemblyFileMgr->m_globalFeatures.GetAt(i).GetString();
+		if (!m_featureCounts.Lookup(pFeatureStr, cnt))  // if a region has a feature with value X, incremet X in redundancyVetor                      
             ++ pAssemblyFileMgr->m_redundancyVector[i][0]; //  this region does not have such feature, so just increase 0 (X = 0)
         else {    
                 if (cnt > 100 ) {
@@ -182,27 +162,25 @@ bool CCSRegion::updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileM
                 }
             ++ pAssemblyFileMgr->m_redundancyVector[i][cnt];  // this region has such feature, so incerase X (X = cnt)                          
         }         
-        pAssemblyFileMgr->m_globalMedians.GetAt(i) = findMedian(pAssemblyFileMgr->m_redundancyVector[i]);   // find the median of this feature and update m_globalMedians     
-    }                
+        globalMedians.GetAt(i) = findMedian(pAssemblyFileMgr->m_redundancyVector[i]);   // find the median of this feature and update m_globalMedians     
+	}
     return true;
 }
 
-// mfarhadi4
+// 
 // find the median of an integer vector (this vector is sorted). Median is the middle nuymber when the numbers are sorted
 //
-int CCSRegion::findMedian(const vector<int>& myVector)
+int CCSRegion::findMedian(const vector<int>& redundancyVector)
 {
     int featureValue = 0;
-    int sum = 0;
-  
-     for (featureValue = 0; featureValue < myVector.size(); ++featureValue) {
-        sum += myVector[featureValue];
-        if (sum > m_cntRegion/2)
+    int sum = 0;  
+    for (featureValue = 0; featureValue < redundancyVector.size(); ++featureValue) {
+		sum += redundancyVector[featureValue];
+        if (sum >= m_cntRegion/2 + 1)
             break;
     }
     return featureValue;
 }
-*/
 
 
 

@@ -174,11 +174,16 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param)
             }
         }
     } while (::FindNextFile(hFile, &fileInfo));
-
-  //  if (bConstructFeaturesOnly) {  mfarhadi: multiple scan of the files is disabled.
+  
         if (!m_pDBMgr->storeGlobalFeatures(m_globalFeatures, param))
-            return false;
-  //  }
+			return false;
+
+		// SterePreda: Please add a culumn for medians to the same table as the table where the features are stored
+		// store features' medians in DB 
+		//
+		//if (!m_pDBMgr->storeGlobalFeatures(m_globalMedians,param))
+		//	return false
+
     tcout << _T("Total number of files: ") << m_nTotalFiles << endl;
     tcout << _T("Total number of functions: ") << m_nTotalFunctions << endl;
     tcout << _T("Total number of regions: ") << m_nTotalRegions << endl;
@@ -257,13 +262,13 @@ bool CCSAssemblyFileMgr::constructBasicFeatures()
 
     if (!constructOpType0Type1Features())
         return false;
-	/*
+	
 	if (!constructGlobalMedians()) //mfarhadi1 
         return false;
 
     if (!constructRedundancyVector()) //mfarhadi2
         return false;
-    */
+    
     return true;
 }
 
@@ -273,7 +278,7 @@ bool CCSAssemblyFileMgr::constructBasicFeatures()
 bool CCSAssemblyFileMgr::constructMnemonicFeatures()
 {
     for (int i = 0; i < CS_NUM_MNEMONICS; ++i) {
-        if (!addGlobalFeature(gMnemonics[i].GetString()))
+		if (!addGlobalFeature(gMnemonics[i].MakeLower())) //mfarhadi: Lookuo function is case sensitive, we need all feature to be the same case
             return false;
     }
     return true;
@@ -286,7 +291,7 @@ bool CCSAssemblyFileMgr::constructMnemonicFeatures()
 bool CCSAssemblyFileMgr::constructOpTypeFeatures()
 {
     for (int i = 0; i < CS_NUM_OPTYPES; ++i) {
-        if (!addGlobalFeature(gOpTypes[i].GetString()))
+        if (!addGlobalFeature(gOpTypes[i].MakeLower())) //mfarhadi: Lookuo function is case sensitive, we need all feature to be the same case
             return false;
     }
     return true;
@@ -295,14 +300,14 @@ bool CCSAssemblyFileMgr::constructOpTypeFeatures()
 //
 // Construct mnemonic and operand type features
 //
-bool CCSAssemblyFileMgr::constructMnemonicOpType0Features()
+bool CCSAssemblyFileMgr::constructMnemonicOpType0Features()  
 {
     for (int i = 0; i < CS_NUM_MNEMONICS; ++i) {
-        for (int j = 0; j < CS_NUM_OPTYPES; ++j) {
-            if (!addGlobalFeature((gMnemonics[i] + gOpTypes[j]).GetString()))
-                return false;
-        }
-    }
+		for (int j = 0; j < CS_NUM_OPTYPES; ++j) {
+			if (!addGlobalFeature((gMnemonics[i] + gOpTypes[j]).MakeLower())) //mfarhadi: Lookuo function is case sensitive, we need all feature to be the same case
+				 return false;			   
+		}
+	}
     return true;
 }
 
@@ -314,7 +319,7 @@ bool CCSAssemblyFileMgr::constructOpType0Type1Features()
 {
     for (int i = 0; i < CS_NUM_OPTYPES; ++i) {
         for (int j = 0; j < CS_NUM_OPTYPES; ++j) {
-            if (!addGlobalFeature((gOpTypes[i] + gOpTypes[j]).GetString()))
+            if (!addGlobalFeature((gOpTypes[i] + gOpTypes[j]).MakeLower())) //mfarhadi: Lookuo function is case sensitive, we need all feature to be the same case
                 return false;
         }
     }
@@ -350,7 +355,7 @@ bool CCSAssemblyFileMgr::addGlobalFeatureIfNew(LPCTSTR featureName)
     }
     return addGlobalFeature(featureName);
 }
-/*
+
 //mfarhadi
 // set the size of m_globalMedians vector equal to number of of features
 //
@@ -374,4 +379,3 @@ bool CCSAssemblyFileMgr::constructRedundancyVector()
 
     return true;
 }
-*/

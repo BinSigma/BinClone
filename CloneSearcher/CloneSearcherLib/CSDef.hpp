@@ -122,7 +122,7 @@ static CString gMnemonics [] = {
 static CString gOpTypes [] = {
     CS_ASSEMBLYTOKEN_OPMEM,
     CS_ASSEMBLYTOKEN_OPREG,
-    CS_ASSEMBLYTOKEN_OPREG
+    CS_ASSEMBLYTOKEN_OPVAL			
 };
 
 #define CS_NUM_RUNNING_CHARS                4

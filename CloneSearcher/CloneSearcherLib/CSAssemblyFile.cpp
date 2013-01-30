@@ -189,15 +189,6 @@ bool CCSAssemblyFile::normalizeCode(const CCSParam& param)
                 ASSERT(false);
                 return false;
             }
-
-            // Update the token string   mfarhadi: we do not have idx any more (no normalize token any more!)
-/*            CString opIdxStr;
-            if (param.m_bNormalizeToken)
-                opIdxStr = _T("0");                        
-            else
-                CBFStrHelper::intToStr(opIdx, opIdxStr);
-            pToken->setTokenStr(newTokenStr + CS_OPERAND_IDX_DELIMETER + opIdxStr); // e.g., REGGen32#457
-*/
             pToken->setTokenStr(newTokenStr); // e.g., REG or REGGen32
         }
     }
@@ -271,90 +262,117 @@ bool CCSAssemblyFile::extractFunctions(CCSDatabaseMgr* pDBMgr, const CCSParam& p
 //
 bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& param, bool bFindExactClones, bool bFindInexactClones, bool bStoreDB, CCSAssemblyFileMgr* pAssemblyFileMgr)
 {
-    // For each function
     int nRegionsInFile = 0;
-    for (int fcnIdx = 0; fcnIdx < m_functions.GetSize(); ++fcnIdx) {
-        CCSAssemblyFunction* pFcn = m_functions.GetAt(fcnIdx);
-        pFcn->resetNumRegions();
-        for (int sIdx = pFcn->m_startIdx + 1; sIdx < pFcn->m_endIdx; sIdx += param.m_stride) {
-            // ensure the endIdx does not go beyond the limit
-            int eIdx = sIdx + param.m_windowSize - 1;
-            if (eIdx > pFcn->m_endIdx - 1)
-                eIdx = pFcn->m_endIdx - 1;
 
-            // skip this region if it is not the first region in the function and its size is smaller than the window size
-            // because it is a region towards the end of a function, and it has already been covered by some previous regions.
-            if (pFcn->getNumRegions() > 0 && eIdx - sIdx + 1 < param.m_windowSize)
-                break;
+	if (bStoreDB) { // mfarhadi: we need an extra scan of the regions to fill the global median vector
+	    // For each function
+		for (int fcnIdx = 0; fcnIdx < m_functions.GetSize(); ++fcnIdx) {
+			CCSAssemblyFunction* pFcn = m_functions.GetAt(fcnIdx);
+			pFcn->resetNumRegions();
+			for (int sIdx = pFcn->m_startIdx + 1; sIdx < pFcn->m_endIdx; sIdx += param.m_stride) {
+				// ensure the endIdx does not go beyond the limit
+				int eIdx = sIdx + param.m_windowSize - 1;
+				if (eIdx > pFcn->m_endIdx - 1)
+					eIdx = pFcn->m_endIdx - 1;
 
-            // create a new region
-            int rawSidx = GetAt(sIdx)->getAsmFileLineIdx();
-            int rawEidx = GetAt(eIdx)->getAsmFileLineIdx();
-            CCSRegion region(pFcn, sIdx, eIdx, rawSidx, rawEidx);
+				// skip this region if it is not the first region in the function and its size is smaller than the window size
+				// because it is a region towards the end of a function, and it has already been covered by some previous regions.
+				if (pFcn->getNumRegions() > 0 && eIdx - sIdx + 1 < param.m_windowSize)
+					break;
 
-            if (bStoreDB) {  //mfarhadi: multiple scan of the files is disabled. we will do it only if we want to store the features and medians in the database
-                if (!region.countRegionFeatures(pAssemblyFileMgr))
-                    return false;
+				// create a new region
+				int rawSidx = GetAt(sIdx)->getAsmFileLineIdx();
+				int rawEidx = GetAt(eIdx)->getAsmFileLineIdx();
+				CCSRegion region(pFcn, sIdx, eIdx, rawSidx, rawEidx);
 
-                // Farhadi: Step 1: update the medians. mfarhadi
-                //if (!region.updateGlobalMedians(pAssemblyFileMgr->m_globalMedians, pAssemblyFileMgr))
-                   // return false;
+				 ++ CCSRegion::m_cntRegion; // increament the total number of regions processes so far
 
-            //    continue;
-            }
-                        
-            // create a hash of this region
-            const CString contentHashKey = composeContentHashKey(sIdx, eIdx);
-            if (contentHashKey.IsEmpty())
-                continue;
+				if (!region.countRegionFeatures(pAssemblyFileMgr))
+					return false;
 
-            // the function contains at least one mnemonic statements.
-            region.m_hashValue = m_hashObject.HashKey((LPCTSTR) contentHashKey);
+				//update the medians. 
+				if (!region.updateGlobalMedians(pAssemblyFileMgr->m_globalMedians, pAssemblyFileMgr))
+					 return false;
 
-            if (bFindExactClones) {
-                // find exact clones from DB
-                CCSRegions cloneRegions;
-                if (!pDBMgr->fetchRegions(param.m_dbParamID, region.m_hashValue, cloneRegions)) {
-                    cloneRegions.cleanup();
-                    return false;
-                }
+				pFcn->incNumRegions();
+			}
+			nRegionsInFile += pFcn->getNumRegions();
+		}
+	}
+	  
+	// For each function
+	for (int fcnIdx = 0; fcnIdx < m_functions.GetSize(); ++fcnIdx) {
+		CCSAssemblyFunction* pFcn = m_functions.GetAt(fcnIdx);
+		pFcn->resetNumRegions();
+		for (int sIdx = pFcn->m_startIdx + 1; sIdx < pFcn->m_endIdx; sIdx += param.m_stride) {
+			// ensure the endIdx does not go beyond the limit
+			int eIdx = sIdx + param.m_windowSize - 1;
+			if (eIdx > pFcn->m_endIdx - 1)
+				eIdx = pFcn->m_endIdx - 1;
 
-                if (!m_clones.makeClones(region, cloneRegions)) {
-                    cloneRegions.cleanup();
-                    return false;
-                }
-                cloneRegions.cleanup();
-            }
+			// skip this region if it is not the first region in the function and its size is smaller than the window size
+			// because it is a region towards the end of a function, and it has already been covered by some previous regions.
+			if (pFcn->getNumRegions() > 0 && eIdx - sIdx + 1 < param.m_windowSize)
+				break;
 
-            if (bFindInexactClones) {
-                // Farhadi: Step 3: find inexact clones from DB. 
-            }
+			// create a new region
+			int rawSidx = GetAt(sIdx)->getAsmFileLineIdx();
+			int rawEidx = GetAt(eIdx)->getAsmFileLineIdx();
+			CCSRegion region(pFcn, sIdx, eIdx, rawSidx, rawEidx);
 
-            if (bStoreDB) {                       
-                // Store region into database (not storing the vector though)
-                if (!pDBMgr->storeRegion(region, param))
-                    return false;
+                     
+			// create a hash of this region
+			const CString contentHashKey = composeContentHashKey(sIdx, eIdx);
+			if (contentHashKey.IsEmpty())
+				continue;
 
-                // actually count the features.
-                if (!region.countRegionFeatures(pAssemblyFileMgr))
-                    return false;
-                if (!region.constructVector(pAssemblyFileMgr->m_globalFeatures))
-                    return false;
-                ASSERT(pAssemblyFileMgr->m_globalFeatures.GetSize() == region.getVector().GetSize());
+			// the function contains at least one mnemonic statements.
+			region.m_hashValue = m_hashObject.HashKey((LPCTSTR) contentHashKey);
 
-                // compute the binary vector, then store the hash into the database
-                if (!region.constructBinaryVector(pAssemblyFileMgr->m_medians))
-                    return false;
-                if (!pDBMgr->storeInexact2CombRegion(region, param))
-                    return false;
-            }
+			if (bFindExactClones) {
+				// find exact clones from DB
+				CCSRegions cloneRegions;
+				if (!pDBMgr->fetchRegions(param.m_dbParamID, region.m_hashValue, cloneRegions)) {
+					cloneRegions.cleanup();
+					return false;
+				}
 
-            //tcout << _T("Region: ") << region.m_dbRegionID << _T(" start: ") << sIdx << _T(" end: ") << eIdx << endl;
-            //tcout << _T("Region: ") << region.m_dbRegionID << _T(" rawStart: ") << rawSidx << _T(" rawEnd: ") << rawEidx << endl;
-            pFcn->incNumRegions();         
-        }
-        nRegionsInFile += pFcn->getNumRegions();
-    }
+				if (!m_clones.makeClones(region, cloneRegions)) {
+					cloneRegions.cleanup();
+					return false;
+				}
+				cloneRegions.cleanup();
+			}
+
+			if (bFindInexactClones) {
+				// Farhadi: Step 3: find inexact clones from DB. 
+			}
+
+			if (bStoreDB) {                       
+				// Store region into database (not storing the vector though)
+				if (!pDBMgr->storeRegion(region, param))
+					return false;
+
+				// actually count the features.
+				if (!region.countRegionFeatures(pAssemblyFileMgr))
+					return false;
+				if (!region.constructVector(pAssemblyFileMgr->m_globalFeatures))
+					return false;
+				ASSERT(pAssemblyFileMgr->m_globalFeatures.GetSize() == region.getVector().GetSize());
+
+				// compute the binary vector, then store the hash into the database
+				if (!region.constructBinaryVector(pAssemblyFileMgr->m_medians))
+					return false;
+				if (!pDBMgr->storeInexact2CombRegion(region, param))
+					return false;
+			}
+
+			//tcout << _T("Region: ") << region.m_dbRegionID << _T(" start: ") << sIdx << _T(" end: ") << eIdx << endl;
+			//tcout << _T("Region: ") << region.m_dbRegionID << _T(" rawStart: ") << rawSidx << _T(" rawEnd: ") << rawEidx << endl;
+			pFcn->incNumRegions();         
+		}
+		nRegionsInFile += pFcn->getNumRegions();
+	}
     tcout << _T("File: ") << m_filePath.GetString() << _T(" has ") << m_functions.GetSize() << _T(" functions and ") << nRegionsInFile << _T(" regions.") << endl;
     return true;
 }
