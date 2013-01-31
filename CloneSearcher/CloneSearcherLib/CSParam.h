@@ -14,8 +14,7 @@ public:
     virtual ~CCSParam();
 
     int m_dbParamID;
-    TCSRegNormalizeLevel m_regNormLevel;
-   // bool m_bNormalizeToken; //mfarhadi : not used anymore!
+    TCSRegNormalizeLevel m_regNormLevel;   
     int m_windowSize;
     int m_stride;    
 };

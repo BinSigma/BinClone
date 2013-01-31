@@ -260,47 +260,10 @@ bool CCSAssemblyFile::extractFunctions(CCSDatabaseMgr* pDBMgr, const CCSParam& p
 // If bStoreDb == true, then store the regions into the database.
 // If bFindExactClones == true or bFindExactClones == ture, then retrieve the clones from the database
 //
-bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& param, bool bFindExactClones, bool bFindInexactClones, bool bStoreDB, CCSAssemblyFileMgr* pAssemblyFileMgr)
+bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& param, bool bFindExactClones, bool bFindInexactClones, bool bStoreDB, bool bFirstScan , CCSAssemblyFileMgr* pAssemblyFileMgr)
 {
+    // For each function
     int nRegionsInFile = 0;
-
-	if (bStoreDB) { // mfarhadi: we need an extra scan of the regions to fill the global median vector
-	    // For each function
-		for (int fcnIdx = 0; fcnIdx < m_functions.GetSize(); ++fcnIdx) {
-			CCSAssemblyFunction* pFcn = m_functions.GetAt(fcnIdx);
-			pFcn->resetNumRegions();
-			for (int sIdx = pFcn->m_startIdx + 1; sIdx < pFcn->m_endIdx; sIdx += param.m_stride) {
-				// ensure the endIdx does not go beyond the limit
-				int eIdx = sIdx + param.m_windowSize - 1;
-				if (eIdx > pFcn->m_endIdx - 1)
-					eIdx = pFcn->m_endIdx - 1;
-
-				// skip this region if it is not the first region in the function and its size is smaller than the window size
-				// because it is a region towards the end of a function, and it has already been covered by some previous regions.
-				if (pFcn->getNumRegions() > 0 && eIdx - sIdx + 1 < param.m_windowSize)
-					break;
-
-				// create a new region
-				int rawSidx = GetAt(sIdx)->getAsmFileLineIdx();
-				int rawEidx = GetAt(eIdx)->getAsmFileLineIdx();
-				CCSRegion region(pFcn, sIdx, eIdx, rawSidx, rawEidx);
-
-				 ++ CCSRegion::m_cntRegion; // increament the total number of regions processes so far
-
-				if (!region.countRegionFeatures(pAssemblyFileMgr))
-					return false;
-
-				//update the medians. 
-				if (!region.updateGlobalMedians(pAssemblyFileMgr->m_globalMedians, pAssemblyFileMgr))
-					 return false;
-
-				pFcn->incNumRegions();
-			}
-			nRegionsInFile += pFcn->getNumRegions();
-		}
-	}
-	  
-	// For each function
 	for (int fcnIdx = 0; fcnIdx < m_functions.GetSize(); ++fcnIdx) {
 		CCSAssemblyFunction* pFcn = m_functions.GetAt(fcnIdx);
 		pFcn->resetNumRegions();
@@ -319,6 +282,20 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 			int rawSidx = GetAt(sIdx)->getAsmFileLineIdx();
 			int rawEidx = GetAt(eIdx)->getAsmFileLineIdx();
 			CCSRegion region(pFcn, sIdx, eIdx, rawSidx, rawEidx);
+
+				
+            if (bFirstScan) {   // if bStoreDB is false, it means that the program is in first scan phase             
+                ++ CCSRegion::m_cntRegion; // increament the total number of regions processes so far
+			    
+                if (!region.countRegionFeatures(pAssemblyFileMgr))
+				    return false;
+
+			    //update the medians. 
+			    if (!region.updateGlobalMedians(pAssemblyFileMgr->m_globalMedians, pAssemblyFileMgr))
+					    return false;
+            
+                continue;
+            }
 
                      
 			// create a hash of this region
@@ -373,7 +350,8 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 		}
 		nRegionsInFile += pFcn->getNumRegions();
 	}
-    tcout << _T("File: ") << m_filePath.GetString() << _T(" has ") << m_functions.GetSize() << _T(" functions and ") << nRegionsInFile << _T(" regions.") << endl;
+    if (bStoreDB)
+        tcout << _T("File: ") << m_filePath.GetString() << _T(" has ") << m_functions.GetSize() << _T(" functions and ") << nRegionsInFile << _T(" regions.") << endl;
     return true;
 }
 

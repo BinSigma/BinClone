@@ -27,7 +27,7 @@ public:
     bool parseFile(const CCSParam& param, bool bStoreDB);
     bool normalizeCode(const CCSParam& param);
     bool extractFunctions(CCSDatabaseMgr* pDBMgr, const CCSParam& param, bool bStoreDB);
-    bool extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& param, bool bFindExactClones, bool bFindInexactClones, bool bStoreDB, CCSAssemblyFileMgr* pAssemblyFileMgr);
+    bool extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& param, bool bFindExactClones, bool bFindInexactClones, bool bStoreDB, bool bFirstScan, CCSAssemblyFileMgr* pAssemblyFileMgr);
 
     CString composeContentHashKey(int startIdx, int endIdx) const;
     int getNumRegions() const;

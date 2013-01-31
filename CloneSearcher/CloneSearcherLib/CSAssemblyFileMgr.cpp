@@ -119,7 +119,7 @@ void CCSAssemblyFileMgr::closeRawAssemblyFile()
 //
 // Parse the whole input folder, including subfolders
 //
-bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param)
+bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, bool bFirstScan)
 {   
     tcout << _T("Parsing folder: ") << folderPath << endl;
     CString folderPathStr = folderPath;
@@ -135,7 +135,7 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param)
         if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {        
             // It is a directory.
             CString subFolderPath = folderPathStr + _T("\\") + fileName;
-            if (!parseFolder((LPCTSTR) subFolderPath, param))
+            if (!parseFolder((LPCTSTR) subFolderPath, param, bFirstScan))
                 return false;
         }
         else {
@@ -147,7 +147,7 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param)
                 // parse the assembly file
                 CString assemblyFilePath = folderPathStr + _T("\\") + fileName;
                 CCSAssemblyFile assemblyFile(assemblyFilePath, this);
-                if (!assemblyFile.parseFile(param, true))
+                if (!assemblyFile.parseFile(param, !bFirstScan))
                     return false;                
 
                 // normalize code
@@ -155,21 +155,21 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param)
                     return false;
 
                 // create functions in memory and store into DB.
-                if (!assemblyFile.extractFunctions(m_pDBMgr, param, true))
+                if (!assemblyFile.extractFunctions(m_pDBMgr, param, !bFirstScan))
                     return false;
-              //  if (!bConstructFeaturesOnly) {  mfarhadi: multiple scan of the files is disabled.
+                if (!bFirstScan) {  
                     m_nTotalFunctions += assemblyFile.getNumFunctions();
                     tcout << _T("Number of functions: ") << assemblyFile.getNumFunctions() << _T(" in ") << assemblyFilePath << endl;
-             //   }
+                }
 
                 // create regions and store into DB.
-                if (!assemblyFile.extractRegions(m_pDBMgr, param, false, false, true, this))
+                if (!assemblyFile.extractRegions(m_pDBMgr, param, false, false, !bFirstScan, bFirstScan, this))
                     return false;
-               // if (!bConstructFeaturesOnly) {  mfarhadi: multiple scan of the files is disabled.
+                if (!bFirstScan) {  
                     m_nTotalRegions += assemblyFile.getNumRegions();
                     tcout << _T("Number of regions: ") << assemblyFile.getNumRegions() << _T(" in ") << assemblyFilePath << endl;
                     ++m_nTotalFiles;
-            //    }
+                }
                 // assemblyFile will be deallocated.
             }
         }
@@ -183,10 +183,11 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param)
 		//
 		//if (!m_pDBMgr->storeGlobalFeatures(m_globalMedians,param))
 		//	return false
-
-    tcout << _T("Total number of files: ") << m_nTotalFiles << endl;
-    tcout << _T("Total number of functions: ") << m_nTotalFunctions << endl;
-    tcout << _T("Total number of regions: ") << m_nTotalRegions << endl;
+    if(!bFirstScan) {  
+        tcout << _T("Total number of files: ") << m_nTotalFiles << endl;
+        tcout << _T("Total number of functions: ") << m_nTotalFunctions << endl;
+        tcout << _T("Total number of regions: ") << m_nTotalRegions << endl;
+    }
     return true;
 }
 
@@ -263,10 +264,10 @@ bool CCSAssemblyFileMgr::constructBasicFeatures()
     if (!constructOpType0Type1Features())
         return false;
 	
-	if (!constructGlobalMedians()) //mfarhadi1 
+	if (!constructGlobalMedians())
         return false;
 
-    if (!constructRedundancyVector()) //mfarhadi2
+    if (!constructRedundancyVector()) 
         return false;
     
     return true;
@@ -278,7 +279,7 @@ bool CCSAssemblyFileMgr::constructBasicFeatures()
 bool CCSAssemblyFileMgr::constructMnemonicFeatures()
 {
     for (int i = 0; i < CS_NUM_MNEMONICS; ++i) {
-		if (!addGlobalFeature(gMnemonics[i].MakeLower())) //mfarhadi: Lookuo function is case sensitive, we need all feature to be the same case
+		if (!addGlobalFeature(gMnemonics[i].MakeLower())) 
             return false;
     }
     return true;
@@ -291,7 +292,7 @@ bool CCSAssemblyFileMgr::constructMnemonicFeatures()
 bool CCSAssemblyFileMgr::constructOpTypeFeatures()
 {
     for (int i = 0; i < CS_NUM_OPTYPES; ++i) {
-        if (!addGlobalFeature(gOpTypes[i].MakeLower())) //mfarhadi: Lookuo function is case sensitive, we need all feature to be the same case
+        if (!addGlobalFeature(gOpTypes[i].MakeLower())) 
             return false;
     }
     return true;
@@ -304,7 +305,7 @@ bool CCSAssemblyFileMgr::constructMnemonicOpType0Features()
 {
     for (int i = 0; i < CS_NUM_MNEMONICS; ++i) {
 		for (int j = 0; j < CS_NUM_OPTYPES; ++j) {
-			if (!addGlobalFeature((gMnemonics[i] + gOpTypes[j]).MakeLower())) //mfarhadi: Lookuo function is case sensitive, we need all feature to be the same case
+			if (!addGlobalFeature((gMnemonics[i] + gOpTypes[j]).MakeLower())) 
 				 return false;			   
 		}
 	}
@@ -319,7 +320,7 @@ bool CCSAssemblyFileMgr::constructOpType0Type1Features()
 {
     for (int i = 0; i < CS_NUM_OPTYPES; ++i) {
         for (int j = 0; j < CS_NUM_OPTYPES; ++j) {
-            if (!addGlobalFeature((gOpTypes[i] + gOpTypes[j]).MakeLower())) //mfarhadi: Lookuo function is case sensitive, we need all feature to be the same case
+            if (!addGlobalFeature((gOpTypes[i] + gOpTypes[j]).MakeLower())) 
                 return false;
         }
     }
@@ -356,7 +357,7 @@ bool CCSAssemblyFileMgr::addGlobalFeatureIfNew(LPCTSTR featureName)
     return addGlobalFeature(featureName);
 }
 
-//mfarhadi
+//
 // set the size of m_globalMedians vector equal to number of of features
 //
 bool CCSAssemblyFileMgr::constructGlobalMedians()
@@ -367,7 +368,7 @@ bool CCSAssemblyFileMgr::constructGlobalMedians()
 }
 
 
-//mfarhadi
+//
 // construct a two dimensial vector, the first dimension shows each feature and the second dimension keeps track of "number of occurance of each feature's value" 
 // It will be used to find median of each feature
 

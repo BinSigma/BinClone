@@ -32,7 +32,7 @@ CCSClone::~CCSClone()
 //
 bool CCSClone::overlap(const CCSClone& theClone) const
 {
-    if ( m_srcFileID !=theClone.m_srcFileID) //mfarhadi: We need to consider the file ID as well.
+    if ( m_srcFileID !=theClone.m_srcFileID) 
         return false;
      
         return ((m_tarStart <= theClone.m_tarStart && m_tarEnd >= theClone.m_tarStart) || (theClone.m_tarStart <= m_tarStart && theClone.m_tarEnd >= m_tarStart)) &&

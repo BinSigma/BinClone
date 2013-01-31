@@ -8,7 +8,7 @@
 #pragma once
 
 #include "CSFeatureVector.h"
-#include <vector> //mfarhadi the vector library is needed to define a vector
+#include <vector> // the vector library is needed to define a vector
 
 class CCSAssemblyFunction;
 class CCSRegionMgr;
@@ -24,13 +24,13 @@ public:
     inline CCSAssemblyFunction* getFunction() const { return m_pFcn; };
     inline const CCSFeatureVector& getVector() const { return m_vector; };
     inline const CCSBoolArray& getBinaryVector() const { return m_binaryVector; };
-	inline int getFeatureCountsSize() const {return m_featureCounts.GetSize();}; //mfarhadi
-	inline const CCSMapStringToInt& getFeatureCounts() const { return  m_featureCounts;  }; //mfarhadi
+	inline int getFeatureCountsSize() const {return m_featureCounts.GetSize();}; 
+	inline const CCSMapStringToInt& getFeatureCounts() const { return  m_featureCounts;  }; 
 
     bool countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr);
     bool constructVector(CStringArray& globaFeatures);
     bool constructBinaryVector(const CCSIntArray& globalMedians);
-	bool updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileMgr* pAssemblyFileMgr); //mfarhadi
+	bool updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileMgr* pAssemblyFileMgr); 
 
     int m_dbRegionID;       // regionID in database
     int m_dbFcnID;          // fcnID in database
@@ -42,7 +42,7 @@ public:
 
     UINT m_hashValue;       // hash value of this funciton.    
 
-	static int m_cntRegion;    // mfarhadi keep track of numbeer of created regions so far
+	static int m_cntRegion;    // keep track of numbeer of created regions so far
 
 private:
     int incFeatureCount(LPCTSTR featureStr);
