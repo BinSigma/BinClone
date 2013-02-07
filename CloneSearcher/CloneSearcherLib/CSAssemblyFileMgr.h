@@ -46,8 +46,9 @@ public:
 
     CStringArray m_globalFeatures;
     CCSIntArray m_medians;
-	CCSIntArray m_globalMedians; 
-   std::vector<std::vector<int>> m_redundancyVector; // keep track of number of occurrence of each feature's value! (to find median with bucket sort algorithm)
+	CCSIntArray m_globalMedians;
+	CCSIntArray m_mediansNZ; // only >0 medians
+    std::vector<std::vector<int>> m_redundancyVector; // keep track of number of occurrence of each feature's value! (to find median with bucket sort algorithm)
 
 private:    
     bool parseFunctions(CCSAssemblyFile* pAssemblyFile, const CCSParam& param);
@@ -58,6 +59,7 @@ private:
     bool addGlobalFeature(LPCTSTR featureName);
 	bool constructGlobalMedians();
     bool constructRedundancyVector(); 
+	bool filterOutFeatures(CCSIntArray& globalMedians);
 
     Int64u m_nTotalFiles;
     Int64u m_nTotalFunctions;

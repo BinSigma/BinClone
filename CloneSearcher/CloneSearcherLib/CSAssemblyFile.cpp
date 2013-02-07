@@ -338,9 +338,9 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 				ASSERT(pAssemblyFileMgr->m_globalFeatures.GetSize() == region.getVector().GetSize());
 
 				// compute the binary vector, then store the hash into the database
-				if (!region.constructBinaryVector(pAssemblyFileMgr->m_medians))
+				if (!region.constructBinaryVector(pAssemblyFileMgr->m_mediansNZ, pAssemblyFileMgr->m_globalMedians)) 
 					return false;
-				if (!pDBMgr->storeInexact2CombRegion(region, param))
+				if (!pDBMgr->storeInexact2CombRegion(region, pAssemblyFileMgr->m_mediansNZ, param))
 					return false;
 			}
 

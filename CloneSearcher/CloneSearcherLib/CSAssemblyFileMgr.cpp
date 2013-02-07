@@ -170,14 +170,24 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
                     tcout << _T("Number of regions: ") << assemblyFile.getNumRegions() << _T(" in ") << assemblyFilePath << endl;
                     ++m_nTotalFiles;
                 }
+
                 // assemblyFile will be deallocated.
             }
         }
     } while (::FindNextFile(hFile, &fileInfo));
   
-        if (!m_pDBMgr->storeGlobalFeatures(m_globalFeatures, param))
-			return false;
+	if (bFirstScan) {
+        if (!m_pDBMgr->storeGlobalFeatures(m_globalFeatures, m_globalMedians , param)) {
+			tcout << _T("Error: failed to store features") << endl;
+			return false;	
+        }  
+		if(!filterOutFeatures(m_globalMedians)){
+			tcout << _T("Error: failed to filtering features ") << endl;
+			return false;		
+		}
+	}
 
+        		
 		// SterePreda: Please add a culumn for medians to the same table as the table where the features are stored
 		// store features' medians in DB 
 		//
@@ -380,3 +390,19 @@ bool CCSAssemblyFileMgr::constructRedundancyVector()
 
     return true;
 }
+
+bool CCSAssemblyFileMgr::filterOutFeatures(CCSIntArray& globalMedians) {
+
+	for (int i = 0; i < globalMedians.GetSize(); ++i) {
+		if (globalMedians.GetAt(i) != 0)
+			m_mediansNZ.Add(i);  // store the index of the features with median more than 0
+	}
+	    if (m_mediansNZ.GetSize() == 0) {
+			tcout << _T("CSAssemblyFileMgr:filterOutFeatures: All feature have 0 median.") << endl;
+			ASSERT(false);
+			return false;
+    }
+	return true;
+}
+
+

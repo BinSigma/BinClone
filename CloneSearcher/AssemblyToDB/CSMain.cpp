@@ -24,11 +24,9 @@ bool parseArgs(int                   nArgs,
                CString&              dbUser,
                CString&              dbPwd,
                CString&              assemblyFolder,
-               TCSRegNormalizeLevel& regNormLevel,
-             //  bool&                 bNormalizeToken, mfarhadi : no need anymore
+               TCSRegNormalizeLevel& regNormLevel, 
                int&                  windowSize,
-               int&                  stride
-          //     int&                  kThreshold   mfarhadi : no need anymore
+               int&                  stride         
                )
 {
     if (nArgs != 8 || !argv) {
@@ -37,11 +35,9 @@ bool parseArgs(int                   nArgs,
         tcout << _T("        <dbUser:string>") << endl;
         tcout << _T("        <dbPwd:string>") << endl;
         tcout << _T("        <assemblyFolder:string>:input folder of assembly files, e.g., C:\\temp\\sample") << endl;
-        tcout << _T("        <regNormLevel:boolean>:register normalization level with 4 possible values: REG, TYPE, IDXPTR, or BITS") << endl;
-     //   tcout << _T("        <bNormalizeToken:boolean>:normalize token: TRUE or FALSE") << endl;
+        tcout << _T("        <regNormLevel:boolean>:register normalization level with 4 possible values: REG, TYPE, IDXPTR, or BITS") << endl;   
         tcout << _T("        <windowSize:integer>:window size, e.g., 5") << endl;
         tcout << _T("        <stride:integer>:step size, e.g., 1") << endl;
-    //    tcout << _T("        <maxKOperands:integer>:maximum number of operands in feature vector, e.g., 5") << endl;
         return false;
     }
 
@@ -63,20 +59,8 @@ bool parseArgs(int                   nArgs,
         ASSERT(false);
         return false;
     }
-/*   mfarhadi: no need anymore
-	if (_tcsicmp(argv[6], CS_TRUE_STR) == 0)
-	    bNormalizeToken = true;
-	else if (_tcsicmp(argv[6], CS_FALSE_STR) == 0)
-		bNormalizeToken = false;
-	else {
-        tcout << _T("Input Error: invalid argument for normalization token.") << endl;
-        ASSERT(false);
-        return false;
-    }
-*/
 	windowSize = StrToInt(argv[6]);
 	stride = StrToInt(argv[7]);
-//    kThreshold = StrToInt(argv[9]);   mfarhadi: no need anymore
     return true;
 }
 
@@ -102,8 +86,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 			//tcout << (LPCTSTR)strHello << endl;
 
 			CString dbName, dbUser, dbPwd, assemblyFolderPath;
-            int windSize = 0, stride = 0; //kThreshold = 0;
-         //   bool bNormalizeToken = false; mfarhadi: no need anymore
+            int windSize = 0, stride = 0;
             TCSRegNormalizeLevel regNormLevel = CS_NORM_REG_ROOT;
 			if (!parseArgs(argc, argv, dbName, dbUser, dbPwd, assemblyFolderPath, regNormLevel, windSize, stride)) { 
 				tcout << _T("Input Error: invalid arguments") << endl;

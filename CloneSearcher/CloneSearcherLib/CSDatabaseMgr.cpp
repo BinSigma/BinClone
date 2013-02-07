@@ -66,9 +66,7 @@ bool CCSDatabaseMgr::storeParam(CCSParam& param)
 	PGresult* pgresult; // result of the last query
 	CString csSqlCheckParam = _T("SELECT \"dbParamID\" from \"Parameter\" WHERE ");
 	CString csSqlVals;
-    CString csNormalizeToken; //  mfarhadi: not used anymore!
-    CBFStrHelper::boolToStr("temp", csNormalizeToken); // mfarhadi: not used anymore!
-	csSqlVals.Format(_T("\"windowSize\"=%d AND \"stride\"=%d AND \"kThreshold\"=%d AND \"regNormLevel\"=%d AND \"bNormalizeToken\"=%s"), param.m_windowSize, param.m_stride, 100, param.m_regNormLevel, csNormalizeToken.GetString());  //mfarhadi: kThreshold (100) and csNormalizeToken need to be removed
+	csSqlVals.Format(_T("\"windowSize\"=%d AND \"stride\"=%d AND \"regNormLevel\"=%d"), param.m_windowSize, param.m_stride, param.m_regNormLevel);  
 	csSqlCheckParam += csSqlVals;
     CStringA csSqlCheckParamANSI;
 	if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckParam, csSqlCheckParamANSI)) {
@@ -86,6 +84,10 @@ bool CCSDatabaseMgr::storeParam(CCSParam& param)
     if (PQntuples(pgresult)) { //the params are in the database
 	    CStringA csParamIDAnsi(PQgetvalue(pgresult, 0, 0));
         CString csParamID;
+        // Delete the features from the table FeatureTable with ParamIDFkey = csParamIDAnsi.GetString();
+        PQexec(getPGDBConnection(), (LPCSTR) (""));
+
+
         if(!CBFStrHelper::convertCStringAToCString(csParamIDAnsi, csParamID)) {
 	        tcout << _T("Failed to convert ANSI to Unicode string:") << csParamIDAnsi.GetString() << endl; 
 		    ASSERT(false);
@@ -101,7 +103,7 @@ bool CCSDatabaseMgr::storeParam(CCSParam& param)
 		CString csSqlValues;
         //CString csNormalizeToken;
         //CBFStrHelper::convertBoolToCString(param.m_bNormalizeToken, csNormalizeToken);
-		csSqlValues.Format(_T("%d, %d, %d, %d, %s,  DEFAULT)"), param.m_windowSize, param.m_stride, 100, param.m_regNormLevel, csNormalizeToken.GetString());
+		csSqlValues.Format(_T("%d, %d, %d, DEFAULT)"), param.m_windowSize, param.m_stride, param.m_regNormLevel);
 		csSqlInsertParam += csSqlValues;
 
         CStringA csSqlInsertParamANSI;
@@ -167,23 +169,16 @@ bool CCSDatabaseMgr::fetchParams(CCSParams& params)
 		return false;
 	}
     CCSParam* pNewParam = NULL;
-    CStringA regNormLevelAnsi, windowSizeAnsi, strideAnsi, kThresholdAnsi, dbParamIDAnsi, bNormalizeTokenAnsi;
+    CStringA regNormLevelAnsi, windowSizeAnsi, strideAnsi, dbParamIDAnsi;
     bool bNormalizeToken = false;
     CString regNormLevel, windowSize, stride, kThreshold, dbParamID;
     for (int i = 0; i < PQntuples(pgresult); i++) {
         regNormLevelAnsi = PQgetvalue(pgresult, i, 3);
         windowSizeAnsi = PQgetvalue(pgresult, i, 0);
-        strideAnsi = PQgetvalue(pgresult, i, 1);
-        kThresholdAnsi = PQgetvalue(pgresult, i, 2);
+        strideAnsi = PQgetvalue(pgresult, i, 1);        
         dbParamIDAnsi = PQgetvalue(pgresult, i, 5);
-        bNormalizeTokenAnsi = PQgetvalue(pgresult, i, 4);
-        if (!CBFStrHelper::strAToBool(bNormalizeTokenAnsi, bNormalizeToken)) {
-            cout << _T("Failed to convert ANSI string to BOOL value: ") << bNormalizeTokenAnsi << endl;
-            ASSERT(false);
-            return(false);
-        }
-        if(!(CBFStrHelper::convertCStringAToCString(regNormLevelAnsi, regNormLevel) && CBFStrHelper::convertCStringAToCString(windowSizeAnsi, windowSize) && CBFStrHelper::convertCStringAToCString(strideAnsi, stride) && CBFStrHelper::convertCStringAToCString(kThresholdAnsi, kThreshold) && CBFStrHelper::convertCStringAToCString(dbParamIDAnsi, dbParamID))) {
-	        tcout << _T("Failed to convert ANSI to Unicode strings: ") << regNormLevelAnsi.GetString() << _T(", ") << windowSizeAnsi.GetString() << _T(", ") << strideAnsi.GetString() << _T(", ") << kThresholdAnsi.GetString() << _T(", ") << dbParamIDAnsi.GetString() << endl; 
+        if(!(CBFStrHelper::convertCStringAToCString(regNormLevelAnsi, regNormLevel) && CBFStrHelper::convertCStringAToCString(windowSizeAnsi, windowSize) && CBFStrHelper::convertCStringAToCString(strideAnsi, stride) && CBFStrHelper::convertCStringAToCString(dbParamIDAnsi, dbParamID))) {
+	        tcout << _T("Failed to convert ANSI to Unicode strings: ") << regNormLevelAnsi.GetString() << _T(", ") << windowSizeAnsi.GetString() << _T(", ") << strideAnsi.GetString() << _T(", ") << _T(", ") << dbParamIDAnsi.GetString() << endl; 
 	        ASSERT(false);
 	        return false;                     
         }
@@ -499,24 +494,54 @@ bool CCSDatabaseMgr::storeRegion(CCSRegion& region, const CCSParam& param)
 //
 // Store global features.
 // 
-bool CCSDatabaseMgr::storeGlobalFeatures(const CStringArray& globalFeatures, const CCSParam& param)
+bool CCSDatabaseMgr::storeGlobalFeatures(const CStringArray& globalFeatures, const CCSIntArray& globalMedians, const CCSParam& param)
 {
-	// paramIDFKey | featID | featName
-    //-------------+--------+---------
-    for (int i = 0; i < globalFeatures.GetSize(); ++i) {
-        // Stere: TODO
-        // store the following:
-        // param.m_dbParamID, i, globalFeatures[i]
-        // into:
-        // paramIDFKey | featID | featName
-    }
+	// paramIDFKey | featID | featName | featMedian
+    //-------------+--------+----------------------
+    
+    PGresult *pgresult;
+	if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+		tcout << _T("CSDataBaseMgr (storeFeature): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+		ASSERT(false);
+		return false;
+	}        
+    CStringA parameterId; 
+    CStringA csSqlCheckFeatureANSI = "Select * from \"Feature\" where \"featName\"=\'regreg\' and \"paramIDFKey\"=";
+    parameterId.Format("%d", param.m_dbParamID);
+    csSqlCheckFeatureANSI += parameterId;
+    pgresult = PQexec(getPGDBConnection(), csSqlCheckFeatureANSI);
+
+    if(PQntuples(pgresult))
+        return true; 
+    else {
+        for (int i = 0; i < globalFeatures.GetSize() - 1; ++i) {
+            CString csSqlInsertFeatures = _T("INSERT into \"Feature\" VALUES(");   
+            CString csValues;
+            csValues.Format(_T("%d, %d, \'%s\', %d)"), param.m_dbParamID, i, globalFeatures.GetAt(i).GetString(), globalMedians.GetAt(i));
+	        csSqlInsertFeatures =csSqlInsertFeatures + csValues;	
+            CStringA csSqlInsertFeatureANSI;
+            if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertFeatures, csSqlInsertFeatureANSI)) {
+                tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertFeatures.GetString() << endl;
+                ASSERT(false);
+                return false;
+            }
+            pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertFeatureANSI);
+	        if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+                tcout << _T("CSDataBaseMgr (storeFeature): Failing to insert the feature name ") << globalFeatures.GetAt(i).GetString() << _T(" in the data base") <<  endl;
+		        ASSERT(false);
+		        return false;
+            }	   
+
+        }
+    PQclear(pgresult);    
+    }    
     return true;
 }
 
 //
 // Store hash region.
 // 
-bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSParam& param)
+bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSIntArray& medianNZ , const CCSParam& param)
 {
 	// paramIDFKey | featID | featName
     //-------------+--------+---------
@@ -524,17 +549,95 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSP
     // paramIDFKey | featAIDFKey | featBIDFKey | featAPresent | featBPresent | dbRegionID
     // integer     | integer     | integer     | boolean      | boolean      | integer
 	//-------------+-------------+-------------+--------------+--------------+-----------
-
-    const CCSBoolArray& binaryVector = region.getBinaryVector();
-    for (int i = 0; i < binaryVector.GetSize(); ++i) {
-        for (int j = i + 1; j < binaryVector.GetSize(); ++j) {
-            // Farhadi and Stere: TODO
+    
+            // Farhadi and Stere: TODO   MFarhadi: DONE!
             // store the following: 
             // param.m_dbParamID, i, j, binaryVector[i], binaryVector[j], region.m_dbRegionID    
             // into:
             // paramIDFKey | featAIDFKey | featBIDFKey | featAPresent | featBPresent | dbRegionID
+    
+    PGresult *pgresult;
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+        tcout << _T("CSDataBaseMgr (storeInexactRegion): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+        ASSERT(false);
+        return false;
+	}    
+    const CCSBoolArray& binaryVector = region.getBinaryVector(); 
+    CString regionDelimeter = _T("#");
+    for (int i = 0; i < binaryVector.GetSize()-1; ++i) {
+        for (int j = i + 1; j < binaryVector.GetSize(); ++j) {
+            CString parameterIDString; 
+            CString featAIDFKeyString;
+            CString featBIDFKeyString;
+            CString featAPresentString;
+            CString featBPresentString;
+            parameterIDString.Format(_T("%d"), param.m_dbParamID);
+            featAIDFKeyString.Format(_T("%d"), medianNZ.GetAt(i));
+            featBIDFKeyString.Format(_T("%d"), medianNZ.GetAt(j));
+            CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(i), featAPresentString);
+            CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(j), featBPresentString);
+            CString csSqlCheckInexact = _T("Select * from \"Inexact2Comb\" where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
+            CStringA csSqlCheckInexactANSI;
+            if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
+                tcout << _T("Failed to convert UNICODE string: ") << region.m_dbRegionID << endl;
+                ASSERT(false);
+                return false;
+            }
+            pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);
+            if(PQntuples(pgresult)) {  // if the values are the same, the region should be added to the same row with delimeter '#'
+                CString dbRegionIDString;
+                dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
+                CString storedDBRegionIDs = (CString)PQgetvalue(pgresult, 0, 5);
+                CString deleteStoredDBRegionIDs = _T("delete from \"Inexact2Comb\" where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
+                CStringA deleteStoredDBRegionIDsANSI;
+                if (!CBFStrHelper::convertCStringToCStringA(deleteStoredDBRegionIDs, deleteStoredDBRegionIDsANSI)) {
+                   tcout << _T("Failed to convert UNICODE string: ") << deleteStoredDBRegionIDs.GetString() << endl;
+                   ASSERT(false);
+                   return false;
+                }
+                pgresult = PQexec(getPGDBConnection(), deleteStoredDBRegionIDsANSI);
+                if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+                   tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to check the Region ") << region.m_dbRegionID << _T(" in the data base") <<  endl;
+	               ASSERT(false);
+	               return false;    
+                }
+                CString newRegionsSet = storedDBRegionIDs + regionDelimeter + dbRegionIDString;
+                CString csSqlInsertInexactRegion = _T("INSERT into \"Inexact2Comb\" VALUES(") + parameterIDString + _T(", ") + featAIDFKeyString + _T(", ") + featBIDFKeyString + _T(", ") + featAPresentString + _T(", ") + featBPresentString + _T(", \'") + newRegionsSet + _T(" \' )");
+                CStringA csSqlInsertInexactANSI;
+                if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertInexactRegion, csSqlInsertInexactANSI)) {
+                   tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertInexactRegion.GetString() << endl;
+                   ASSERT(false);
+                   return false;
+                }
+            
+                pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertInexactANSI);
+	            if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+                    tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to insert the Region ") << region.m_dbRegionID << _T(" in the data base") <<  endl;
+		            ASSERT(false);
+		            return false;    
+                }
+            }
+            else { 
+                CString csSqlInsertInexactRegion = _T("INSERT into \"Inexact2Comb\" VALUES(");   
+                CString csValues;
+                csValues.Format(_T("%d, %d, %d, \'%s\', \'%s\', %d)"), param.m_dbParamID, medianNZ.GetAt(i) ,medianNZ.GetAt(j), featAPresentString, featBPresentString, region.m_dbRegionID);
+	            csSqlInsertInexactRegion +=+ csValues;	
+                CStringA csSqlInsertInexactANSI;
+                if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertInexactRegion, csSqlInsertInexactANSI)) {
+                    tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertInexactRegion.GetString() << endl;
+                    ASSERT(false);
+                    return false;
+                }
+                pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertInexactANSI);
+	            if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+                    tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to insert the Region ") << region.m_dbRegionID << _T(" in the data base") <<  endl;
+		            ASSERT(false);
+		            return false;               
+                }
+            }
         }
     }
+    PQclear(pgresult); 
     return true;
 }
 

@@ -125,19 +125,18 @@ bool CCSRegion::constructVector(CStringArray& globalFeatures)
 //
 // Construct binary vector
 //
-bool CCSRegion::constructBinaryVector(const CCSIntArray& globalMedians)
-{
-    return true; // Farhadi: remove this line when you have implemented the computation of the median.
-
+bool CCSRegion::constructBinaryVector(const CCSIntArray& mediansNZ, const CCSIntArray& globalMedians)
+{    
+#if 0
     if (m_vector.GetSize() != globalMedians.GetSize()) {
         tcout << _T("CCSRegion:constructBinaryVector: incorrect vector size.") <<  endl;
         ASSERT(false);
         return false;
     }
-
-    m_binaryVector.SetSize(m_vector.GetSize());
-    for (int f = 0; f < m_vector.GetSize(); ++f)
-        m_binaryVector[f] = m_vector[f] >= globalMedians[f];
+#endif
+    m_binaryVector.SetSize(mediansNZ.GetSize());
+    for (int f = 0; f < mediansNZ.GetSize(); ++f)
+		m_binaryVector[f] = m_vector[f] >= globalMedians.GetAt(mediansNZ[f]); // mediansNZ stores the index of the medians which are more than 0 in globalMedian Vector
     
     return true;
 }

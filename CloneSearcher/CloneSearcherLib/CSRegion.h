@@ -29,7 +29,7 @@ public:
 
     bool countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr);
     bool constructVector(CStringArray& globaFeatures);
-    bool constructBinaryVector(const CCSIntArray& globalMedians);
+    bool constructBinaryVector(const CCSIntArray& mediansNZ  ,const CCSIntArray& globalMedians);
 	bool updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileMgr* pAssemblyFileMgr); 
 
     int m_dbRegionID;       // regionID in database
@@ -46,7 +46,7 @@ public:
 
 private:
     int incFeatureCount(LPCTSTR featureStr);
-    int findMedian(const std::vector<int>& myVector); //mfarhadi 
+    int findMedian(const std::vector<int>& myVector);
 
     CCSAssemblyFunction* m_pFcn;            // function of this region
     CCSMapStringToInt m_featureCounts;      // keep track of the count of each feature. 
