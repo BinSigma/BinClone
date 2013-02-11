@@ -539,6 +539,69 @@ bool CCSDatabaseMgr::storeGlobalFeatures(const CStringArray& globalFeatures, con
 }
 
 //
+// Pre-insert Inexact2Com table
+//
+bool CCSDatabaseMgr::preInsertInexact2Comb (const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians, const CCSParam& param)
+{
+	PGresult *pgresult;
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+        tcout << _T("CSDataBaseMgr (storeInexactRegion): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+        ASSERT(false);
+        return false;
+	} 
+	CStringA parameterID; 
+    CStringA csSqlCheckInexactANSI = "Select * from \"Inexact2Comb\" where \"paramIDFKey\"=";
+    parameterID.Format("%d", param.m_dbParamID);
+    csSqlCheckInexactANSI += parameterID;
+    pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);
+
+    if(PQntuples(pgresult))
+        return true; 
+	else {
+		for (int i = 0; i < filteredFeatures.GetSize()-1; ++i) {
+			for (int j = i + 1; j < filteredFeatures.GetSize(); ++j) {
+			CString parameterIDString; 
+				CString featAIDFKeyString;
+				CString featBIDFKeyString;
+				CString featAPresentString;
+				CString featBPresentString;
+				parameterIDString.Format(_T("%d"), param.m_dbParamID);
+				featAIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(i));
+				featBIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(j));
+				for (int k = 0; k < 4; k++) {
+					CString csSqlPreInsertInexact2Comb = _T("INSERT into \"Inexact2Comb\" VALUES(");   
+					if (k == 0) { featAPresentString = _T("T"); featBPresentString = _T("T"); }
+					if (k == 1) { featAPresentString = _T("T"); featBPresentString = _T("F"); }
+					if (k == 2) { featAPresentString = _T("F"); featBPresentString = _T("T"); }
+					if (k == 3) { featAPresentString = _T("F"); featBPresentString = _T("F"); }			
+					CString csValues;
+					csValues.Format(_T("%d, %d, %d, \'%s\', \'%s\', \'%s\')"), param.m_dbParamID, filteredFeatures.GetAt(i), filteredFeatures.GetAt(j), featAPresentString, featBPresentString, _T("-1"));
+					csSqlPreInsertInexact2Comb += csValues;	
+					CStringA csSqlPreInsertInexact2CombANSI;
+					if (!CBFStrHelper::convertCStringToCStringA(csSqlPreInsertInexact2Comb, csSqlPreInsertInexact2CombANSI)) {
+						tcout << _T("Failed to convert UNICODE string: ") << csSqlPreInsertInexact2Comb.GetString() << endl;
+						ASSERT(false);
+						return false;
+					}
+					pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlPreInsertInexact2CombANSI);
+					if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+					   tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to Pre insert into Inexact2Comb ") << filteredFeatures.GetAt(i) << _T(" in the data base") <<  endl;
+					   ASSERT(false);
+					   return false;    
+					}
+				}		
+			}		
+		}
+		CStringA createIndex; // create index to optimize searching
+		CStringA csSqlcreateIndexANSI = "Create INDEX \"InexactIndex\" ON \"Inexact2Comb\" (\"paramIDFKey\", \"featAIDFKey\", \"featBIDFKey\", \"featAPresent\", \"featBPresent\")";
+		pgresult = PQexec(getPGDBConnection(), csSqlcreateIndexANSI);
+	}
+	PQclear(pgresult); 
+    return true;
+}
+
+
+//
 // Store hash region.
 // 
 bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSIntArray& medianNZ , const CCSParam& param)
@@ -550,12 +613,7 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSI
     // integer     | integer     | integer     | boolean      | boolean      | integer
 	//-------------+-------------+-------------+--------------+--------------+-----------
     
-            // Farhadi and Stere: TODO   MFarhadi: DONE!
-            // store the following: 
-            // param.m_dbParamID, i, j, binaryVector[i], binaryVector[j], region.m_dbRegionID    
-            // into:
-            // paramIDFKey | featAIDFKey | featBIDFKey | featAPresent | featBPresent | dbRegionID
-    
+           
     PGresult *pgresult;
     if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
         tcout << _T("CSDataBaseMgr (storeInexactRegion): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
@@ -563,7 +621,6 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSI
         return false;
 	}    
     const CCSBoolArray& binaryVector = region.getBinaryVector(); 
-    CString regionDelimeter = _T("#");
     for (int i = 0; i < binaryVector.GetSize()-1; ++i) {
         for (int j = i + 1; j < binaryVector.GetSize(); ++j) {
             CString parameterIDString; 
@@ -571,12 +628,14 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSI
             CString featBIDFKeyString;
             CString featAPresentString;
             CString featBPresentString;
+			CString dbRegionIDString;
             parameterIDString.Format(_T("%d"), param.m_dbParamID);
             featAIDFKeyString.Format(_T("%d"), medianNZ.GetAt(i));
             featBIDFKeyString.Format(_T("%d"), medianNZ.GetAt(j));
+			dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
             CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(i), featAPresentString);
             CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(j), featBPresentString);
-            CString csSqlCheckInexact = _T("Select * from \"Inexact2Comb\" where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
+			CString csSqlCheckInexact = _T("UPDATE \"Inexact2Comb\" SET \"dbRegionID\" = \"dbRegionID\" || '#' || \'") + dbRegionIDString + _T(" \' where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
             CStringA csSqlCheckInexactANSI;
             if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
                 tcout << _T("Failed to convert UNICODE string: ") << region.m_dbRegionID << endl;
@@ -584,58 +643,7 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSI
                 return false;
             }
             pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);
-            if(PQntuples(pgresult)) {  // if the values are the same, the region should be added to the same row with delimeter '#'
-                CString dbRegionIDString;
-                dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
-                CString storedDBRegionIDs = (CString)PQgetvalue(pgresult, 0, 5);
-                CString deleteStoredDBRegionIDs = _T("delete from \"Inexact2Comb\" where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
-                CStringA deleteStoredDBRegionIDsANSI;
-                if (!CBFStrHelper::convertCStringToCStringA(deleteStoredDBRegionIDs, deleteStoredDBRegionIDsANSI)) {
-                   tcout << _T("Failed to convert UNICODE string: ") << deleteStoredDBRegionIDs.GetString() << endl;
-                   ASSERT(false);
-                   return false;
-                }
-                pgresult = PQexec(getPGDBConnection(), deleteStoredDBRegionIDsANSI);
-                if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
-                   tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to check the Region ") << region.m_dbRegionID << _T(" in the data base") <<  endl;
-	               ASSERT(false);
-	               return false;    
-                }
-                CString newRegionsSet = storedDBRegionIDs + regionDelimeter + dbRegionIDString;
-                CString csSqlInsertInexactRegion = _T("INSERT into \"Inexact2Comb\" VALUES(") + parameterIDString + _T(", ") + featAIDFKeyString + _T(", ") + featBIDFKeyString + _T(", ") + featAPresentString + _T(", ") + featBPresentString + _T(", \'") + newRegionsSet + _T(" \' )");
-                CStringA csSqlInsertInexactANSI;
-                if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertInexactRegion, csSqlInsertInexactANSI)) {
-                   tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertInexactRegion.GetString() << endl;
-                   ASSERT(false);
-                   return false;
-                }
-            
-                pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertInexactANSI);
-	            if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
-                    tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to insert the Region ") << region.m_dbRegionID << _T(" in the data base") <<  endl;
-		            ASSERT(false);
-		            return false;    
-                }
-            }
-            else { 
-                CString csSqlInsertInexactRegion = _T("INSERT into \"Inexact2Comb\" VALUES(");   
-                CString csValues;
-                csValues.Format(_T("%d, %d, %d, \'%s\', \'%s\', %d)"), param.m_dbParamID, medianNZ.GetAt(i) ,medianNZ.GetAt(j), featAPresentString, featBPresentString, region.m_dbRegionID);
-	            csSqlInsertInexactRegion +=+ csValues;	
-                CStringA csSqlInsertInexactANSI;
-                if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertInexactRegion, csSqlInsertInexactANSI)) {
-                    tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertInexactRegion.GetString() << endl;
-                    ASSERT(false);
-                    return false;
-                }
-                pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertInexactANSI);
-	            if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
-                    tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to insert the Region ") << region.m_dbRegionID << _T(" in the data base") <<  endl;
-		            ASSERT(false);
-		            return false;               
-                }
-            }
-        }
+		}
     }
     PQclear(pgresult); 
     return true;

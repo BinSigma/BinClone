@@ -30,7 +30,8 @@ public:
     bool storeFunction(CCSAssemblyFunction& assemblyFcn, const CCSParam& param);
 
     bool storeRegion(CCSRegion& region, const CCSParam& param);
-    bool storeGlobalFeatures(const CStringArray& globalFeatures, const CCSIntArray& globalMedians, const CCSParam& param); 
+    bool storeGlobalFeatures(const CStringArray& globalFeatures, const CCSIntArray& globalMedians, const CCSParam& param);
+	bool preInsertInexact2Comb(const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians, const CCSParam& param);
     bool storeInexact2CombRegion(const CCSRegion& region, const CCSIntArray& medianNZ, const CCSParam& param);
     bool fetchRegions(int dbParamID, UINT hashValue, CCSRegions& cloneRegions);
 

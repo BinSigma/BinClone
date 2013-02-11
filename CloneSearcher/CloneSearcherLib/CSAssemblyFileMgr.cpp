@@ -177,14 +177,20 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
     } while (::FindNextFile(hFile, &fileInfo));
   
 	if (bFirstScan) {
-        if (!m_pDBMgr->storeGlobalFeatures(m_globalFeatures, m_globalMedians , param)) {
+        if (!m_pDBMgr->storeGlobalFeatures(m_globalFeatures, m_globalMedians ,param)) {
 			tcout << _T("Error: failed to store features") << endl;
 			return false;	
         }  
-		if(!filterOutFeatures(m_globalMedians)){
+		if(!filterOutFeatures(m_globalMedians)) {
 			tcout << _T("Error: failed to filtering features ") << endl;
 			return false;		
 		}
+	
+	    if (!m_pDBMgr->preInsertInexact2Comb(m_mediansNZ, m_globalMedians, param) ) {
+			tcout << _T("Error: failed to pre-insert Inexact2Comb table") << endl;
+			return false;	
+        } 
+	
 	}
 
         		
