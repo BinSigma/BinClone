@@ -173,10 +173,10 @@ bool CCSDatabaseMgr::fetchParams(CCSParams& params)
     bool bNormalizeToken = false;
     CString regNormLevel, windowSize, stride, kThreshold, dbParamID;
     for (int i = 0; i < PQntuples(pgresult); i++) {
-        regNormLevelAnsi = PQgetvalue(pgresult, i, 3);
+        regNormLevelAnsi = PQgetvalue(pgresult, i, 2);
         windowSizeAnsi = PQgetvalue(pgresult, i, 0);
         strideAnsi = PQgetvalue(pgresult, i, 1);        
-        dbParamIDAnsi = PQgetvalue(pgresult, i, 5);
+        dbParamIDAnsi = PQgetvalue(pgresult, i, 3);
         if(!(CBFStrHelper::convertCStringAToCString(regNormLevelAnsi, regNormLevel) && CBFStrHelper::convertCStringAToCString(windowSizeAnsi, windowSize) && CBFStrHelper::convertCStringAToCString(strideAnsi, stride) && CBFStrHelper::convertCStringAToCString(dbParamIDAnsi, dbParamID))) {
 	        tcout << _T("Failed to convert ANSI to Unicode strings: ") << regNormLevelAnsi.GetString() << _T(", ") << windowSizeAnsi.GetString() << _T(", ") << strideAnsi.GetString() << _T(", ") << _T(", ") << dbParamIDAnsi.GetString() << endl; 
 	        ASSERT(false);
