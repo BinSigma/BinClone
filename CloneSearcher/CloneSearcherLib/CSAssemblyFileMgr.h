@@ -33,7 +33,7 @@ public:
     inline CCSOperandsMap* getOpMems() { return &m_opMems; };
     inline CCSOperandsMap* getOpRegs() { return &m_opRegs; };
     inline CCSOperandsMap* getOpVals() { return &m_opVals; };
-
+ 
     // functions for manipulating reading assembly files
     bool openRawAssemblyFile(LPCTSTR assemblyFilePath);
     bool getRawAssemblyFileLineStr(CString& str);
@@ -49,7 +49,7 @@ public:
 	CCSIntArray m_globalMedians;
 	CCSIntArray m_mediansNZ; // only >0 medians
     std::vector<std::vector<int>> m_redundancyVector; // keep track of number of occurrence of each feature's value! (to find median with bucket sort algorithm)
-
+	
 private:    
     bool parseFunctions(CCSAssemblyFile* pAssemblyFile, const CCSParam& param);
     bool constructMnemonicFeatures();

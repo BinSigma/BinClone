@@ -170,7 +170,6 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
                     tcout << _T("Number of regions: ") << assemblyFile.getNumRegions() << _T(" in ") << assemblyFilePath << endl;
                     ++m_nTotalFiles;
                 }
-
                 // assemblyFile will be deallocated.
             }
         }
@@ -183,22 +182,18 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
         }  
 		if(!filterOutFeatures(m_globalMedians)) {
 			tcout << _T("Error: failed to filtering features ") << endl;
-			return false;		
+			return false;	
 		}
-	
+		if(!m_pDBMgr->storeFilteredFeatures(m_globalFeatures, m_mediansNZ, m_globalMedians, param)){
+			tcout << _T("Error: failed to store filtered features ") << endl;
+			return false;	
+		}	
 	    if (!m_pDBMgr->preInsertInexact2Comb(m_mediansNZ, m_globalMedians, param) ) {
 			tcout << _T("Error: failed to pre-insert Inexact2Comb table") << endl;
 			return false;	
-        } 
-	
+        }
 	}
 
-        		
-		// SterePreda: Please add a culumn for medians to the same table as the table where the features are stored
-		// store features' medians in DB 
-		//
-		//if (!m_pDBMgr->storeGlobalFeatures(m_globalMedians,param))
-		//	return false
     if(!bFirstScan) {  
         tcout << _T("Total number of files: ") << m_nTotalFiles << endl;
         tcout << _T("Total number of functions: ") << m_nTotalFunctions << endl;

@@ -285,19 +285,17 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 
 				
             if (bFirstScan) {   // if bStoreDB is false, it means that the program is in first scan phase             
-                ++ CCSRegion::m_cntRegion; // increament the total number of regions processes so far
+                ++ CCSRegion::m_cntRegion; // increament the total number of regions processes so far in the first scan
 			    
                 if (!region.countRegionFeatures(pAssemblyFileMgr))
 				    return false;
 
 			    //update the medians. 
 			    if (!region.updateGlobalMedians(pAssemblyFileMgr->m_globalMedians, pAssemblyFileMgr))
-					    return false;
-            
+					    return false;           
                 continue;
             }
 
-                     
 			// create a hash of this region
 			const CString contentHashKey = composeContentHashKey(sIdx, eIdx);
 			if (contentHashKey.IsEmpty())
@@ -322,7 +320,34 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 			}
 
 			if (bFindInexactClones) {
-				// Farhadi: Step 3: find inexact clones from DB. 
+
+				CCSRegions cloneRegions;
+                if (!region.countRegionFeatures(pAssemblyFileMgr))
+					return false;	
+
+				if (!pDBMgr->fetchFeatureVector(region, param))
+					return false;								
+				
+				if (!pDBMgr->createTargetRegionBinaryVector(region, param))
+					return false;
+
+				if(!pDBMgr->constructScoreVector(param))
+					return false;
+
+				if (!pDBMgr->fetchInexactScore(region, param))
+			        return false;
+
+				if (!pDBMgr->fetchInexactRegions(region, param, cloneRegions)) {
+			        cloneRegions.cleanup();
+					return false;
+				}
+
+				if (!m_clones.makeClones(region, cloneRegions)) {
+					cloneRegions.cleanup();
+					return false;
+				}
+				cloneRegions.cleanup();
+
 			}
 
 			if (bStoreDB) {                       

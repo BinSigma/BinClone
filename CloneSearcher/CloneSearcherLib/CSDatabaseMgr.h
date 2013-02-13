@@ -30,17 +30,18 @@ public:
     bool storeFunction(CCSAssemblyFunction& assemblyFcn, const CCSParam& param);
 
     bool storeRegion(CCSRegion& region, const CCSParam& param);
-    bool storeGlobalFeatures(const CStringArray& globalFeatures, const CCSIntArray& globalMedians, const CCSParam& param);
-	bool preInsertInexact2Comb(const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians, const CCSParam& param);
-    bool storeInexact2CombRegion(const CCSRegion& region, const CCSIntArray& medianNZ, const CCSParam& param);
     bool fetchRegions(int dbParamID, UINT hashValue, CCSRegions& cloneRegions);
 
-    bool storeVectorFeatureNames(int dbParamID, const CStringArray& vectorFeatureNames);
-    bool fetchVectorFeatureNames(int dbParamID, CStringArray& vectorFeatureNames);
-
-    bool storeRegionVector(int dbParamID, int dbRegionID, const CStringArray& vectorFeatureNames, const CCSFeatureVector& vector);
-    bool computeMedianVector(int dbParamID, CCSFeatureVector& vector);
-    
+    bool storeGlobalFeatures(const CStringArray& globalFeatures, const CCSIntArray& globalMedians, const CCSParam& param);
+	bool storeFilteredFeatures(const CStringArray& globalFeatures, const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians, const CCSParam& param);
+	bool preInsertInexact2Comb(const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians, const CCSParam& param);
+	bool fetchFeatureVector(const CCSRegion& region, const CCSParam& param);
+	bool createTargetRegionBinaryVector(const CCSRegion& region, const CCSParam& param);
+	bool constructScoreVector(const CCSParam& param); 	
+    bool storeInexact2CombRegion(const CCSRegion& region, const CCSIntArray& filteredFeatures, const CCSParam& param);
+    bool fetchInexactScore(const CCSRegion& region, const CCSParam& param);
+	bool fetchInexactRegions(const CCSRegion& region, const CCSParam& param, CCSRegions& cloneRegions);
+   
     bool storeConstant(CCSIndexedToken& indexedToken);
     bool fetchConstants(LPCTSTR tokStr, CCSIndexedTokens& indexedTokens);
 
@@ -49,4 +50,15 @@ public:
 
     bool storeImport(CCSIndexedToken& indexedToken);
     bool fetchImports(LPCTSTR tokStr, CCSIndexedTokens& indexedTokens);
+
+	inline void setMinCoOccThreshold (double minCoOccThreshold) {m_minCoOccThreshold = minCoOccThreshold;};
+
+private:
+	std::vector<std::vector<int>> m_scoreVector;  
+	CCSFeatureVector m_targetRegionVector;	// Target region feature vector determined from DB
+	CCSBoolArray m_targetpRegionBinaryVector;
+	CCSIntArray m_filteredFeatures;
+	double m_minCoOccThreshold;
+
+	CCSAssemblyFile* m_assemblyFile;
 };

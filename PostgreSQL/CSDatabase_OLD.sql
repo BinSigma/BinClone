@@ -38,6 +38,20 @@ CREATE TABLE "Constant" (
 ALTER TABLE public."Constant" OWNER TO postgres;
 
 --
+-- Name: Feature; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+--
+
+CREATE TABLE "Feature" (
+    "paramIDFKey" integer,
+    "featID" integer,
+    "featName" character varying(10),
+    "featMedian" integer
+);
+
+
+ALTER TABLE public."Feature" OWNER TO postgres;
+
+--
 -- Name: File; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
@@ -136,15 +150,29 @@ CREATE TABLE "Import" (
 ALTER TABLE public."Import" OWNER TO postgres;
 
 --
+-- Name: Inexact2Comb; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
+--
+
+CREATE TABLE "Inexact2Comb" (
+    "paramIDFKey" integer,
+    "featAIDFKey" integer,
+    "featBIDFKey" integer,
+    "featAPresent" boolean,
+    "featBPresent" boolean,
+    "dbRegionID" text
+);
+
+
+ALTER TABLE public."Inexact2Comb" OWNER TO postgres;
+
+--
 -- Name: Parameter; Type: TABLE; Schema: public; Owner: postgres; Tablespace:
 --
 
 CREATE TABLE "Parameter" (
     "windowSize" integer,
     stride integer,
-    "kThreshold" integer,
     "regNormLevel" integer,
-    "bNormalizeToken" boolean,
     "dbParamID" integer NOT NULL
 );
 
@@ -275,6 +303,14 @@ COPY "Constant" ("constantToken", "rawLineNum", "dbFileID") FROM stdin;
 
 
 --
+-- Data for Name: Feature; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY "Feature" ("paramIDFKey", "featID", "featName", "featMedian") FROM stdin;
+\.
+
+
+--
 -- Data for Name: File; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -299,10 +335,18 @@ COPY "Import" ("importToken", "rawLineNum", "dbFileID") FROM stdin;
 
 
 --
+-- Data for Name: Inexact2Comb; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY "Inexact2Comb" ("paramIDFKey", "featAIDFKey", "featBIDFKey", "featAPresent", "featBPresent", "dbRegionID") FROM stdin;
+\.
+
+
+--
 -- Data for Name: Parameter; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY "Parameter" ("windowSize", stride, "kThreshold", "regNormLevel", "bNormalizeToken", "dbParamID") FROM stdin;
+COPY "Parameter" ("windowSize", stride, "regNormLevel", "dbParamID") FROM stdin;
 \.
 
 
@@ -377,6 +421,14 @@ ALTER TABLE ONLY "Constant"
 
 
 --
+-- Name: Feature_ParamIDFkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY "Feature"
+    ADD CONSTRAINT "Feature_ParamIDFkey" FOREIGN KEY ("paramIDFKey") REFERENCES "Parameter"("dbParamID") ON DELETE CASCADE;
+
+
+--
 -- Name: Function_FileIdFKey_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -390,6 +442,14 @@ ALTER TABLE ONLY "Function"
 
 ALTER TABLE ONLY "Import"
     ADD CONSTRAINT "Import_dbFileIDFkey" FOREIGN KEY ("dbFileID") REFERENCES "File"("dbFileID") ON DELETE CASCADE;
+
+
+--
+-- Name: Inexact2Comb_paramIDFKey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY "Inexact2Comb"
+    ADD CONSTRAINT "Inexact2Comb_paramIDFKey" FOREIGN KEY ("paramIDFKey") REFERENCES "Parameter"("dbParamID") ON DELETE CASCADE;
 
 
 --
@@ -429,3 +489,4 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 -- PostgreSQL database dump complete
 --
+

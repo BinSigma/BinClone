@@ -23,7 +23,7 @@ CCSRegion::~CCSRegion()
 {
 }
 
-int CCSRegion::m_cntRegion = 0; // initilize the static variable to keep track of number of regions processed so far.
+int CCSRegion::m_cntRegion = 0; // initilize the static variable to keep track of number of regions processed so far in the first scan.
 
 //
 // Count features
@@ -47,9 +47,6 @@ bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
                 ASSERT(false);
                 continue;
             }
-
-            if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) mnemonic))
-                return false;
             incFeatureCount(mnemonic.MakeLower());
         }
 
@@ -60,8 +57,6 @@ bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
             if (pToken->getTokenType() == CSTOKEN_TYPE_OPMEM || pToken->getTokenType() == CSTOKEN_TYPE_OPREG || pToken->getTokenType() == CSTOKEN_TYPE_OPVAL) {
                 // Get opType of each operand  
                 opType = pLine->GetAt(tIdx)->getTokenTypeStr();
-                if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) opType))
-                    return false;
                 incFeatureCount(opType.MakeLower());        
             }
         }
@@ -70,8 +65,6 @@ bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
         CString mnemonicOpType0;
         if (pLine->GetSize() > 1) {
             mnemonicOpType0 = mnemonic + pLine->GetAt(1)->getTokenTypeStr();
-            if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) mnemonicOpType0))
-                return false;
             incFeatureCount(mnemonicOpType0.MakeLower());
         }
 
@@ -79,8 +72,6 @@ bool CCSRegion::countRegionFeatures(CCSAssemblyFileMgr* pAssemblyFileMgr)
         CString opType0OpType1;
         if (pLine->GetSize() > 2) {
             opType0OpType1 = pLine->GetAt(1)->getTokenTypeStr() + pLine->GetAt(2)->getTokenTypeStr();
-            if (!pAssemblyFileMgr->addGlobalFeatureIfNew((LPCTSTR) opType0OpType1))
-                return false;
             incFeatureCount(opType0OpType1.MakeLower());
         }
     }
@@ -125,7 +116,7 @@ bool CCSRegion::constructVector(CStringArray& globalFeatures)
 //
 // Construct binary vector
 //
-bool CCSRegion::constructBinaryVector(const CCSIntArray& mediansNZ, const CCSIntArray& globalMedians)
+bool CCSRegion::constructBinaryVector(const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians)
 {    
 #if 0
     if (m_vector.GetSize() != globalMedians.GetSize()) {
@@ -134,9 +125,9 @@ bool CCSRegion::constructBinaryVector(const CCSIntArray& mediansNZ, const CCSInt
         return false;
     }
 #endif
-    m_binaryVector.SetSize(mediansNZ.GetSize());
-    for (int f = 0; f < mediansNZ.GetSize(); ++f)
-		m_binaryVector[f] = m_vector[f] >= globalMedians.GetAt(mediansNZ[f]); // mediansNZ stores the index of the medians which are more than 0 in globalMedian Vector
+    m_binaryVector.SetSize(filteredFeatures.GetSize());
+    for (int f = 0; f < filteredFeatures.GetSize(); ++f)
+		m_binaryVector[f] = m_vector[f] >= globalMedians.GetAt(filteredFeatures[f]); // mediansNZ stores the index of the medians which are more than 0 in globalMedian Vector
     
     return true;
 }

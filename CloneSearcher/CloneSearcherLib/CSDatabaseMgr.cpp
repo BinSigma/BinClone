@@ -491,163 +491,6 @@ bool CCSDatabaseMgr::storeRegion(CCSRegion& region, const CCSParam& param)
     return region.m_dbRegionID > 0;
 }
 
-//
-// Store global features.
-// 
-bool CCSDatabaseMgr::storeGlobalFeatures(const CStringArray& globalFeatures, const CCSIntArray& globalMedians, const CCSParam& param)
-{
-	// paramIDFKey | featID | featName | featMedian
-    //-------------+--------+----------------------
-    
-    PGresult *pgresult;
-	if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
-		tcout << _T("CSDataBaseMgr (storeFeature): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
-		ASSERT(false);
-		return false;
-	}        
-    CStringA parameterId; 
-    CStringA csSqlCheckFeatureANSI = "Select * from \"Feature\" where \"featName\"=\'regreg\' and \"paramIDFKey\"=";
-    parameterId.Format("%d", param.m_dbParamID);
-    csSqlCheckFeatureANSI += parameterId;
-    pgresult = PQexec(getPGDBConnection(), csSqlCheckFeatureANSI);
-
-    if(PQntuples(pgresult))
-        return true; 
-    else {
-        for (int i = 0; i < globalFeatures.GetSize() - 1; ++i) {
-            CString csSqlInsertFeatures = _T("INSERT into \"Feature\" VALUES(");   
-            CString csValues;
-            csValues.Format(_T("%d, %d, \'%s\', %d)"), param.m_dbParamID, i, globalFeatures.GetAt(i).GetString(), globalMedians.GetAt(i));
-	        csSqlInsertFeatures =csSqlInsertFeatures + csValues;	
-            CStringA csSqlInsertFeatureANSI;
-            if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertFeatures, csSqlInsertFeatureANSI)) {
-                tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertFeatures.GetString() << endl;
-                ASSERT(false);
-                return false;
-            }
-            pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertFeatureANSI);
-	        if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
-                tcout << _T("CSDataBaseMgr (storeFeature): Failing to insert the feature name ") << globalFeatures.GetAt(i).GetString() << _T(" in the data base") <<  endl;
-		        ASSERT(false);
-		        return false;
-            }	   
-
-        }
-    PQclear(pgresult);    
-    }    
-    return true;
-}
-
-//
-// Pre-insert Inexact2Com table
-//
-bool CCSDatabaseMgr::preInsertInexact2Comb (const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians, const CCSParam& param)
-{
-	PGresult *pgresult;
-    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
-        tcout << _T("CSDataBaseMgr (storeInexactRegion): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
-        ASSERT(false);
-        return false;
-	} 
-	CStringA parameterID; 
-    CStringA csSqlCheckInexactANSI = "Select * from \"Inexact2Comb\" where \"paramIDFKey\"=";
-    parameterID.Format("%d", param.m_dbParamID);
-    csSqlCheckInexactANSI += parameterID;
-    pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);
-
-    if(PQntuples(pgresult))
-        return true; 
-	else {
-		for (int i = 0; i < filteredFeatures.GetSize()-1; ++i) {
-			for (int j = i + 1; j < filteredFeatures.GetSize(); ++j) {
-			CString parameterIDString; 
-				CString featAIDFKeyString;
-				CString featBIDFKeyString;
-				CString featAPresentString;
-				CString featBPresentString;
-				parameterIDString.Format(_T("%d"), param.m_dbParamID);
-				featAIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(i));
-				featBIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(j));
-				for (int k = 0; k < 4; k++) {
-					CString csSqlPreInsertInexact2Comb = _T("INSERT into \"Inexact2Comb\" VALUES(");   
-					if (k == 0) { featAPresentString = _T("T"); featBPresentString = _T("T"); }
-					if (k == 1) { featAPresentString = _T("T"); featBPresentString = _T("F"); }
-					if (k == 2) { featAPresentString = _T("F"); featBPresentString = _T("T"); }
-					if (k == 3) { featAPresentString = _T("F"); featBPresentString = _T("F"); }			
-					CString csValues;
-					csValues.Format(_T("%d, %d, %d, \'%s\', \'%s\', \'%s\')"), param.m_dbParamID, filteredFeatures.GetAt(i), filteredFeatures.GetAt(j), featAPresentString, featBPresentString, _T("-1"));
-					csSqlPreInsertInexact2Comb += csValues;	
-					CStringA csSqlPreInsertInexact2CombANSI;
-					if (!CBFStrHelper::convertCStringToCStringA(csSqlPreInsertInexact2Comb, csSqlPreInsertInexact2CombANSI)) {
-						tcout << _T("Failed to convert UNICODE string: ") << csSqlPreInsertInexact2Comb.GetString() << endl;
-						ASSERT(false);
-						return false;
-					}
-					pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlPreInsertInexact2CombANSI);
-					if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
-					   tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to Pre insert into Inexact2Comb ") << filteredFeatures.GetAt(i) << _T(" in the data base") <<  endl;
-					   ASSERT(false);
-					   return false;    
-					}
-				}		
-			}		
-		}
-		CStringA createIndex; // create index to optimize searching
-		CStringA csSqlcreateIndexANSI = "Create INDEX \"InexactIndex\" ON \"Inexact2Comb\" (\"paramIDFKey\", \"featAIDFKey\", \"featBIDFKey\", \"featAPresent\", \"featBPresent\")";
-		pgresult = PQexec(getPGDBConnection(), csSqlcreateIndexANSI);
-	}
-	PQclear(pgresult); 
-    return true;
-}
-
-
-//
-// Store hash region.
-// 
-bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSIntArray& medianNZ , const CCSParam& param)
-{
-	// paramIDFKey | featID | featName
-    //-------------+--------+---------
-
-    // paramIDFKey | featAIDFKey | featBIDFKey | featAPresent | featBPresent | dbRegionID
-    // integer     | integer     | integer     | boolean      | boolean      | integer
-	//-------------+-------------+-------------+--------------+--------------+-----------
-    
-           
-    PGresult *pgresult;
-    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
-        tcout << _T("CSDataBaseMgr (storeInexactRegion): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
-        ASSERT(false);
-        return false;
-	}    
-    const CCSBoolArray& binaryVector = region.getBinaryVector(); 
-    for (int i = 0; i < binaryVector.GetSize()-1; ++i) {
-        for (int j = i + 1; j < binaryVector.GetSize(); ++j) {
-            CString parameterIDString; 
-            CString featAIDFKeyString;
-            CString featBIDFKeyString;
-            CString featAPresentString;
-            CString featBPresentString;
-			CString dbRegionIDString;
-            parameterIDString.Format(_T("%d"), param.m_dbParamID);
-            featAIDFKeyString.Format(_T("%d"), medianNZ.GetAt(i));
-            featBIDFKeyString.Format(_T("%d"), medianNZ.GetAt(j));
-			dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
-            CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(i), featAPresentString);
-            CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(j), featBPresentString);
-			CString csSqlCheckInexact = _T("UPDATE \"Inexact2Comb\" SET \"dbRegionID\" = \"dbRegionID\" || '#' || \'") + dbRegionIDString + _T(" \' where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
-            CStringA csSqlCheckInexactANSI;
-            if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
-                tcout << _T("Failed to convert UNICODE string: ") << region.m_dbRegionID << endl;
-                ASSERT(false);
-                return false;
-            }
-            pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);
-		}
-    }
-    PQclear(pgresult); 
-    return true;
-}
 
 //
 // Retrieve regions by dbParamID and hashValue
@@ -714,35 +557,456 @@ bool CCSDatabaseMgr::fetchRegions(int dbParamID, UINT hashValue, CCSRegions& clo
     return true;
 }
 
+
+
+
+
 //
-// Store the feature vector names
-//
-bool CCSDatabaseMgr::storeVectorFeatureNames(int dbParamID, const CStringArray& vectorFeatureNames)
+// Store global features.
+// 
+bool CCSDatabaseMgr::storeGlobalFeatures(const CStringArray& globalFeatures, const CCSIntArray& globalMedians, const CCSParam& param)
 {
+	// paramIDFKey | featID | featName | featMedian
+    //-------------+--------+----------------------
+    
+    PGresult *pgresult;
+	if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+		tcout << _T("CSDataBaseMgr (storeFeature): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+		ASSERT(false);
+		return false;
+	}        
+    CStringA parameterId; 
+    CStringA csSqlCheckFeatureANSI = "Select * from \"Feature\" where \"featName\"=\'regreg\' and \"paramIDFKey\"=";
+    parameterId.Format("%d", param.m_dbParamID);
+    csSqlCheckFeatureANSI += parameterId;
+    pgresult = PQexec(getPGDBConnection(), csSqlCheckFeatureANSI);
+
+    if(PQntuples(pgresult))
+        return true; 
+    else {
+        for (int i = 0; i < globalFeatures.GetSize(); ++i) {
+            CString csSqlInsertFeatures = _T("INSERT into \"Feature\" VALUES(");   
+            CString csValues;
+            csValues.Format(_T("%d, %d, \'%s\', %d)"), param.m_dbParamID, i, globalFeatures.GetAt(i).GetString(), globalMedians.GetAt(i));
+	        csSqlInsertFeatures =csSqlInsertFeatures + csValues;	
+            CStringA csSqlInsertFeatureANSI;
+            if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertFeatures, csSqlInsertFeatureANSI)) {
+                tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertFeatures.GetString() << endl;
+                ASSERT(false);
+                return false;
+            }
+            pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertFeatureANSI);
+	        if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+                tcout << _T("CSDataBaseMgr (storeFeature): Failing to insert the feature name ") << globalFeatures.GetAt(i).GetString() << _T(" in the data base") <<  endl;
+		        ASSERT(false);
+		        return false;
+            }	   
+
+        }
+    PQclear(pgresult);    
+    }    
     return true;
 }
 
 //
-// Fetch vector feature names
 //
-bool CCSDatabaseMgr::fetchVectorFeatureNames(int dbParamID, CStringArray& vectorFeatureNames)
+//
+bool CCSDatabaseMgr::storeFilteredFeatures(const CStringArray& globalFeatures, const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians, const CCSParam& param)
 {
+    PGresult *pgresult;
+	if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+		tcout << _T("CSDataBaseMgr (storeFeature): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+		ASSERT(false);
+		return false;
+	}        
+    CStringA parameterId; 
+    CStringA csSqlCheckFilteredFeatureANSI = "Select * from \"FilteredFeature\" where \"paramIDFKey\"=";
+    parameterId.Format("%d", param.m_dbParamID);
+    csSqlCheckFilteredFeatureANSI += parameterId;
+    pgresult = PQexec(getPGDBConnection(), csSqlCheckFilteredFeatureANSI);
+    if(PQntuples(pgresult))
+        return true; 
+    else {
+        for (int i = 0; i < filteredFeatures.GetSize(); ++i) {
+            CString csSqlInsertFilteredFeatures = _T("INSERT into \"FilteredFeature\" VALUES(");   
+            CString csValues;
+            csValues.Format(_T("%d, %d, \'%s\', %d)"), param.m_dbParamID, filteredFeatures.GetAt(i), globalFeatures.GetAt(filteredFeatures.GetAt(i)).GetString(), globalMedians.GetAt(filteredFeatures.GetAt(i)));
+	        csSqlInsertFilteredFeatures += csValues;	
+            CStringA csSqlInsertFilteredFeatureANSI;
+            if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertFilteredFeatures, csSqlInsertFilteredFeatureANSI)) {
+                tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertFilteredFeatureANSI.GetString() << endl;
+                ASSERT(false);
+                return false;
+            }
+            pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertFilteredFeatureANSI);
+	        if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+                tcout << _T("CSDataBaseMgr (storeFeature): Failing to insert the filtered feature name ") << globalFeatures.GetAt(filteredFeatures.GetAt(i)).GetString() << _T(" in the data base") <<  endl;
+		        ASSERT(false);
+		        return false;
+            }	
+        }
+    PQclear(pgresult);    
+    }    
     return true;
 }
 
 //
-// Store the feature vector
+// Pre-insert Inexact2Com table
 //
-bool CCSDatabaseMgr::storeRegionVector(int dbParamID, int dbRegionID, const CStringArray& vectorFeatureNames, const CCSFeatureVector& vector)
+bool CCSDatabaseMgr::preInsertInexact2Comb (const CCSIntArray& filteredFeatures, const CCSIntArray& globalMedians, const CCSParam& param)
 {
+	PGresult *pgresult;
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+        tcout << _T("CSDataBaseMgr (storeInexactRegion): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+        ASSERT(false);
+        return false;
+	} 
+	CStringA parameterID; 
+    CStringA csSqlCheckInexactANSI = "Select * from \"Inexact2Comb\" where \"paramIDFKey\"=";
+    parameterID.Format("%d", param.m_dbParamID);
+    csSqlCheckInexactANSI += parameterID;
+    pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);
+
+    if(PQntuples(pgresult))
+        return true; 
+	else {
+		for (int i = 0; i < filteredFeatures.GetSize()-1; ++i) {
+			for (int j = i + 1; j < filteredFeatures.GetSize(); ++j) {
+				CString parameterIDString; 
+				CString featAIDFKeyString;
+				CString featBIDFKeyString;
+				CString featAPresentString;
+				CString featBPresentString;
+				parameterIDString.Format(_T("%d"), param.m_dbParamID);
+				featAIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(i));
+				featBIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(j));
+				for (int k = 0; k < 4; k++) {
+					CString csSqlPreInsertInexact2Comb = _T("INSERT into \"Inexact2Comb\" VALUES(");   
+					if (k == 0) { featAPresentString = _T("T"); featBPresentString = _T("T"); }
+					if (k == 1) { featAPresentString = _T("T"); featBPresentString = _T("F"); }
+					if (k == 2) { featAPresentString = _T("F"); featBPresentString = _T("T"); }
+					if (k == 3) { featAPresentString = _T("F"); featBPresentString = _T("F"); }			
+					CString csValues;
+					csValues.Format(_T("%d, %d, %d, \'%s\', \'%s\', \'%s\')"), param.m_dbParamID, filteredFeatures.GetAt(i), filteredFeatures.GetAt(j), featAPresentString, featBPresentString, _T("-1"));
+					csSqlPreInsertInexact2Comb += csValues;	
+					CStringA csSqlPreInsertInexact2CombANSI;
+					if (!CBFStrHelper::convertCStringToCStringA(csSqlPreInsertInexact2Comb, csSqlPreInsertInexact2CombANSI)) {
+						tcout << _T("Failed to convert UNICODE string: ") << csSqlPreInsertInexact2Comb.GetString() << endl;
+						ASSERT(false);
+						return false;
+					}
+					pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlPreInsertInexact2CombANSI);
+					if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+					   tcout << _T("CSDataBaseMgr (storeInexactRegion): Failing to Pre insert into Inexact2Comb ") << filteredFeatures.GetAt(i) << _T(" in the data base") <<  endl;
+					   ASSERT(false);
+					   return false;    
+					}
+				}		
+			}		
+		}
+		CStringA createIndex; // create index to optimize searching
+		CStringA csSqlcreateIndexANSI = "Create INDEX \"InexactIndex\" ON \"Inexact2Comb\" (\"paramIDFKey\", \"featAIDFKey\", \"featBIDFKey\", \"featAPresent\", \"featBPresent\")";
+		pgresult = PQexec(getPGDBConnection(), csSqlcreateIndexANSI);
+	}
+	PQclear(pgresult); 
     return true;
 }
 
 //
-// Compute the median vector
+// fetch the number of regions from DB to be used for inexact detection. Score vector shows the co occurenece of regions with a target region 
 //
-bool CCSDatabaseMgr::computeMedianVector(int dbParamID, CCSFeatureVector& vector)
+bool CCSDatabaseMgr::constructScoreVector(const CCSParam& param)
 {
+	m_scoreVector.clear(); 
+	PGresult *pgresult;
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+        tcout << _T("CSDataBaseMgr (constructScoreVector): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+        ASSERT(false);
+        return false;
+	} 	
+	
+	CStringA parameterID; 
+	parameterID.Format("%d", param.m_dbParamID);
+	CString fetchNRegions = _T("Select * from \"Region\" where \"ParamIDFKey\" = ");
+	fetchNRegions += parameterID;
+    CStringA fetchNRegionsANSI;
+    if (!CBFStrHelper::convertCStringToCStringA(fetchNRegions, fetchNRegionsANSI)) {
+        tcout << _T("Failed to convert UNICODE string: ") << fetchNRegionsANSI << endl;
+        ASSERT(false);
+        return false;
+    }	
+	pgresult = PQexec(getPGDBConnection(), fetchNRegionsANSI);
+
+	CString InexactRegions;
+	m_scoreVector.resize(PQntuples(pgresult));
+	for (int m = 0; m < m_scoreVector.size(); ++m)
+		m_scoreVector[m].resize(2); // keep track of co occurence 
+	PQclear(pgresult); 
+	return true;
+}
+
+
+bool CCSDatabaseMgr::fetchFeatureVector(const CCSRegion& region, const CCSParam& param)
+{   
+	m_targetRegionVector.RemoveAll();
+	PGresult *pgresult;
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+        tcout << _T("CSDataBaseMgr (fetchFeatureVector): Bad Connection with the Server") <<  endl; 
+        ASSERT(false);
+        return false;
+	}
+	CString featureName;
+	CStringA parameterID; 
+	parameterID.Format("%d", param.m_dbParamID);
+	CString fetchDBFeatures = _T("Select * from \"Feature\" where \"paramIDFKey\" = ");
+	fetchDBFeatures += parameterID;
+    CStringA fetchDBFeaturesANSI;
+    if (!CBFStrHelper::convertCStringToCStringA(fetchDBFeatures, fetchDBFeaturesANSI)) {
+        tcout << _T("Failed to convert UNICODE string: ") << fetchDBFeaturesANSI << endl;
+        ASSERT(false);
+        return false;
+    }	
+	pgresult = PQexec(getPGDBConnection(), fetchDBFeaturesANSI);
+	// create feature vector for the target region
+	int cnt = -1;	
+	m_targetRegionVector.SetSize(PQntuples(pgresult));
+	for (int f = 0; f < PQntuples(pgresult); f++) {
+		featureName = PQgetvalue(pgresult, f, 2);
+		if (!region.getFeatureCounts().Lookup(featureName, cnt))    
+			m_targetRegionVector[f] = 0;    // this region does not have such feature
+        else
+            m_targetRegionVector[f] = cnt;  // this region has such feature		
+	}	
+	PQclear(pgresult); 
+	return true;
+}
+
+
+bool CCSDatabaseMgr::createTargetRegionBinaryVector(const CCSRegion& region, const CCSParam& param)
+{
+	PGresult *pgresult;
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+        tcout << _T("CSDataBaseMgr (createTargetRegionBinaryVector): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+        ASSERT(false);
+        return false;
+	} 	
+	CStringA parameterID; 
+	parameterID.Format("%d", param.m_dbParamID);
+	CString fetchFilteredFeatures = _T("Select * from \"FilteredFeature\" where \"paramIDFKey\"= ");
+	fetchFilteredFeatures += parameterID;
+    CStringA fetchFilteredFeaturesANSI;
+    if (!CBFStrHelper::convertCStringToCStringA(fetchFilteredFeatures, fetchFilteredFeaturesANSI)) {
+        tcout << _T("Failed to convert UNICODE string: ") << fetchFilteredFeaturesANSI << endl;
+        ASSERT(false);
+        return false;
+    }	
+	pgresult = PQexec(getPGDBConnection(), fetchFilteredFeaturesANSI);
+	CString featureIDString;
+	int featureMedianInt = 0;
+	CString featureMedianString;
+	m_filteredFeatures.SetSize(PQntuples(pgresult));
+	m_targetpRegionBinaryVector.SetSize(m_filteredFeatures.GetSize());
+	for (int i = 0; i < PQntuples(pgresult); i++) {
+		featureIDString = PQgetvalue(pgresult, i, 1);
+		m_filteredFeatures.GetAt(i) = CBFStrHelper::strToInt((LPCTSTR) featureIDString);
+		featureMedianString = PQgetvalue(pgresult, i, 3);
+		featureMedianInt = CBFStrHelper::strToInt((LPCTSTR) featureMedianString);
+		m_targetpRegionBinaryVector[i] = m_targetRegionVector[i] >= featureMedianInt;
+	}
+	PQclear(pgresult); 
+	return true;
+}
+
+//
+// Store hash region.
+// 
+bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSIntArray& filteredFeatures , const CCSParam& param)
+{
+	// paramIDFKey | featID | featName
+    //-------------+--------+---------
+
+    // paramIDFKey | featAIDFKey | featBIDFKey | featAPresent | featBPresent | dbRegionID
+    // integer     | integer     | integer     | boolean      | boolean      | integer
+	//-------------+-------------+-------------+--------------+--------------+-----------    
+           
+    PGresult *pgresult;
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+        tcout << _T("CSDataBaseMgr (storeInexactRegion): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+        ASSERT(false);
+        return false;
+	}    
+    const CCSBoolArray& binaryVector = region.getBinaryVector(); 
+    for (int i = 0; i < binaryVector.GetSize()-1; ++i) {
+        for (int j = i + 1; j < binaryVector.GetSize(); ++j) {
+            CString parameterIDString; 
+            CString featAIDFKeyString;
+            CString featBIDFKeyString;
+            CString featAPresentString;
+            CString featBPresentString;
+			CString dbRegionIDString;
+            parameterIDString.Format(_T("%d"), param.m_dbParamID);
+            featAIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(i));
+            featBIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(j));
+			dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
+            CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(i), featAPresentString);
+            CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(j), featBPresentString);
+			CString csSqlCheckInexact = _T("UPDATE \"Inexact2Comb\" SET \"dbRegionID\" = \"dbRegionID\" || '#' || \'") + dbRegionIDString + _T(" \' where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
+            CStringA csSqlCheckInexactANSI;
+            if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
+                tcout << _T("Failed to convert UNICODE string: ") << region.m_dbRegionID << endl;
+                ASSERT(false);
+                return false;
+            }
+            pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);
+            if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+                tcout << _T("CSDataBaseMgr (fetchInexactScore): Failing to fetch inexact score of region: ") << region.m_dbRegionID << _T(" from data base") <<  endl;
+				ASSERT(false);
+				return false;  
+            }
+		}
+    }
+    PQclear(pgresult); 
+    return true;
+}
+
+//
+// fills the score vector for each target region from DB by finding the regions in "Inexact2Comb Table"which are store in the same row as target region
+//
+bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& param)
+{    
+	PGresult *pgresult;
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+        tcout << _T("CSDataBaseMgr (fetchInexactScore): Bad Connection with the Server") <<  endl;
+        ASSERT(false);
+        return false;
+    }	
+	// get the first dbRegionID value 
+	CStringA parameterID; 
+	parameterID.Format("%d", param.m_dbParamID);
+	CString fetchFilteredFeatures = _T("Select * from \"Region\" where \"\ParamIDFKey\"= ");
+	fetchFilteredFeatures += parameterID;
+    CStringA fetchFilteredFeaturesANSI;
+    if (!CBFStrHelper::convertCStringToCStringA(fetchFilteredFeatures, fetchFilteredFeaturesANSI)) {
+        tcout << _T("Failed to convert UNICODE string: ") << fetchFilteredFeaturesANSI << endl;
+        ASSERT(false);
+        return false;
+    }	
+	pgresult = PQexec(getPGDBConnection(), fetchFilteredFeaturesANSI);
+	int nTotalRegions =PQntuples(pgresult);
+	CStringA firstDBRegionIDANSI;
+	if (nTotalRegions =! 0)
+		firstDBRegionIDANSI =PQgetvalue(pgresult,0,0);
+
+	CString firstDBRegionID;
+	if(!CBFStrHelper::convertCStringAToCString(firstDBRegionIDANSI, firstDBRegionID)) {
+		tcout << _T("Failed to convert ANSI to Unicode string:") << endl; 
+		ASSERT(false);
+		return false;                     
+    }
+	int firstDBRegionIDInt = CBFStrHelper::strToInt((LPCTSTR) firstDBRegionID);
+	CString InexactRegions;
+    for (int i = 0; i < m_targetpRegionBinaryVector.GetSize()-1; ++i) {
+        for (int j = i + 1; j < m_targetpRegionBinaryVector.GetSize(); ++j) {
+            CString parameterIDString; 
+            CString featAIDFKeyString;
+            CString featBIDFKeyString;
+            CString featAPresentString;
+            CString featBPresentString;
+			CString dbRegionIDString;
+            parameterIDString.Format(_T("%d"), param.m_dbParamID);
+            featAIDFKeyString.Format(_T("%d"), m_filteredFeatures.GetAt(i));
+            featBIDFKeyString.Format(_T("%d"), m_filteredFeatures.GetAt(j));
+			dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
+            CBFStrHelper::boolToStr(m_targetpRegionBinaryVector[i], featAPresentString);
+            CBFStrHelper::boolToStr(m_targetpRegionBinaryVector[j], featBPresentString);
+			CString csSqlCheckInexact = _T("Select * from \"Inexact2Comb\" where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
+            CStringA csSqlCheckInexactANSI;
+            if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
+                tcout << _T("Failed to convert UNICODE string: ") << csSqlCheckInexact << endl;
+                ASSERT(false);
+                return false;
+            }
+            pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);          
+			
+			int pos = 2;
+            CString singleRegionDBIDString;
+            int singleRegionDBIDInt;
+            InexactRegions = PQgetvalue(pgresult, 0, 5);
+			CString resInexactRegion = InexactRegions.Tokenize(_T("#"), pos);
+			while (!resInexactRegion.IsEmpty()) {
+                singleRegionDBIDInt = CBFStrHelper::strToInt(resInexactRegion);
+                m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][0] = singleRegionDBIDInt;
+                int mytemp = m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][1];
+				++ m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][1];        
+				resInexactRegion = InexactRegions.Tokenize(_T("#"), pos);
+            }
+        }
+    }
+    PQclear(pgresult); 
+    return true;
+}
+
+//
+// checks the score vector to see if the score is more or less than minCoOccurence threshold and creates clones based on this comparison.
+//
+bool CCSDatabaseMgr::fetchInexactRegions(const CCSRegion& region, const CCSParam& param, CCSRegions& cloneRegions)
+
+{
+	//CCSAssemblyFile* pAssemblyFile = NULL;
+	PGresult *pgresult;
+	if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+		tcout << _T("CSDataBaseMgr (fetchInexactRegion): Bad Connection with the Server") <<  endl; 
+		ASSERT(false);
+		return false;
+	}
+
+	double actualminCoOccThreshold = 0.0; 
+	actualminCoOccThreshold = m_minCoOccThreshold* m_targetpRegionBinaryVector.GetSize() * (m_targetpRegionBinaryVector.GetSize() -1) /2; 
+	int inexactRegionDBID;
+	int mytemp = m_scoreVector.size();
+
+	for (int m = 0; m < m_scoreVector.size(); ++m) {
+       if (m_scoreVector[m][1] >= (int) actualminCoOccThreshold) {
+		   inexactRegionDBID = m_scoreVector[m][0];
+		
+			CString fetchInexactRegion;
+			// the following returns the tupples needed for the 2nd constructor of CCSRegion
+			fetchInexactRegion.Format(_T("SELECT \"R\".\"FcnIDFkey\", \"F\".\"FileIdFKey\", \"R\".\"startIdx\", \"R\".\"endIdx\", \"R\".\"rawStartIdx\", \"R\".\"rawEndIdx\" from \"Region\" \"R\" JOIN \"Function\" \"F\" on (\"R\".\"FcnIDFkey\"=\"F\".\"dbFcnID\") where \"R\".\"dbRegionID\"=%d AND \"R\".\"ParamIDFKey\"=%d"), inexactRegionDBID, param.m_dbParamID);
+
+			CStringA fetchInexactRegionANSI;
+			if (!CBFStrHelper::convertCStringToCStringA(fetchInexactRegion, fetchInexactRegionANSI)) {
+				tcout << _T("Failed to convert UNICODE string: ") << fetchInexactRegion.GetString() << endl;
+				ASSERT(false);
+				return false;
+			}
+			pgresult = PQexec(getPGDBConnection(), (LPCSTR) fetchInexactRegionANSI);
+			if(PQresultStatus(pgresult) != PGRES_TUPLES_OK) { // PGRES_TUPLES_OK even if 0 tuples returned
+				tcout << _T("CSDataBaseMgr (fetchInexactRegion): Bad query to fetch the Inexact Regions from the database") <<  endl; 
+				ASSERT(false);
+				return false;
+			}
+			CCSRegion* pNewRegion = NULL;
+			CStringA FcnIDFkeyAnsi, FileIdFKeyAnsi, startIdxAnsi, endIdxAnsi, rawStartIdxAnsi, rawEndIdxAnsi;
+			CString FcnIDFkey, FileIdFKey, startIdx, endIdx, rawStartIdx, rawEndIdx;		
+			FcnIDFkeyAnsi = PQgetvalue(pgresult, 0, 0);
+			FileIdFKeyAnsi = PQgetvalue(pgresult, 0, 1);
+			startIdxAnsi = PQgetvalue(pgresult, 0, 2);
+			endIdxAnsi = PQgetvalue(pgresult, 0, 3);
+			rawStartIdxAnsi = PQgetvalue(pgresult, 0, 4);
+			rawEndIdxAnsi = PQgetvalue(pgresult, 0, 5);
+			if(! (CBFStrHelper::convertCStringAToCString(FcnIDFkeyAnsi, FcnIDFkey) && CBFStrHelper::convertCStringAToCString(FileIdFKeyAnsi, FileIdFKey) && CBFStrHelper::convertCStringAToCString(startIdxAnsi, startIdx) && CBFStrHelper::convertCStringAToCString(endIdxAnsi, endIdx) && CBFStrHelper::convertCStringAToCString(rawStartIdxAnsi, rawStartIdx) && CBFStrHelper::convertCStringAToCString(rawEndIdxAnsi, rawEndIdx))) {
+				tcout << _T("Failed to convert ANSI to Unicode strings:") << FcnIDFkeyAnsi.GetString() << _T(", ") << FileIdFKeyAnsi.GetString() << _T(", ") << startIdxAnsi.GetString() << _T(", ") << endIdxAnsi.GetString() << rawStartIdxAnsi.GetString() << _T(", ") << rawEndIdxAnsi.GetString() << _T(", ") <<  endl; 
+				ASSERT(false);
+				return false;                     
+			}
+			pNewRegion = new CCSRegion(inexactRegionDBID, CBFStrHelper::strToInt(FcnIDFkey.GetString()), CBFStrHelper::strToInt(FileIdFKey.GetString()), CBFStrHelper::strToInt(startIdx.GetString()), CBFStrHelper::strToInt(endIdx.GetString()), CBFStrHelper::strToInt(rawStartIdx.GetString()), CBFStrHelper::strToInt(rawEndIdx.GetString()));
+			if (!cloneRegions.addRegion(pNewRegion)) {
+				ASSERT(false);
+				return false;
+			}		
+	   }
+	}
+    PQclear(pgresult);
     return true;
 }
 

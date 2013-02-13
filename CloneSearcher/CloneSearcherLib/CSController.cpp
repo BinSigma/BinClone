@@ -125,7 +125,12 @@ bool CCSController::findFileClones(LPCTSTR targetAssemblyFilePath,
                                    double minCoOccThreshold, 
                                    const CCSClones*& pClones)
 {
-    // Parse the target assembly file.
+	
+	// initialze the inexact detection minCoOccThreshold and score vector
+	if (bFindInexactClones) {
+		m_dbMgr.setMinCoOccThreshold(minCoOccThreshold);
+	}
+	// Parse the target assembly file.
     long startProgTime = getTime();
 
     pClones = NULL;

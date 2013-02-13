@@ -19,10 +19,12 @@ class CCSRegion
 public:
     CCSRegion(CCSAssemblyFunction* pFcn, int startIdx, int endIdx, int rawStartIdx, int rawEndIdx);
     CCSRegion(int dbRegionID, int dbFcnID, int dbFileID, int startIdx, int endIdx, int rawStartIdx, int rawEndIdx);
+	CCSRegion(CCSFeatureVector& targetRegionVector);
     virtual ~CCSRegion();
 
     inline CCSAssemblyFunction* getFunction() const { return m_pFcn; };
     inline const CCSFeatureVector& getVector() const { return m_vector; };
+
     inline const CCSBoolArray& getBinaryVector() const { return m_binaryVector; };
 	inline int getFeatureCountsSize() const {return m_featureCounts.GetSize();}; 
 	inline const CCSMapStringToInt& getFeatureCounts() const { return  m_featureCounts;  }; 
@@ -38,12 +40,12 @@ public:
     int m_startIdx;         // starting point of a region, inclusive
     int m_endIdx;           // ending point of a region, inclusive        
     int m_rawStartIdx;      // starting point of a region in raw file, inclusive
-    int m_rawEndIdx;        // ending point of a region in raw file, inclusive      
+    int m_rawEndIdx;        // ending point of a region in raw file, inclusive 
+	
+	UINT m_hashValue;       // hash value of this funciton.    
 
-    UINT m_hashValue;       // hash value of this funciton.    
-
-	static int m_cntRegion;    // keep track of numbeer of created regions so far
-
+	static int m_cntRegion;    // keep track of number of created regions so far in the first scan
+		
 private:
     int incFeatureCount(LPCTSTR featureStr);
     int findMedian(const std::vector<int>& myVector);
@@ -52,6 +54,8 @@ private:
     CCSMapStringToInt m_featureCounts;      // keep track of the count of each feature. 
     CCSFeatureVector m_vector;              // region-specific feature vector
     CCSBoolArray m_binaryVector;            // binary vector
+	
+
 };
 
 typedef CTypedPtrArray<CPtrArray, CCSRegion*> CCSRegionArray;
