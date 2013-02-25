@@ -58,7 +58,8 @@ ALTER TABLE public."Feature" OWNER TO postgres;
 
 CREATE TABLE "File" (
     "dbFileID" integer NOT NULL,
-    "filePath" character varying(60)
+    "filePath" character varying(60),
+    "ParamIDFKey" integer
 );
 
 
@@ -89,7 +90,7 @@ ALTER SEQUENCE "File_fileID_seq" OWNED BY "File"."dbFileID";
 -- Name: File_fileID_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"File_fileID_seq"', 179, true);
+SELECT pg_catalog.setval('"File_fileID_seq"', 366, true);
 
 
 --
@@ -117,7 +118,8 @@ CREATE TABLE "Function" (
     "dbHashValueFcn" integer,
     "FileIdFKey" integer,
     "startRawIdx" integer,
-    "endRawIdx" integer
+    "endRawIdx" integer,
+    "ParamIDFKey" integer
 );
 
 
@@ -148,7 +150,7 @@ ALTER SEQUENCE "Function_dbFcnID_seq" OWNED BY "Function"."dbFcnID";
 -- Name: Function_dbFcnID_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Function_dbFcnID_seq"', 982, true);
+SELECT pg_catalog.setval('"Function_dbFcnID_seq"', 2220, true);
 
 
 --
@@ -219,7 +221,7 @@ ALTER SEQUENCE "Parameter_dbParamID_seq" OWNED BY "Parameter"."dbParamID";
 -- Name: Parameter_dbParamID_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Parameter_dbParamID_seq"', 30, true);
+SELECT pg_catalog.setval('"Parameter_dbParamID_seq"', 52, true);
 
 
 --
@@ -248,7 +250,7 @@ CREATE SEQUENCE "Region_dbRegionID_seq"
     START WITH 1
     INCREMENT BY 1
     NO MAXVALUE
-    NO MINVALUE
+    MINVALUE -1
     CACHE 1;
 
 
@@ -265,7 +267,7 @@ ALTER SEQUENCE "Region_dbRegionID_seq" OWNED BY "Region"."dbRegionID";
 -- Name: Region_dbRegionID_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Region_dbRegionID_seq"', 35265, true);
+SELECT pg_catalog.setval('"Region_dbRegionID_seq"', 45496, true);
 
 
 --
@@ -329,7 +331,7 @@ COPY "Feature" ("paramIDFKey", "featID", "featName", "featMedian") FROM stdin;
 -- Data for Name: File; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY "File" ("dbFileID", "filePath") FROM stdin;
+COPY "File" ("dbFileID", "filePath", "ParamIDFKey") FROM stdin;
 \.
 
 
@@ -345,7 +347,7 @@ COPY "FilteredFeature" ("paramIDFKey", "featIDPKey", "featName", "featMedian") F
 -- Data for Name: Function; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY "Function" ("dbFcnID", "startIdx", "endIdx", "dbHashValueFcn", "FileIdFKey", "startRawIdx", "endRawIdx") FROM stdin;
+COPY "Function" ("dbFcnID", "startIdx", "endIdx", "dbHashValueFcn", "FileIdFKey", "startRawIdx", "endRawIdx", "ParamIDFKey") FROM stdin;
 \.
 
 
@@ -398,14 +400,6 @@ ALTER TABLE ONLY "File"
 
 
 --
--- Name: FilteredFeature_featIDPKey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace:
---
-
-ALTER TABLE ONLY "FilteredFeature"
-    ADD CONSTRAINT "FilteredFeature_featIDPKey" PRIMARY KEY ("featIDPKey");
-
-
---
 -- Name: Function_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace:
 --
 
@@ -444,10 +438,24 @@ CREATE INDEX fki_ ON "Function" USING btree ("FileIdFKey");
 
 
 --
+-- Name: fki_File_ParamIDFKey; Type: INDEX; Schema: public; Owner: postgres; Tablespace:
+--
+
+CREATE INDEX "fki_File_ParamIDFKey" ON "File" USING btree ("ParamIDFKey");
+
+
+--
 -- Name: fki_FilteredFeature_paramIDFKey; Type: INDEX; Schema: public; Owner: postgres; Tablespace:
 --
 
 CREATE INDEX "fki_FilteredFeature_paramIDFKey" ON "FilteredFeature" USING btree ("paramIDFKey");
+
+
+--
+-- Name: fki_Function_ParamIDFKey; Type: INDEX; Schema: public; Owner: postgres; Tablespace:
+--
+
+CREATE INDEX "fki_Function_ParamIDFKey" ON "Function" USING btree ("ParamIDFKey");
 
 
 --
@@ -495,6 +503,14 @@ ALTER TABLE ONLY "Feature"
 
 
 --
+-- Name: File_ParamIDFKey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY "File"
+    ADD CONSTRAINT "File_ParamIDFKey" FOREIGN KEY ("ParamIDFKey") REFERENCES "Parameter"("dbParamID") ON DELETE CASCADE;
+
+
+--
 -- Name: FilteredFeature_paramIDFKey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -508,6 +524,14 @@ ALTER TABLE ONLY "FilteredFeature"
 
 ALTER TABLE ONLY "Function"
     ADD CONSTRAINT "Function_FileIdFKey_fkey" FOREIGN KEY ("FileIdFKey") REFERENCES "File"("dbFileID") ON DELETE CASCADE;
+
+
+--
+-- Name: Function_ParamIDFKey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY "Function"
+    ADD CONSTRAINT "Function_ParamIDFKey" FOREIGN KEY ("ParamIDFKey") REFERENCES "Parameter"("dbParamID") ON DELETE CASCADE;
 
 
 --

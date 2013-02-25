@@ -1,1 +1,0 @@
-..\Release\CloneDetector .\Data04 .\clonepairs04.xml 5 1 5 2000 0.5 TRUE TRUE REG TRUE 30 0.5 5 0.4 0.5

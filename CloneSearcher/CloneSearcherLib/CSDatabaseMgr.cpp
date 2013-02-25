@@ -199,7 +199,7 @@ bool CCSDatabaseMgr::fetchParams(CCSParams& params)
 //
 // Store file. Put the fileID in m_dbFileID. What if file already exists?
 // 
-bool CCSDatabaseMgr::storeFile(CCSAssemblyFile& assemblyFile)
+bool CCSDatabaseMgr::storeFile(CCSAssemblyFile& assemblyFile, const CCSParam& param)
 {
     // if m_filePath already exists in DB, then delete all functions and regions assoicated with this fileID.
     // then store filePath and assign a unique ID to m_dbFileID,
@@ -214,9 +214,12 @@ bool CCSDatabaseMgr::storeFile(CCSAssemblyFile& assemblyFile)
 		ASSERT(false);
 		return false;
 	}
+	CString ParamID;
+	ParamID.Format(_T("%d"), param.m_dbParamID);
 	CString csSqlCheckFile = _T("SELECT \"dbFileID\" from \"File\" WHERE \"filePath\"=E'");
 	csSqlCheckFile += assemblyFile.getFilePath();
-	csSqlCheckFile += _T("'");
+	csSqlCheckFile += _T("' AND \"ParamIDFKey\" =");
+	csSqlCheckFile += ParamID;
 
     CStringA csSqlCheckFileANSI;
 	if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckFile, csSqlCheckFileANSI)) {
@@ -267,6 +270,7 @@ bool CCSDatabaseMgr::storeFile(CCSAssemblyFile& assemblyFile)
 		PQclear(pgresult);
 
 	CString csSqlStoreFile = _T("INSERT INTO \"File\" VALUES (");
+	CString paramID;
 	if (piv) {
 		CString dbFileID;
 		dbFileID.Format(_T("%d"), piv);	
@@ -278,7 +282,11 @@ bool CCSDatabaseMgr::storeFile(CCSAssemblyFile& assemblyFile)
 
 	csSqlStoreFile += _T(", E'");
 	csSqlStoreFile += assemblyFile.getFilePath();
-	csSqlStoreFile += _T("')");
+	csSqlStoreFile += _T("', ");
+	paramID.Format(_T("%d"), param.m_dbParamID);
+	csSqlStoreFile += paramID;
+	csSqlStoreFile += _T(")");
+
 	CStringA ccSqlStoreFileANSI;
 	if (!CBFStrHelper::convertCStringToCStringA(csSqlStoreFile, ccSqlStoreFileANSI)) {
         tcout << _T("Failed to convert UNICODE string: ") << csSqlStoreFile.GetString() << endl;
@@ -382,7 +390,7 @@ bool CCSDatabaseMgr::storeFunction(CCSAssemblyFunction& assemblyFcn, const CCSPa
 	}
 	CString csSqlInsertFunction = _T("INSERT into \"Function\" VALUES (DEFAULT, ");
 	CString csValues;
-	csValues.Format(_T("%d, %d, %d, %d, %d, %d)"), assemblyFcn.m_startIdx, assemblyFcn.m_endIdx, (int)assemblyFcn.m_hashValue, assemblyFcn.getAssemblyFile()->m_dbFileID, assemblyFcn.m_startRawIdx, assemblyFcn.m_endRawIdx);
+	csValues.Format(_T("%d, %d, %d, %d, %d, %d, %d)"), assemblyFcn.m_startIdx, assemblyFcn.m_endIdx, (int)assemblyFcn.m_hashValue, assemblyFcn.getAssemblyFile()->m_dbFileID, assemblyFcn.m_startRawIdx, assemblyFcn.m_endRawIdx, param.m_dbParamID);
 	csSqlInsertFunction += csValues;	
     CStringA csSqlInsertFunctionANSI;
 	if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertFunction, csSqlInsertFunctionANSI)) {
@@ -399,7 +407,7 @@ bool CCSDatabaseMgr::storeFunction(CCSAssemblyFunction& assemblyFcn, const CCSPa
 	PQclear(pgresult);
 	CString csSqlFetchFcnId = _T("SELECT \"dbFcnID\" from \"Function\" WHERE \"FileIdFKey\"=");
 	CString csVals;
-	csVals.Format(_T("%d AND \"startRawIdx\"=%d"), assemblyFcn.getAssemblyFile()->m_dbFileID, assemblyFcn.m_startRawIdx);
+	csVals.Format(_T("%d AND \"startRawIdx\"=%d AND \"ParamIDFKey\"=%d"), assemblyFcn.getAssemblyFile()->m_dbFileID, assemblyFcn.m_startRawIdx, param.m_dbParamID);
 	csSqlFetchFcnId += csVals;
 
     CStringA csSqlFetchFcnIdANSI;
@@ -438,7 +446,9 @@ bool CCSDatabaseMgr::storeRegion(CCSRegion& region, const CCSParam& param)
 
 	// dbRegionID | startIdx | endIdx | rawStartIdx | rawEndIdx | hashValue | FcnIDFkey | ParamIDFKey
 	//------------+----------+--------+-------------+-----------+-----------+-----------+-------------
-	PGresult *pgresult;
+	
+	
+	PGresult* pgresult; // result of the last query
 	if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
 		tcout << _T("CSDataBaseMgr (storeRegion): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
 		ASSERT(false);
@@ -449,12 +459,12 @@ bool CCSDatabaseMgr::storeRegion(CCSRegion& region, const CCSParam& param)
 	csValues.Format(_T("%d, %d, %d, %d, %d, %d, %d)"), region.m_startIdx, region.m_endIdx, region.m_rawStartIdx, region.m_rawEndIdx, (int)region.m_hashValue, region.getFunction()->m_dbFcnID, param.m_dbParamID);
 	csSqlInsertRegion += csValues;
 
-    CStringA csSqlInsertRegionANSI;
+	CStringA csSqlInsertRegionANSI;
 	if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertRegion, csSqlInsertRegionANSI)) {
-        tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertRegion.GetString() << endl;
-        ASSERT(false);
-        return false;
-    }
+		tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertRegion.GetString() << endl;
+		ASSERT(false);
+		return false;
+	}
 	pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertRegionANSI);
 	if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
 		tcout << _T("CSDataBaseMgr (storeRegion): Failing to insert the region from ") << (region.getFunction()->getAssemblyFile()->getFilePath()).GetString() << _T(", beginning at line no. ") << region.m_rawStartIdx << _T(" in the data base") <<  endl;
@@ -467,12 +477,12 @@ bool CCSDatabaseMgr::storeRegion(CCSRegion& region, const CCSParam& param)
 	csVals.Format(_T("%d AND \"rawStartIdx\"=%d"), region.getFunction()->m_dbFcnID, region.m_rawStartIdx);
 	csSqlFetchRegId += csVals;
 
-    CStringA csSqlFetchRegIdANSI;
+	CStringA csSqlFetchRegIdANSI;
 	if (!CBFStrHelper::convertCStringToCStringA(csSqlFetchRegId, csSqlFetchRegIdANSI)) {
-        tcout << _T("Failed to convert UNICODE string: ") << csSqlFetchRegId.GetString() << endl;
-        ASSERT(false);
-        return false;
-    }
+		tcout << _T("Failed to convert UNICODE string: ") << csSqlFetchRegId.GetString() << endl;
+		ASSERT(false);
+		return false;
+	}
 	pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlFetchRegIdANSI);
 	if(PQresultStatus(pgresult) != PGRES_TUPLES_OK) { // PGRES_TUPLES_OK even if 0 tuples returned
 		tcout << _T("CSDataBaseMgr (storeRegion): failed to fetch the dbRegionID from ") <<  (region.getFunction()->getAssemblyFile()->getFilePath()).GetString() << _T(", beginning at line no. ") << region.m_rawStartIdx << _T(" in the data base") <<  endl;
@@ -480,15 +490,15 @@ bool CCSDatabaseMgr::storeRegion(CCSRegion& region, const CCSParam& param)
 		return false;
 	}
 	CStringA csRegIDAnsi(PQgetvalue(pgresult, 0, 0));
-    CString csRegID;
-    if(!CBFStrHelper::convertCStringAToCString(csRegIDAnsi, csRegID)) {
-	    tcout << _T("Failed to convert ANSI to Unicode string:") << csRegIDAnsi.GetString() << endl; 
-	    ASSERT(false);
-	    return false;                     
-    }
-    region.m_dbRegionID = CBFStrHelper::strToInt(csRegID.GetString());
+	CString csRegID;
+	if(!CBFStrHelper::convertCStringAToCString(csRegIDAnsi, csRegID)) {
+		tcout << _T("Failed to convert ANSI to Unicode string:") << csRegIDAnsi.GetString() << endl; 
+		ASSERT(false);
+		return false;                     
+	}
+	region.m_dbRegionID = CBFStrHelper::strToInt(csRegID.GetString());
 	PQclear(pgresult);
-    return region.m_dbRegionID > 0;
+	return region.m_dbRegionID > 0;
 }
 
 
@@ -794,6 +804,7 @@ bool CCSDatabaseMgr::createTargetRegionBinaryVector(const CCSRegion& region, con
 	parameterID.Format("%d", param.m_dbParamID);
 	CString fetchFilteredFeatures = _T("Select * from \"FilteredFeature\" where \"paramIDFKey\"= ");
 	fetchFilteredFeatures += parameterID;
+	fetchFilteredFeatures += _T("order by \"featIDPKey\"");
     CStringA fetchFilteredFeaturesANSI;
     if (!CBFStrHelper::convertCStringToCStringA(fetchFilteredFeatures, fetchFilteredFeaturesANSI)) {
         tcout << _T("Failed to convert UNICODE string: ") << fetchFilteredFeaturesANSI << endl;
@@ -883,8 +894,9 @@ bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& 
 	// get the first dbRegionID value 
 	CStringA parameterID; 
 	parameterID.Format("%d", param.m_dbParamID);
-	CString fetchFilteredFeatures = _T("Select * from \"Region\" where \"\ParamIDFKey\"= ");
+	CString fetchFilteredFeatures = _T("Select * from \"Region\" where \"ParamIDFKey\"= ");
 	fetchFilteredFeatures += parameterID;
+	fetchFilteredFeatures += _T("order by \"dbRegionID\" ");
     CStringA fetchFilteredFeaturesANSI;
     if (!CBFStrHelper::convertCStringToCStringA(fetchFilteredFeatures, fetchFilteredFeaturesANSI)) {
         tcout << _T("Failed to convert UNICODE string: ") << fetchFilteredFeaturesANSI << endl;
@@ -935,6 +947,11 @@ bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& 
 			CString resInexactRegion = InexactRegions.Tokenize(_T("#"), pos);
 			while (!resInexactRegion.IsEmpty()) {
                 singleRegionDBIDInt = CBFStrHelper::strToInt(resInexactRegion);
+				if (singleRegionDBIDInt < firstDBRegionIDInt) {
+					tcout << _T("stored dbRegionID are not stored coorectly in DB, remove the regions from DB and restore the regions into DB") << endl;
+					ASSERT(false);
+					return false;
+				}
                 m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][0] = singleRegionDBIDInt;
                 int mytemp = m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][1];
 				++ m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][1];        
@@ -1006,7 +1023,7 @@ bool CCSDatabaseMgr::fetchInexactRegions(const CCSRegion& region, const CCSParam
 			}		
 	   }
 	}
-    PQclear(pgresult);
+    //PQclear(pgresult);
     return true;
 }
 

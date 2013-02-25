@@ -1,0 +1,1 @@
+..\CloneSearcher\Release\AssemblyToDB CSDataBase postgres drdc .\NewData REG 10 1

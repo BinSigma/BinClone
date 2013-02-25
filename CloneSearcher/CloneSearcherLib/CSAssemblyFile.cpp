@@ -62,7 +62,7 @@ bool CCSAssemblyFile::parseFile(const CCSParam& param, bool bStoreDB)
             return false;
         }        
         
-        if (bStoreDB && !m_pAssemblyFileMgr->getDBMgr()->storeFile(*this))
+		if (bStoreDB && !m_pAssemblyFileMgr->getDBMgr()->storeFile(*this, param))
             return false;
 
         int asmFileLineIdx = -1;    // line index in the raw assembly file.        

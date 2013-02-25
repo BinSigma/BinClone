@@ -159,7 +159,7 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
                     return false;
                 if (!bFirstScan) {  
                     m_nTotalFunctions += assemblyFile.getNumFunctions();
-                    tcout << _T("Number of functions: ") << assemblyFile.getNumFunctions() << _T(" in ") << assemblyFilePath << endl;
+					tcout << _T("Number of functions: ") << assemblyFile.getNumFunctions() << _T(" in ") << assemblyFilePath.GetString() << endl;
                 }
 
                 // create regions and store into DB.
@@ -167,7 +167,7 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
                     return false;
                 if (!bFirstScan) {  
                     m_nTotalRegions += assemblyFile.getNumRegions();
-                    tcout << _T("Number of regions: ") << assemblyFile.getNumRegions() << _T(" in ") << assemblyFilePath << endl;
+                    tcout << _T("Number of regions: ") << assemblyFile.getNumRegions() << _T(" in ") << assemblyFilePath.GetString() << endl;
                     ++m_nTotalFiles;
                 }
                 // assemblyFile will be deallocated.

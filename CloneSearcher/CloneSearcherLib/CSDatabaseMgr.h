@@ -24,7 +24,7 @@ public:
     bool storeParam(CCSParam& param);
     bool fetchParams(CCSParams& params);
     
-    bool storeFile(CCSAssemblyFile& assemblyFile);
+    bool storeFile(CCSAssemblyFile& assemblyFile, const CCSParam& param);
     bool fetchFilePath(int dbFileID, CString& assemblyFilePath);
 
     bool storeFunction(CCSAssemblyFunction& assemblyFcn, const CCSParam& param);
