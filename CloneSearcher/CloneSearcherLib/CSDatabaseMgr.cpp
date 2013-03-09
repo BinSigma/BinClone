@@ -822,7 +822,7 @@ bool CCSDatabaseMgr::createTargetRegionBinaryVector(const CCSRegion& region, con
 		m_filteredFeatures.GetAt(i) = CBFStrHelper::strToInt((LPCTSTR) featureIDString);
 		featureMedianString = PQgetvalue(pgresult, i, 3);
 		featureMedianInt = CBFStrHelper::strToInt((LPCTSTR) featureMedianString);
-		m_targetpRegionBinaryVector[i] = m_targetRegionVector[i] >= featureMedianInt;
+		m_targetpRegionBinaryVector[i] = m_targetRegionVector[m_filteredFeatures.GetAt(i)] >= featureMedianInt;
 	}
 	PQclear(pgresult); 
 	return true;

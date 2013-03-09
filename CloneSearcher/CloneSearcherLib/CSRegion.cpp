@@ -127,7 +127,7 @@ bool CCSRegion::constructBinaryVector(const CCSIntArray& filteredFeatures, const
 #endif
     m_binaryVector.SetSize(filteredFeatures.GetSize());
     for (int f = 0; f < filteredFeatures.GetSize(); ++f)
-		m_binaryVector[f] = m_vector[f] >= globalMedians.GetAt(filteredFeatures[f]); // mediansNZ stores the index of the medians which are more than 0 in globalMedian Vector
+		m_binaryVector[f] = m_vector[filteredFeatures.GetAt(f)] >= globalMedians.GetAt(filteredFeatures.GetAt(f)); // filteredFeatures stores the index of the medians which are more than 0 in globalMedian Vector
     
     return true;
 }
@@ -166,7 +166,7 @@ int CCSRegion::findMedian(const vector<int>& redundancyVector)
     int sum = 0;  
     for (featureValue = 0; featureValue < redundancyVector.size(); ++featureValue) {
 		sum += redundancyVector[featureValue];
-        if (sum >= m_cntRegion/2 + 1)
+        if (sum > m_cntRegion/2 + 1)
             break;
     }
     return featureValue;
