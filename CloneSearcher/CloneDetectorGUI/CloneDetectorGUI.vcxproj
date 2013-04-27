@@ -58,7 +58,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\BFLib\Debug;..\CloneSearcherLib\Debug;..\Debug;..\..\PostgreSQL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\BFLib\Debug;..\CloneSearcherLib\Debug;..\Debug;..\..\PostgreSQL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>BFLib.lib;CloneSearcherLib.lib;libpq.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>

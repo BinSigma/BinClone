@@ -32,10 +32,15 @@ CCSClone::~CCSClone()
 //
 bool CCSClone::overlap(const CCSClone& theClone) const
 {
-    if ( m_srcFileID !=theClone.m_srcFileID) 
+	int offset = 0; 
+	if (m_srcFileID !=theClone.m_srcFileID) // check to see if the clones are in the same file.
         return false;
+	
+	offset = m_tarStart - theClone.m_tarStart; //check the overlap offset. The offset should be the same.
+	if (abs(offset) != abs(m_srcStart - theClone.m_srcStart))
+		return false;
      
-        return ((m_tarStart <= theClone.m_tarStart && m_tarEnd >= theClone.m_tarStart) || (theClone.m_tarStart <= m_tarStart && theClone.m_tarEnd >= m_tarStart)) &&
+    return ((m_tarStart <= theClone.m_tarStart && m_tarEnd >= theClone.m_tarStart) || (theClone.m_tarStart <= m_tarStart && theClone.m_tarEnd >= m_tarStart)) &&
                ((m_srcStart <= theClone.m_srcStart && m_srcEnd >= theClone.m_srcStart) || (theClone.m_srcStart <= m_srcStart && theClone.m_srcEnd >= m_srcStart));
 }
 
