@@ -5,8 +5,6 @@
 #include "CloneDetectorGUI.h"
 #include "ClonePairsAsmFrame.h"
 #include "ClonePairsAsmView.h"
-//#include "..\CloneSearcherLib\CSController.h"
-
 #include "MainFrm.h"
 #include "BFFileHelper.h"
 #include "NewDetectDialog.h"
@@ -14,8 +12,6 @@
 #include "CSController.h"
 #include "CloneFiles.h"
 #include "BFFileHelper.h"
-//#include "CloneFiles.h"
-//#include "..\..\CloneSearcher\CloneSearcherLib\CSController.h"
 
 
 // ClonePairsAsmFrame
@@ -27,7 +23,8 @@ ClonePairsAsmFrame::ClonePairsAsmFrame()
  m_currentLine(-1),
  m_numOfClonePairs(0),
  m_xmlFile(_T("")),
- m_idFromXmlFile(0)
+ m_idFromXmlFile(0),
+ m_syncScroll(true)
 {
 }
 
@@ -168,10 +165,7 @@ bool ClonePairsAsmFrame::init()
 			cdControlDlg.DoModal();
 			pFrame->stopProgress();									   
 			if( cdControlDlg.m_result == true)
-			{
-				//m_xmlFilePathAndName = newDetectDlg.m_targetAsmFile;
-                //theApp.setCurrXMLFile(m_xmlFilePathAndName);
-				//m_tmpTargetFragAsmFile = cdControlDlg.m_tmpAsmFilePath;
+			{				
 				m_pClones = cdControlDlg.m_pClones;
 				return TRUE;  // the only place to return true!
 			}
@@ -187,90 +181,27 @@ bool ClonePairsAsmFrame::init()
 
 }
 
-
-void ClonePairsAsmFrame::init(const CloneFile & p_clonefile, const CString & p_xmlFile, int p_id) 
-{
-	   m_pCurSelCloneFile = p_clonefile;
-	   m_xmlFile = p_xmlFile;
-	   m_idFromXmlFile = p_id;
-       
-	   CString dbName, dbUser, dbPwd, targetAssemblyFilePath;
-	   CCSParams params;
-       CCSController theControllerObj(dbName, dbUser, dbPwd);
-            
-	   /* OLD
-       CCDController theControllerObj(_T(""),_T(""),-1,-1,-1,-1,false,false,CD_NORM_REG_ROOT,true,-1,-1.0, CD_INEXACT_METHOD_RANDOM);  
-	   */
-
-	   CString fileA, fileB, contentA, contentB, lineStr, lineText;
-	   p_clonefile.getFiles(fileA,fileB);
-
-       // Get the content of file A
-	   if (!theControllerObj.openRawAssemblyFile(fileA))
-	   {
-		   CString error;
-		   error.Format(_T("%s is not found!"),fileA);
-		   AfxMessageBox(error, MB_ICONSTOP,0);
-		   PostMessage(WM_CLOSE);
-		   return;  // error
-	   }
-       int lineIdx = 0;
-	   while (theControllerObj.getRawAssemblyFileLineStr(lineStr)) {
-		   lineText.Format(_T("%5d: %s\n"), lineIdx++, lineStr);
-		   contentA += lineText;
-	   }
-       theControllerObj.closeRawAssemblyFile();
-
-       // Get the content of file B
-	   if (!theControllerObj.openRawAssemblyFile(fileB))
-	   {
-		   CString error;
-		   error.Format(_T("%s is not found!"),fileB);
-		   AfxMessageBox(error, MB_ICONSTOP,0);
-		   theControllerObj.closeRawAssemblyFile();
-		   PostMessage(WM_CLOSE);
-		   return;  // error
-	   }
-
-	   lineIdx = 0;
-	   while (theControllerObj.getRawAssemblyFileLineStr(lineStr)) {
-		   lineText.Format(_T("%5d: %s\n"), lineIdx++, lineStr);
-		   contentB += lineText;
-	   }
-       theControllerObj.closeRawAssemblyFile();
-
-	   // call the views to fill the contents
-	   ClonePairsAsmView* pViewA = (ClonePairsAsmView*) m_wndSplitter2.GetPane(0,0);
-	   ClonePairsAsmView* pViewB = (ClonePairsAsmView*) m_wndSplitter2.GetPane(0,1);
-
-	   pViewA->initView(fileA,contentA);
-	   pViewB->initView(fileB,contentB);
-
-	   ClonePairsAsmView* pViewList = (ClonePairsAsmView*)m_wndSplitter.GetPane(1,0);
-	   pViewList->initCloneFile(m_pCurSelCloneFile);
-}
-
 // Version 2.0
 void ClonePairsAsmFrame::displayAsmContents(const CString & tarFile, const CString & tarContent, const CString & srcFile, const CString & srcContent)
 {
 	   ClonePairsAsmView* pViewA = (ClonePairsAsmView*) m_wndSplitter2.GetPane(0,0);
 	   ClonePairsAsmView* pViewB = (ClonePairsAsmView*) m_wndSplitter2.GetPane(0,1);
 
-	   pViewA->initView(tarFile,tarContent);
-	   pViewB->initView(srcFile,srcContent);
+	   pViewA->initView(tarFile,tarContent,1);
+	   pViewB->initView(srcFile,srcContent,2);
 
 }
 
 void ClonePairsAsmFrame::displayTarAsmContents(const CString & tarFile, const CString & tarContent)
 {
 	   ClonePairsAsmView* pViewA = (ClonePairsAsmView*) m_wndSplitter2.GetPane(0,0);
-	   pViewA->initView(tarFile,tarContent);
+	   pViewA->initView(tarFile,tarContent,1);
 }
 
 void ClonePairsAsmFrame::displaySrcAsmContents(const CString & srcFile, const CString & srcContent)
 {
 	   ClonePairsAsmView* pViewB = (ClonePairsAsmView*) m_wndSplitter2.GetPane(0,1);
-	   pViewB->initView(srcFile,srcContent);
+	   pViewB->initView(srcFile,srcContent,2);
 }
 
 
@@ -280,6 +211,8 @@ BEGIN_MESSAGE_MAP(ClonePairsAsmFrame, CMDIChildWnd)
 	ON_COMMAND(ID_VIEW_PREVIOUS, &ClonePairsAsmFrame::OnViewPrevious)
 	ON_COMMAND(ID_BUTTON_NEXT, &ClonePairsAsmFrame::OnButtonNext)
 	ON_COMMAND(ID_BUTTON_PREV, &ClonePairsAsmFrame::OnButtonPrev)
+	ON_COMMAND(ID_VIEW_SYNCHRONIZEDSCROLLING, &ClonePairsAsmFrame::OnViewSynchronizedscrolling)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SYNCHRONIZEDSCROLLING, &ClonePairsAsmFrame::OnUpdateViewSynchronizedscrolling)
 END_MESSAGE_MAP()
 
 
@@ -312,26 +245,32 @@ bool ClonePairsAsmFrame::fillSelectedClonePairsOnViews(int p_selLine)
 // Version 2
 bool ClonePairsAsmFrame::fillSelectedClonePairsOnViews2(int listLine, int tarStart, int tarEnd, int srcStart, int srcEnd)	                                                    
 {
+	ClonePairsAsmView* pViewA = NULL;
+	ClonePairsAsmView* pViewB = NULL;
+	ClonePairsAsmView* pViewList = NULL;
 	if( tarStart >=0 && tarEnd >=0 )
 	{
-	    ClonePairsAsmView* pViewA = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,0);
+	    pViewA = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,0);
 	    SetActiveView(pViewA);
 	    pViewA->highLightLines(tarStart,tarEnd);
 	}
 
 	if( srcStart >=0 && srcEnd >=0 )
 	{
-	    ClonePairsAsmView* pViewB = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,1);
+	    pViewB = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,1);
 	    SetActiveView(pViewB);
 	    pViewB->highLightLines(srcStart,srcEnd);
 	}
 
 	if( listLine >= 0)
 	{
-	    ClonePairsAsmView* pViewList = (ClonePairsAsmView*)m_wndSplitter.GetPane(1,0);
+	    pViewList = (ClonePairsAsmView*)m_wndSplitter.GetPane(1,0);
 	    SetActiveView(pViewList);
 		pViewList->highLightLines(listLine,listLine);
 	}
+	if( pViewA) SetActiveView(pViewA);
+	if( pViewB) SetActiveView(pViewB);
+	if( pViewList) SetActiveView(pViewList);
 	return true;
 }
 
@@ -435,23 +374,38 @@ void ClonePairsAsmFrame::OnButtonPrev()
 	OnViewPrevious();
 }
 
-/*
-BOOL ClonePairsAsmFrame::PreCreateWindow(CREATESTRUCT& cs)
+void ClonePairsAsmFrame::SyncScroll(int fromView, UINT nScrollCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
-
-	//return CMDIChildWnd::PreCreateWindow(cs);
-
-	if( !CMDIChildWnd::PreCreateWindow(cs) )
-		return FALSE;
-
-	//cs.style =  WS_CHILD | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_MAXIMIZE;
-
-	cs.style = WS_CHILD | WS_VISIBLE | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_MAXIMIZE;
-
-//FWS_ADDTOTITLE
-
-	return TRUE;
+	ClonePairsAsmView* pView; 
+	if( fromView == 2) {
+		pView = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,0);
+	}   
+	else if( fromView == 1) {
+		pView = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,1);
+	}
+	else {
+		return;
+	}
+	
+	pView->SyncScroll(nScrollCode);
 }
-*/
 
+
+void ClonePairsAsmFrame::OnViewSynchronizedscrolling()
+{
+	
+	// TODO: Add your command handler code here
+	
+	if( m_syncScroll ) 
+		m_syncScroll = false;
+	else
+		m_syncScroll = true;
+	 
+}
+
+
+void ClonePairsAsmFrame::OnUpdateViewSynchronizedscrolling(CCmdUI *pCmdUI)
+{
+	// TODO: Add your command update UI handler code here
+	pCmdUI->SetCheck(m_syncScroll ? 1 : 0 );
+}

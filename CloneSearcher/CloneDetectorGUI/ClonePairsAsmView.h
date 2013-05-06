@@ -33,6 +33,9 @@ protected:
 	int     m_beginPos;
 	int     m_endPos;
 	int     m_fileId;
+	int     m_viewId;
+	bool    m_popSyncScroll;
+	
 
 	DECLARE_MESSAGE_MAP()
 
@@ -42,11 +45,12 @@ public:
 	virtual void OnInitialUpdate();
 	void selectedLine(unsigned int p_line);
 	void highLightLines(int p_begin, int p_end);
-	void initView(const CString & p_filename, const CString & p_str, int p_fileId=-1);
+	void initView(const CString & p_filename, const CString & p_str, int viewId, int p_fileId=-1);
 	void initCloneFile( CloneFile & p_cloneFile);
 	void SetProtected(void);
 	void SetWordWrap(const bool bOn=true, const int iLineWidth=0);
 	void SetColour(COLORREF color);
+	void SyncScroll(UINT nScrollCode);
 
 	
 	LRESULT OnCopy(WPARAM, LPARAM);
@@ -55,6 +59,10 @@ public:
 	afx_msg void OnViewClose32780();
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnTokenViewClose();
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	virtual BOOL OnScroll(UINT nScrollCode, UINT nPos, BOOL bDoScroll = TRUE);
 };
 
 class ClonePairsListView :public ClonePairsAsmView

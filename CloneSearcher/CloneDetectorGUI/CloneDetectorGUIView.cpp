@@ -199,6 +199,7 @@ CCloneDetectorGUIDoc* CCloneDetectorGUIView::GetDocument() const // non-debug ve
 }
 #endif //_DEBUG
 
+/*
 void CCloneDetectorGUIView::OnLButtonDblClk(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMLISTVIEW* p = (NMLISTVIEW*) pNMHDR;
@@ -211,6 +212,7 @@ void CCloneDetectorGUIView::OnLButtonDblClk(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 }
+*/
 
 
 // CCloneDetectorGUIView message handlers

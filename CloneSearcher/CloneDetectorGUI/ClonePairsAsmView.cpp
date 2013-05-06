@@ -17,7 +17,8 @@ ClonePairsAsmView::ClonePairsAsmView()
  m_isListView(false),
  m_beginLine(-1),
  m_endLine(-1),
- m_fileId(-1)
+ m_fileId(-1),
+ m_popSyncScroll(true)
 {
 
 }
@@ -32,9 +33,10 @@ ClonePairsAsmDoc* ClonePairsAsmView::GetDocument() const // non-debug version is
 	return (ClonePairsAsmDoc*)m_pDocument;
 }
 
-void ClonePairsAsmView::initView(const CString & p_filename, const CString & p_content, int p_fileId)
+void ClonePairsAsmView::initView(const CString & p_filename, const CString & p_content, int viewId, int p_fileId)
 {
 	// TODO: Add your specialized code here and/or call the base class
+	m_viewId = viewId;
 	m_fileId = p_fileId;
 	m_filename = p_filename;
 	//Set the default font
@@ -81,89 +83,9 @@ void ClonePairsAsmView::initView(const CString & p_filename, const CString & p_c
 
 	m_binit = true;
 
-	// test
-	//highLightLines(0,2);
 }
 
 
-
-void ClonePairsAsmView::initCloneFile( CloneFile & p_cloneFile)
-{
-	m_isListView = true;
-	m_filename = _T("Clone Pairs List");
-	CHARFORMAT cfDefault;
-	cfDefault.cbSize = sizeof(cfDefault);
-	cfDefault.dwEffects = CFE_PROTECTED;
-	cfDefault.dwMask = CFM_BOLD | CFM_FACE | CFM_SIZE | CFM_CHARSET | CFM_PROTECTED;
-	cfDefault.yHeight = 200;
-	cfDefault.bCharSet = 0x00;
-	
-
-	//wcscpy(cfDefault.szFaceName, _T("Courier"));
-	GetRichEditCtrl().SetBackgroundColor(false,GetSysColor((COLOR_BTNFACE)));//RGB( 224,255,255)); //GetSysColor((COLOR_BTNFACE)));
-	//GetRichEditCtrl().SetBackgroundColor(false,RGB( 245,245,220));
-	//GetRichEditCtrl().SetBackgroundColor(false,RGB( 240,247,249));
-
-	CRichEditCtrl& richEditCtrl = GetRichEditCtrl();
-	richEditCtrl.SetDefaultCharFormat(cfDefault);
-	richEditCtrl.SetEventMask(ENM_PROTECTED);
-
-	SetWordWrap(false);
-	int numOfClonePairs = p_cloneFile.getNumberOfClonePairs();
-	int iRow = 0;
-	CString str(_T(""));
-	while(iRow < numOfClonePairs )
-	{
-		ClonePair pair;
-		if( p_cloneFile.getClonePair(iRow,pair))
-		{
-			CString tmp;
-			tmp.Format(_T("[%2d] clone_pair regionA start=\"%d\" regionA end=\"%d\" \t\t regionB start=\"%d\" regionB end=\"%d\"\n"),
-				          iRow+1,
-				          pair.m_regionA.m_start,
-						  pair.m_regionA.m_end,
-						  pair.m_regionB.m_start,
-						  pair.m_regionB.m_end);
-			str += tmp;
-			++iRow;
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	SetWindowText(str);
-	//SetWordWrap(false);
-	
-	//SetString(outText);
-
-	//SetWindowText(p_content);
-
-	GetRichEditCtrl().EnableWindow(true);
-
-	FINDTEXTEX findText;
-    findText.chrg.cpMin = 0;
-    findText.chrg.cpMax = -1;
-    GetRichEditCtrl().SetSel(findText.chrgText);// Select all Text
-    SetProtected(); 
-	SetWordWrap(false);
-	GetRichEditCtrl().SetReadOnly(true);
-
-	int nFirstVisible = GetRichEditCtrl().GetFirstVisibleLine();
-
-    // Scroll the rich edit control so that the first visible line
-    // is the first line of text.
-	if (nFirstVisible > 0)
-	{
-		GetRichEditCtrl().LineScroll(-nFirstVisible, 0);
-	}
-
-	GetRichEditCtrl().HideSelection(TRUE,FALSE);
-
-	m_binit = true;
-
-}
 
 void ClonePairsAsmView::SetProtected(void)
 { 
@@ -225,6 +147,9 @@ BEGIN_MESSAGE_MAP(ClonePairsAsmView, CRichEditView)
 	ON_WM_RBUTTONDOWN()
 	ON_MESSAGE(ID_MENU_COPY,OnCopy)
 	ON_COMMAND(ID_TOKEN_VIEW_CLOSE, &ClonePairsAsmView::OnTokenViewClose)
+	ON_WM_VSCROLL()
+	ON_WM_MOUSEHWHEEL()
+	ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
 
@@ -292,13 +217,11 @@ void ClonePairsAsmView::highLightLines(int p_begin, int p_end)
 	{
 		// reset the pervious selected
 	    GetRichEditCtrl().SetSel(m_beginPos, m_endPos);
-	    SetColour(RGB(0,0,0));
-	    GetRichEditCtrl().HideSelection(TRUE,FALSE);
+	    SetColour(RGB(0,0,0));	 
 	}
 	else
 	{
-		GetRichEditCtrl().SetSel(0, 0);
-		GetRichEditCtrl().HideSelection(TRUE,FALSE);
+		GetRichEditCtrl().SetSel(0, 0);	
 	}
 
 	// scroll the current selected line
@@ -314,19 +237,21 @@ void ClonePairsAsmView::highLightLines(int p_begin, int p_end)
 		m_beginPos  = beginPos;
 		m_endPos    = endPos;
 
+		nFirstVisible = GetRichEditCtrl().GetFirstVisibleLine();
 		GetRichEditCtrl().SetSel(beginPos, endPos);
-		SetColour(RGB(255,0,0));
-
+		SetColour(RGB(255,0,0));		
+		GetRichEditCtrl().SetSel(beginPos, beginPos);
+		
 		nFirstVisible = GetRichEditCtrl().GetFirstVisibleLine();
 		
-		if(nFirstVisible > p_begin)
-		{
-			int linesToScrollUp = (p_end-p_begin)+1;
+		if( m_viewId == 1 || m_viewId == 2)
+		{		
+			int linesToScrollUp = (nFirstVisible-p_begin)+1;
 			GetRichEditCtrl().LineScroll(-linesToScrollUp, 0);
 		}
 	}
-
-	GetRichEditCtrl().HideSelection(TRUE,FALSE);
+	
+	GetRichEditCtrl().HideSelection(TRUE,TRUE); 
 }
 
 void ClonePairsAsmView::OnViewClose32780()
@@ -438,17 +363,6 @@ void ClonePairsAsmView::selectedLine(unsigned int p_line)
 	pFrame->fillSelectedClonePairsOnViews2(p_line, 
 		                                   pcsClones->GetAt(p_line)->m_tarRawStart,pcsClones->GetAt(p_line)->m_tarRawEnd,
 		                                   pcsClones->GetAt(p_line)->m_srcRawStart,pcsClones->GetAt(p_line)->m_srcRawEnd);
-
-	
-	/*
-	pFrame->selectedParticularLine(line);
-		
-	CString frameText;
-	int id = pFrame->getCurId();
-	CString xml = pFrame->getXMLFile();
-	frameText.Format(_T("ID [%d] - %s"),pFrame->getCurId(),pFrame->getXMLFile());
-	pFrame->SetWindowText(frameText);
-	*/
 	return;
 }
 	
@@ -601,99 +515,123 @@ void ClonePairsListView::OnLButtonDown(UINT nFlags, CPoint point)
 				(line < pFrame->getNumOfClonePairs()))
 			{
 		        selectedLine(line);
-		        highLightLines(line,line);
+		        //highLightLines(line,line);
 				pFrame->setCurSelLine(line);
 			}
 		}
 	}
+}
+
+
+void ClonePairsAsmView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
 	
 
-	/*
-	ClonePairsAsmView::OnLButtonDown(nFlags, point);
+	if( m_popSyncScroll) {
 
-	ClonePairsAsmDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
-	if (!pDoc)
-		return;
+		switch(nSBCode)
+		{
+			case SB_LINEUP:
+			case SB_PAGEUP:
+			case SB_PAGEDOWN:    
+			case SB_LINEDOWN: 
+			case SB_ENDSCROLL:
+			{
+				ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+				if( pFrame->m_syncScroll)
+					pFrame->SyncScroll(m_viewId,nSBCode);
+			}
+			break;
+			default:
+				break;
+		}
+				
+	}
+	else {
+		m_popSyncScroll = true;
+		nPos = GetScrollPos(SB_VERT);
+		//nPos = scrollBar->GetScrollPos();
+	}
+	CRichEditView::OnVScroll(nSBCode, nPos, pScrollBar);
+}
 
-	CCSController * pController = pDoc->m_csController; 
-	if( !pController)
-	{
-        AfxMessageBox(_T("CCSController is not valid."), MB_ICONSTOP, 0);					
-		return;
+
+void ClonePairsAsmView::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	// This feature requires Windows Vista or greater.
+	// The symbol _WIN32_WINNT must be >= 0x0600.
+	// TODO: Add your message handler code here and/or call default
+
+
+	CRichEditView::OnMouseHWheel(nFlags, zDelta, pt);
+}
+
+
+BOOL ClonePairsAsmView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	// TODO: Add your message handler code here and/or call default
+	BOOL up = TRUE;
+    int delta = zDelta;
+    if(zDelta < 0)
+    {
+        up = FALSE;
+        delta = - delta;
+    }
+    
+	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+	UINT WheelScrollLines;
+
+    // get from the OS the number of wheelscrolllines. win95 doesnt support this call
+    ::SystemParametersInfo(SPI_GETWHEELSCROLLLINES,0,&WheelScrollLines,0);
+    // scroll a page at a time
+    if(WheelScrollLines == WHEEL_PAGESCROLL)
+    {
+		if( pFrame->m_syncScroll)
+			pFrame->SyncScroll(m_viewId,MAKEWPARAM((up)? SB_PAGEUP:SB_PAGEDOWN,0)); 
+        SendMessage(WM_VSCROLL,MAKEWPARAM((up)? SB_PAGEUP:SB_PAGEDOWN,0),0);
+    }
+    else
+    // or scroll numlines
+    {
+        int numlines = (delta * WheelScrollLines) / WHEEL_DELTA;
+        while ( numlines-- )
+		{
+			if( pFrame->m_syncScroll)
+				pFrame->SyncScroll(m_viewId, MAKEWPARAM((up)? SB_LINEUP:SB_LINEDOWN,0));
+            SendMessage(WM_VSCROLL,MAKEWPARAM((up)? SB_LINEUP:SB_LINEDOWN,0),0);
+		}
     }
 
-	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
-	
-	if( m_isListView)
-	{
-	   int line = 0;
-	   line = GetRichEditCtrl().LineFromChar(-1);
-	   ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+	return CRichEditView::OnMouseWheel(nFlags, zDelta, pt);
+}
 
-	   const CCSClones* pcsClones = pDoc->m_pClones;
-	   CString srcFile = pcsClones->GetAt(line)->m_srcFilePath; 
 
-	   CString tarContent, srcContent;
+void ClonePairsAsmView::SyncScroll(UINT nScrollCode)
+{
+	/*
+	switch(nScrollCode)
+    {
+    case SB_LINEUP:
+	case SB_LINEDOWN:
+      
+    case SB_PAGEUP:
+    case SB_PAGEDOWN:
+       
+    default:
+        return;
+    
+    }
+	*/
+	m_popSyncScroll = false;
 
-	   // Get the content of target file
-	   if (!pController->openRawAssemblyFile(pDoc->m_targetFilePathAndName))
-	   {
-		   CString error;
-		   error.Format(_T("%s is not found!"),pDoc->m_targetFilePathAndName);
-		   AfxMessageBox(error, MB_ICONSTOP,0);
-		   PostMessage(WM_CLOSE);
-		   return;  // error
-	   }
+	SendMessage(WM_VSCROLL,MAKEWPARAM(nScrollCode,0),0);
 
-       int lineIdx = 0;
-	   CString lineStr, lineText;
-	   while (pController->getRawAssemblyFileLineStr(lineStr)) 
-	   {
-		   lineText.Format(_T("%5d: %s\n"), lineIdx++, lineStr);
-		   tarContent += lineText;
-	   }
-       pController->closeRawAssemblyFile();
+}
 
-	   // Get the content of source file
-	   if (!pController->openRawAssemblyFile(srcFile))
-	   {
-		   CString error;
-		   error.Format(_T("%s is not found!"),srcFile);
-		   AfxMessageBox(error, MB_ICONSTOP,0);
-		   PostMessage(WM_CLOSE);
-		   return;  // error
-	   }
+BOOL ClonePairsAsmView::OnScroll(UINT nScrollCode, UINT nPos, BOOL bDoScroll)
+{
+	// TODO: Add your specialized code here and/or call the base class
 
-       lineIdx = 0;
-	   while (pController->getRawAssemblyFileLineStr(lineStr)) 
-	   {
-		   lineText.Format(_T("%5d: %s\n"), lineIdx++, lineStr);
-		   srcContent += lineText;
-	   }
-       pController->closeRawAssemblyFile();
-
-	   pFrame->displayAsmContents(pDoc->m_targetFilePathAndName,tarContent,srcFile,srcContent);
-
-	   pFrame->fillSelectedClonePairsOnViews2(pcsClones->GetAt(line)->m_tarRawStart,
-		                                      pcsClones->GetAt(line)->m_tarRawEnd,
-											  pcsClones->GetAt(line)->m_srcRawStart,
-											  pcsClones->GetAt(line)->m_srcRawEnd);
-
-	   highLightLines(line,line);
-	   */
-	
-	   /*
-	   pFrame->selectedParticularLine(line);
-		
-	   CString frameText;
-		int id = pFrame->getCurId();
-		CString xml = pFrame->getXMLFile();
-		frameText.Format(_T("ID [%d] - %s"),pFrame->getCurId(),pFrame->getXMLFile());
-		pFrame->SetWindowText(frameText);
-		*/
-		//return;
-	
-	
-	//pFrame->SetWindowText(m_filename); 
+	return CRichEditView::OnScroll(nScrollCode, nPos, bDoScroll);
 }

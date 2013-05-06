@@ -332,7 +332,7 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 }
 
 
-
+/*
 void CMainFrame::launchClonePairsAsmWind(const CloneFile & p_pCurSelCloneFile, int p_id) const
 {
 		// TODO: Add your command handler code here
@@ -363,6 +363,7 @@ void CMainFrame::launchClonePairsAsmWind(const CloneFile & p_pCurSelCloneFile, i
 	pAsmFram->init( p_pCurSelCloneFile,theApp.getCurrXMLFile(),p_id);
 
 }
+*/
 
 void CMainFrame::launchTokenRefWind(const CString & p_searchTokenStr, 
 	                                const CString & p_dbName, 
@@ -616,3 +617,5 @@ void CMainFrame::OnNewSearchtoken()
 						   searchTokenDlg.m_import);
 	}
 }
+
+

@@ -18,8 +18,7 @@ class ClonePairsAsmFrame : public CMDIChildWnd
 
 public:
 	
-	bool init();
-	void init(const CloneFile & p_clonefile, const CString & p_xmlFile, int p_id);
+	bool init(); 
 	int getCurSelLine(){ return m_currentLine;}
 	void setCurSelLine(unsigned int p_line) { m_currentLine=p_line;}
 	void setNumOfClonePairs(unsigned int p_num) {m_numOfClonePairs = p_num;}
@@ -31,6 +30,7 @@ public:
 	void displayTarAsmContents(const CString & tarFile, const CString & tarContent);
 	void displaySrcAsmContents(const CString & srcFile, const CString & srcContent);
 	bool fillSelectedClonePairsOnViews2(int listLine, int tarStart, int tarEnd, int srcStart, int srcEnd);
+	void SyncScroll(int fromView, UINT nScrollCode);
 		                                
 	bool selectedParticularLine(int p_line);
 	CString & getXMLFile(){ return m_xmlFile;}
@@ -44,6 +44,8 @@ public:
 	const CCSClones* m_pClones;
 
 	CString m_targetFilePathAndName;
+
+	bool m_syncScroll;
 
 protected:
 	ClonePairsAsmFrame();           // protected constructor used by dynamic creation
@@ -78,6 +80,8 @@ public:
 	afx_msg void OnButtonNext();
 	afx_msg void OnButtonPrev();
 	//virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	afx_msg void OnViewSynchronizedscrolling();
+	afx_msg void OnUpdateViewSynchronizedscrolling(CCmdUI *pCmdUI);
 };
 
 

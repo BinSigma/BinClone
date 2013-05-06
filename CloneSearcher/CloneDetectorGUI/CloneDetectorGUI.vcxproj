@@ -136,8 +136,6 @@
   <ItemGroup>
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="CloneDetectorGUI.cpp" />
-    <ClCompile Include="CloneDetectorGUIDoc.cpp" />
-    <ClCompile Include="CloneDetectorGUIView.cpp" />
     <ClCompile Include="CloneFiles.cpp" />
     <ClCompile Include="ClonePairListCtrl.cpp" />
     <ClCompile Include="ClonePairsAsmDoc.cpp" />

@@ -116,12 +116,6 @@
     <ClCompile Include="ChildFrm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CloneDetectorGUIDoc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CloneDetectorGUIView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CloneFiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

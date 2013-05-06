@@ -41,4 +41,5 @@ protected:
 	CloneFile    m_pCurSelCloneFile;
 
 	DECLARE_MESSAGE_MAP()
+
 };
