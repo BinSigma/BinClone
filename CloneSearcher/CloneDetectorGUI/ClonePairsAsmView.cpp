@@ -515,7 +515,7 @@ void ClonePairsListView::OnLButtonDown(UINT nFlags, CPoint point)
 				(line < pFrame->getNumOfClonePairs()))
 			{
 		        selectedLine(line);
-		        //highLightLines(line,line);
+		        highLightLines(line,line);
 				pFrame->setCurSelLine(line);
 			}
 		}
@@ -526,8 +526,34 @@ void ClonePairsListView::OnLButtonDown(UINT nFlags, CPoint point)
 void ClonePairsAsmView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: Add your message handler code here and/or call default
-	
+	int prev_pos = GetScrollPos(SB_VERT); 
+	// TODO: Add your message handler code here and/or call default
+	if (nSBCode/256==SB_THUMBTRACK || (nSBCode & 0xFF)==SB_THUMBTRACK ||
+		nSBCode/256==SB_THUMBPOSITION || (nSBCode & 0xFF)==SB_THUMBPOSITION) // ||
+		//nSBCode/256==SB_ENDSCROLL || (nSBCode & 0xFF)==SB_ENDSCROLL )
+	{
+		SCROLLINFO sinfo;
+        sinfo.cbSize=sizeof(sinfo);
+        sinfo.fMask=SIF_TRACKPOS;
+		::GetScrollInfo(m_hWnd, SB_VERT, &sinfo);
+        nPos=sinfo.nTrackPos;
+	}
 
+	if(m_popSyncScroll && prev_pos != nPos)
+	{
+		ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+		if( pFrame->m_syncScroll) {
+			pFrame->SyncScroll(m_viewId,nSBCode,prev_pos-nPos);
+		}
+	}
+	else
+	{
+		m_popSyncScroll = true;
+		//nPos = GetScrollPos(SB_VERT);
+		//nPos = scrollBar->GetScrollPos();
+	}
+	
+/*
 	if( m_popSyncScroll) {
 
 		switch(nSBCode)
@@ -553,6 +579,8 @@ void ClonePairsAsmView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBa
 		nPos = GetScrollPos(SB_VERT);
 		//nPos = scrollBar->GetScrollPos();
 	}
+*/
+
 	CRichEditView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -588,7 +616,7 @@ BOOL ClonePairsAsmView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     if(WheelScrollLines == WHEEL_PAGESCROLL)
     {
 		if( pFrame->m_syncScroll)
-			pFrame->SyncScroll(m_viewId,MAKEWPARAM((up)? SB_PAGEUP:SB_PAGEDOWN,0)); 
+			pFrame->SyncScroll(m_viewId,MAKEWPARAM((up)? SB_PAGEUP:SB_PAGEDOWN,0),0); 
         SendMessage(WM_VSCROLL,MAKEWPARAM((up)? SB_PAGEUP:SB_PAGEDOWN,0),0);
     }
     else
@@ -598,7 +626,7 @@ BOOL ClonePairsAsmView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
         while ( numlines-- )
 		{
 			if( pFrame->m_syncScroll)
-				pFrame->SyncScroll(m_viewId, MAKEWPARAM((up)? SB_LINEUP:SB_LINEDOWN,0));
+				pFrame->SyncScroll(m_viewId, MAKEWPARAM((up)? SB_LINEUP:SB_LINEDOWN,0),0);
             SendMessage(WM_VSCROLL,MAKEWPARAM((up)? SB_LINEUP:SB_LINEDOWN,0),0);
 		}
     }
@@ -607,7 +635,7 @@ BOOL ClonePairsAsmView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 }
 
 
-void ClonePairsAsmView::SyncScroll(UINT nScrollCode)
+void ClonePairsAsmView::SyncScroll(UINT nSBCode, int pos)
 {
 	/*
 	switch(nScrollCode)
@@ -625,8 +653,17 @@ void ClonePairsAsmView::SyncScroll(UINT nScrollCode)
 	*/
 	m_popSyncScroll = false;
 
-	SendMessage(WM_VSCROLL,MAKEWPARAM(nScrollCode,0),0);
-
+	if (nSBCode/256==SB_THUMBTRACK || (nSBCode & 0xFF)==SB_THUMBTRACK ||
+		nSBCode/256==SB_THUMBPOSITION || (nSBCode & 0xFF)==SB_THUMBPOSITION ||
+		nSBCode/256==SB_ENDSCROLL || (nSBCode & 0xFF)==SB_ENDSCROLL)		
+	{
+		//SendMessage(WM_VSCROLL,MAKEWPARAM((pos > 0)? SB_LINEUP:SB_LINEDOWN,0),0);	
+		SendMessage(WM_VSCROLL,MAKEWPARAM(nSBCode,GetScrollPos(SB_VERT)-pos),0);
+	}
+	else
+	{
+		SendMessage(WM_VSCROLL,MAKEWPARAM(nSBCode,0),0);
+	}
 }
 
 BOOL ClonePairsAsmView::OnScroll(UINT nScrollCode, UINT nPos, BOOL bDoScroll)

@@ -30,7 +30,7 @@ public:
 	void displayTarAsmContents(const CString & tarFile, const CString & tarContent);
 	void displaySrcAsmContents(const CString & srcFile, const CString & srcContent);
 	bool fillSelectedClonePairsOnViews2(int listLine, int tarStart, int tarEnd, int srcStart, int srcEnd);
-	void SyncScroll(int fromView, UINT nScrollCode);
+	void SyncScroll(int fromView, UINT nScrollCode, int pos);
 		                                
 	bool selectedParticularLine(int p_line);
 	CString & getXMLFile(){ return m_xmlFile;}

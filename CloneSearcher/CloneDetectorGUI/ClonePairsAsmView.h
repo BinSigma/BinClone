@@ -50,7 +50,7 @@ public:
 	void SetProtected(void);
 	void SetWordWrap(const bool bOn=true, const int iLineWidth=0);
 	void SetColour(COLORREF color);
-	void SyncScroll(UINT nScrollCode);
+	void SyncScroll(UINT nScrollCode, int pos);
 
 	
 	LRESULT OnCopy(WPARAM, LPARAM);

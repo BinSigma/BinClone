@@ -374,7 +374,7 @@ void ClonePairsAsmFrame::OnButtonPrev()
 	OnViewPrevious();
 }
 
-void ClonePairsAsmFrame::SyncScroll(int fromView, UINT nScrollCode)
+void ClonePairsAsmFrame::SyncScroll(int fromView, UINT nScrollCode, int pos)
 {
 	ClonePairsAsmView* pView; 
 	if( fromView == 2) {
@@ -387,7 +387,7 @@ void ClonePairsAsmFrame::SyncScroll(int fromView, UINT nScrollCode)
 		return;
 	}
 	
-	pView->SyncScroll(nScrollCode);
+	pView->SyncScroll(nScrollCode,pos);
 }
 
 
