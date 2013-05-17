@@ -267,6 +267,10 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 	for (int fcnIdx = 0; fcnIdx < m_functions.GetSize(); ++fcnIdx) {
 		CCSAssemblyFunction* pFcn = m_functions.GetAt(fcnIdx);
 		pFcn->resetNumRegions();
+		// skip this function if its size is smaller than the window size
+		int fcnSize = (pFcn->m_endIdx -1) - (pFcn->m_startIdx +1) + 1;
+		if (fcnSize < param.m_windowSize)
+			continue;
 		for (int sIdx = pFcn->m_startIdx + 1; sIdx < pFcn->m_endIdx; sIdx += param.m_stride) {
 			// ensure the endIdx does not go beyond the limit
 			int eIdx = sIdx + param.m_windowSize - 1;
