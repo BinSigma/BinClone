@@ -530,8 +530,8 @@ void ClonePairsAsmView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBa
 	int prev_pos = GetScrollPos(SB_VERT); 
 	// TODO: Add your message handler code here and/or call default
 	if (nSBCode/256==SB_THUMBTRACK || (nSBCode & 0xFF)==SB_THUMBTRACK ||
-		nSBCode/256==SB_THUMBPOSITION || (nSBCode & 0xFF)==SB_THUMBPOSITION) // ||
-		//nSBCode/256==SB_ENDSCROLL || (nSBCode & 0xFF)==SB_ENDSCROLL )
+		nSBCode/256==SB_THUMBPOSITION || (nSBCode & 0xFF)==SB_THUMBPOSITION  ||
+		nSBCode/256==SB_ENDSCROLL || (nSBCode & 0xFF)==SB_ENDSCROLL )
 	{
 		SCROLLINFO sinfo;
         sinfo.cbSize=sizeof(sinfo);
@@ -552,8 +552,8 @@ void ClonePairsAsmView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBa
 		m_popSyncScroll = true;
 	}
 	
-
-	CRichEditView::OnVScroll(nSBCode, nPos, pScrollBar);
+	
+		CRichEditView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 
@@ -630,11 +630,18 @@ void ClonePairsAsmView::SyncScroll(UINT nSBCode, int pos)
 	m_popSyncScroll = false;
 
 	if (nSBCode/256==SB_THUMBTRACK || (nSBCode & 0xFF)==SB_THUMBTRACK ||
-		nSBCode/256==SB_THUMBPOSITION || (nSBCode & 0xFF)==SB_THUMBPOSITION ||
-		nSBCode/256==SB_ENDSCROLL || (nSBCode & 0xFF)==SB_ENDSCROLL)		
+		nSBCode/256==SB_THUMBPOSITION || (nSBCode & 0xFF)==SB_THUMBPOSITION ) //||
+		//nSBCode/256==SB_ENDSCROLL || (nSBCode & 0xFF)==SB_ENDSCROLL)		
 	{
 		//SendMessage(WM_VSCROLL,MAKEWPARAM((pos > 0)? SB_LINEUP:SB_LINEDOWN,0),0);	
-		SendMessage(WM_VSCROLL,MAKEWPARAM(nSBCode,GetScrollPos(SB_VERT)-pos),0);
+		int prev_pos = GetScrollPos(SB_VERT);
+
+		if( (prev_pos - pos) < 0)
+			pos = 0;
+		else
+			pos = prev_pos - pos;
+		
+		SendMessage(WM_VSCROLL,MAKEWPARAM(nSBCode,pos,0));
 	}
 	else
 	{
