@@ -390,6 +390,58 @@ void ClonePairsAsmFrame::SyncScroll(int fromView, UINT nScrollCode, int pos)
 	pView->SyncScroll(nScrollCode,pos);
 }
 
+void ClonePairsAsmFrame::SyncVWScroll(int fromView, UINT nFlags, short zDelta, CPoint pt)
+{
+	ClonePairsAsmView* pView; 
+	if( fromView == 2) {
+		pView = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,0);
+	}   
+	else if( fromView == 1) {
+		pView = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,1);
+	}
+	else {
+		return;
+	}
+	
+	pView->SyncVWScroll(nFlags,zDelta,pt);
+
+}
+
+void ClonePairsAsmFrame::KeySynchro(int fromView, UINT nChar)
+{
+	ClonePairsAsmView* pView; 
+	if( fromView == 2) {
+		pView = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,0);
+	}   
+	else if( fromView == 1) {
+		pView = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,1);
+	}
+	else {
+		return;
+	}
+	
+	pView->KeySynchro(nChar);
+
+}
+
+void ClonePairsAsmFrame::KeySynchro(int fromView, UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	ClonePairsAsmView* pView; 
+	if( fromView == 2) {
+		pView = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,0);
+	}   
+	else if( fromView == 1) {
+		pView = (ClonePairsAsmView*)m_wndSplitter2.GetPane(0,1);
+	}
+	else {
+		return;
+	}
+	
+	pView->KeySynchro(nChar);
+
+
+}
+
 
 void ClonePairsAsmFrame::OnViewSynchronizedscrolling()
 {

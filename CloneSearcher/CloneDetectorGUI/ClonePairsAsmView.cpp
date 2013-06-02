@@ -150,6 +150,7 @@ BEGIN_MESSAGE_MAP(ClonePairsAsmView, CRichEditView)
 	ON_WM_VSCROLL()
 	ON_WM_MOUSEHWHEEL()
 	ON_WM_MOUSEWHEEL()
+	ON_WM_KEYDOWN()
 END_MESSAGE_MAP()
 
 
@@ -549,37 +550,8 @@ void ClonePairsAsmView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBa
 	else
 	{
 		m_popSyncScroll = true;
-		//nPos = GetScrollPos(SB_VERT);
-		//nPos = scrollBar->GetScrollPos();
 	}
 	
-/*
-	if( m_popSyncScroll) {
-
-		switch(nSBCode)
-		{
-			case SB_LINEUP:
-			case SB_PAGEUP:
-			case SB_PAGEDOWN:    
-			case SB_LINEDOWN: 
-			case SB_ENDSCROLL:
-			{
-				ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
-				if( pFrame->m_syncScroll)
-					pFrame->SyncScroll(m_viewId,nSBCode);
-			}
-			break;
-			default:
-				break;
-		}
-				
-	}
-	else {
-		m_popSyncScroll = true;
-		nPos = GetScrollPos(SB_VERT);
-		//nPos = scrollBar->GetScrollPos();
-	}
-*/
 
 	CRichEditView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
@@ -591,14 +563,29 @@ void ClonePairsAsmView::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
 	// The symbol _WIN32_WINNT must be >= 0x0600.
 	// TODO: Add your message handler code here and/or call default
 
-
 	CRichEditView::OnMouseHWheel(nFlags, zDelta, pt);
 }
 
+void ClonePairsAsmView::SyncVWScroll(UINT nFlags, short zDelta, CPoint pt)
+{
+	m_popSyncScroll = false;
+	OnMouseWheel(nFlags, zDelta, pt);
+	m_popSyncScroll = true; 
+}
 
 BOOL ClonePairsAsmView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// TODO: Add your message handler code here and/or call default
+	if( m_popSyncScroll)
+	{
+		ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+		if( pFrame->m_syncScroll)
+		{
+			pFrame->SyncVWScroll(m_viewId,nFlags,zDelta,pt);
+		}
+	}
+
+#if 0
 	BOOL up = TRUE;
     int delta = zDelta;
     if(zDelta < 0)
@@ -606,13 +593,12 @@ BOOL ClonePairsAsmView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
         up = FALSE;
         delta = - delta;
     }
-    
-	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
-	UINT WheelScrollLines;
 
+
+	UINT WheelScrollLines;
     // get from the OS the number of wheelscrolllines. win95 doesnt support this call
     ::SystemParametersInfo(SPI_GETWHEELSCROLLLINES,0,&WheelScrollLines,0);
-    // scroll a page at a time
+    // scroll a page at a time	
     if(WheelScrollLines == WHEEL_PAGESCROLL)
     {
 		if( pFrame->m_syncScroll)
@@ -620,16 +606,20 @@ BOOL ClonePairsAsmView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
         SendMessage(WM_VSCROLL,MAKEWPARAM((up)? SB_PAGEUP:SB_PAGEDOWN,0),0);
     }
     else
-    // or scroll numlines
-    {
+    // or scroll numlines	
+    {	
         int numlines = (delta * WheelScrollLines) / WHEEL_DELTA;
+		
+		TRACE(_T("numlines %d, WheelScrollLines %d\n"),numlines,WheelScrollLines);
+
         while ( numlines-- )
 		{
 			if( pFrame->m_syncScroll)
 				pFrame->SyncScroll(m_viewId, MAKEWPARAM((up)? SB_LINEUP:SB_LINEDOWN,0),0);
             SendMessage(WM_VSCROLL,MAKEWPARAM((up)? SB_LINEUP:SB_LINEDOWN,0),0);
-		}
+		}	
     }
+#endif
 
 	return CRichEditView::OnMouseWheel(nFlags, zDelta, pt);
 }
@@ -637,20 +627,6 @@ BOOL ClonePairsAsmView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void ClonePairsAsmView::SyncScroll(UINT nSBCode, int pos)
 {
-	/*
-	switch(nScrollCode)
-    {
-    case SB_LINEUP:
-	case SB_LINEDOWN:
-      
-    case SB_PAGEUP:
-    case SB_PAGEDOWN:
-       
-    default:
-        return;
-    
-    }
-	*/
 	m_popSyncScroll = false;
 
 	if (nSBCode/256==SB_THUMBTRACK || (nSBCode & 0xFF)==SB_THUMBTRACK ||
@@ -666,9 +642,53 @@ void ClonePairsAsmView::SyncScroll(UINT nSBCode, int pos)
 	}
 }
 
-BOOL ClonePairsAsmView::OnScroll(UINT nScrollCode, UINT nPos, BOOL bDoScroll)
+/*
+void ClonePairsAsmView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	// TODO: Add your message handler code here and/or call default
+	CRichEditView::OnKeyDown(nChar, nRepCnt, nFlags);
+	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+	if( pFrame->m_syncScroll)
+	{
+		pFrame->KeySynchro(m_viewId,nChar, nRepCnt, nFlags); 
+	}
+}
+*/
 
-	return CRichEditView::OnScroll(nScrollCode, nPos, bDoScroll);
+void ClonePairsAsmView::KeySynchro(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	CRichEditView::OnKeyDown(nChar, nRepCnt, nFlags);
+
+}
+
+void ClonePairsAsmView::KeySynchro( UINT nChar)
+{
+    switch (nChar)
+	{
+		case VK_UP:
+			CRichEditView::OnVScroll(SB_LINEUP, 0, NULL);
+			break;
+        case VK_DOWN:
+
+            CRichEditView::OnVScroll(SB_LINEDOWN, 0, NULL);
+            break;
+        case VK_LEFT:
+            CRichEditView::OnHScroll(SB_LINELEFT, 0, NULL);
+            break;
+        case VK_RIGHT:
+            CRichEditView::OnHScroll(SB_LINERIGHT, 0, NULL);
+            break;
+        case VK_HOME:
+            CRichEditView::OnHScroll(SB_LEFT, 0, NULL);
+            break;
+        case VK_END:
+            CRichEditView::OnHScroll(SB_RIGHT,0,NULL);
+            break;
+        case VK_PRIOR:
+            CRichEditView::OnVScroll(SB_PAGEUP, 0, NULL);
+            break;
+        case VK_NEXT:
+            CRichEditView::OnVScroll(SB_PAGEDOWN, 0, NULL);
+            break;
+	}
 }

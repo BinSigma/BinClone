@@ -31,6 +31,9 @@ public:
 	void displaySrcAsmContents(const CString & srcFile, const CString & srcContent);
 	bool fillSelectedClonePairsOnViews2(int listLine, int tarStart, int tarEnd, int srcStart, int srcEnd);
 	void SyncScroll(int fromView, UINT nScrollCode, int pos);
+	void SyncVWScroll(int fromView, UINT nFlags, short zDelta, CPoint pt);
+	void KeySynchro(int fromView, UINT nChar);
+	void KeySynchro(int fromView, UINT nChar, UINT nRepCnt, UINT nFlags);
 		                                
 	bool selectedParticularLine(int p_line);
 	CString & getXMLFile(){ return m_xmlFile;}

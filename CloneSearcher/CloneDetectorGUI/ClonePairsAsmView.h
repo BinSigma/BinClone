@@ -51,6 +51,9 @@ public:
 	void SetWordWrap(const bool bOn=true, const int iLineWidth=0);
 	void SetColour(COLORREF color);
 	void SyncScroll(UINT nScrollCode, int pos);
+	void SyncVWScroll(UINT nFlags, short zDelta, CPoint pt);
+	void KeySynchro(UINT nChar);
+	void KeySynchro(UINT nChar, UINT nRepCnt, UINT nFlags);
 
 	
 	LRESULT OnCopy(WPARAM, LPARAM);
@@ -62,7 +65,7 @@ public:
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-	virtual BOOL OnScroll(UINT nScrollCode, UINT nPos, BOOL bDoScroll = TRUE);
+	//afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
 class ClonePairsListView :public ClonePairsAsmView
