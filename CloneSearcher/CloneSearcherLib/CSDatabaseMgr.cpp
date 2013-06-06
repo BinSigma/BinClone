@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "CSDatabaseMgr.h"
 
-
 CCSDatabaseMgr::CCSDatabaseMgr(LPCTSTR dbName, LPCTSTR dbUser, LPCTSTR dbPwd)
 {
     // initiate a connection object
@@ -1043,7 +1042,6 @@ bool CCSDatabaseMgr::storeConstant(CCSIndexedToken& indexedToken)
 	PGresult* pgresult; // result of the last query
 	CString csSqlInsertConstant = _T("INSERT into \"Constant\" VALUES(E'");
     CString token = indexedToken.getTokStr();
-    //PQexec(getPGDBConnection(), "SET client_encoding = \'Latin9\'");
     token.Replace(_T("\\"), _T("\\\\"));
     token.Replace(_T("\'"), _T("\\'"));
     csSqlInsertConstant += token; // indexedToken.getTokStr();
@@ -1063,10 +1061,31 @@ bool CCSDatabaseMgr::storeConstant(CCSIndexedToken& indexedToken)
 	pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertConstantAnsi);
 	if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
 		tcout << _T("CSDataBaseMgr (storeConstant): Failing to insert the Constant ") << indexedToken.getTokStr().GetString() << _T(" in the database") <<  endl;
-        tcout << _T("If the Constant has more than 600 chars, then constantToken column type must be changed...") << endl; 
-        cout << "INSERT COMMAND IS : " << csSqlInsertConstantAnsi.GetString() << " ;" << endl;
-		ASSERT(false);
-		return false;
+        tcout << _T(" ... Trying to reinsert it ... ") << endl;
+        PQclear(pgresult);
+        CStringA csSqlInsertModifConstantAnsi;
+        TCHAR cInv;
+        for (int i = 0; i < indexedToken.getTokStr().GetLength(); i++ ) {
+            if ((int)indexedToken.getTokStr().GetAt(i) == 144) {
+                cInv = indexedToken.getTokStr().GetAt(i);
+                csSqlInsertConstant.Replace((cInv), '0');
+            }
+
+        }
+        if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertConstant, csSqlInsertModifConstantAnsi)) {
+            tcout << _T("Failed to convert UNICODE string: ") << csSqlInsertConstant.GetString() << endl;
+            ASSERT(false);
+            return false;
+        } 
+        pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertModifConstantAnsi);
+        if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
+            tcout << _T("CSDataBaseMgr (storeConstant): Failing to re-insert ") << indexedToken.getTokStr().GetString() << _T(" in the database") <<  endl;
+		    tcout << _T("with the transformed SQL query ") << csSqlInsertModifConstantAnsi.GetString() << _T(" in the database") <<  endl;       
+            ASSERT(false);
+		    return false;
+        }
+        else
+            tcout << _T("Succesfully inserted with:") << csSqlInsertModifConstantAnsi.GetString() << _T(" (slightly modified query)") <<  endl;    
 	} 
 	PQclear(pgresult);
     return true;
@@ -1143,7 +1162,10 @@ bool CCSDatabaseMgr::storeString(CCSIndexedToken& indexedToken)
 	}
 	PGresult* pgresult; // result of the last query
 	CString csSqlInsertString = _T("INSERT into \"String\" VALUES(E'");
-    csSqlInsertString += indexedToken.getTokStr();
+    CString token = indexedToken.getTokStr();
+    token.Replace(_T("\\"), _T("\\\\"));
+    token.Replace(_T("\'"), _T("\\'"));
+    csSqlInsertString += token;
     csSqlInsertString += _T("', ");
     CString csIntValues;
     csIntValues.Format(_T("%d, %d)"), indexedToken.getRawLineNum(), indexedToken.getDBfileID());
@@ -1155,7 +1177,7 @@ bool CCSDatabaseMgr::storeString(CCSIndexedToken& indexedToken)
         return false;
     }
     //are there any specific characters that SQL wants "\" prefixed ? for example, : 
-    csSqlInsertStringAnsi.Replace((LPCSTR)"\\", (LPCSTR)"\\\\");
+    //csSqlInsertStringAnsi.Replace((LPCSTR)"\\", (LPCSTR)"\\\\");
 	pgresult = PQexec(getPGDBConnection(), (LPCSTR) csSqlInsertStringAnsi);
 	if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
 		tcout << _T("CSDataBaseMgr (storeString): Failing to insert the String ") << indexedToken.getTokStr().GetString() << _T(" in the database") <<  endl;
