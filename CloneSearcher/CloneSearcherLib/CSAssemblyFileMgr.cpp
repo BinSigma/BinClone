@@ -188,10 +188,10 @@ bool CCSAssemblyFileMgr::parseFolder(LPCTSTR folderPath, const CCSParam& param, 
 			tcout << _T("Error: failed to store filtered features ") << endl;
 			return false;	
 		}	
-	    if (!m_pDBMgr->preInsertInexact2Comb(m_mediansNZ, m_globalMedians, param) ) {
-			tcout << _T("Error: failed to pre-insert Inexact2Comb table") << endl;
-			return false;	
-        }
+	   /* if (!m_pDBMgr->preInsertInexact2Comb(m_mediansNZ, m_globalMedians, param) ) { 
+			//tcout << _T("Error: failed to pre-insert Inexact2Comb table") << endl;
+			//return false;	
+        }*/
 	}
 
     if(!bFirstScan) {  

@@ -53,12 +53,20 @@ public:
 
 	inline void setMinCoOccThreshold (double minCoOccThreshold) {m_minCoOccThreshold = minCoOccThreshold;};
 
+	bool setInitialVariables(const CCSParam& param); //mm
+
 private:
 	std::vector<std::vector<int>> m_scoreVector;  
 	CCSFeatureVector m_targetRegionVector;	// Target region feature vector determined from DB
 	CCSBoolArray m_targetpRegionBinaryVector;
 	CCSIntArray m_filteredFeatures;
 	double m_minCoOccThreshold;
+	//mm
+	int m_firstDBRegionIDInt;
+	int m_nTotalRegions;
+	CCSIntArray m_scoreArray;
+	CCSClones m_clones;
+
 
 	CCSAssemblyFile* m_assemblyFile;
 };

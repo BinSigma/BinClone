@@ -845,29 +845,29 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSI
         ASSERT(false);
         return false;
 	}    
-    const CCSBoolArray& binaryVector = region.getBinaryVector(); 
-    for (int i = 0; i < binaryVector.GetSize()-1; ++i) {
+	
+	CString csValues;
+	CString dbRegionIDString;
+	dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
+
+	const CCSBoolArray& binaryVector = region.getBinaryVector(); 
+	for (int i = 0; i < binaryVector.GetSize()-1; ++i) {
         for (int j = i + 1; j < binaryVector.GetSize(); ++j) {
-            CString parameterIDString; 
-            CString featAIDFKeyString;
-            CString featBIDFKeyString;
             CString featAPresentString;
             CString featBPresentString;
-			CString dbRegionIDString;
-            parameterIDString.Format(_T("%d"), param.m_dbParamID);
-            featAIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(i));
-            featBIDFKeyString.Format(_T("%d"), filteredFeatures.GetAt(j));
-			dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
-            CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(i), featAPresentString);
+			CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(i), featAPresentString);
             CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(j), featBPresentString);
-			CString csSqlCheckInexact = _T("UPDATE \"Inexact2Comb\" SET \"dbRegionID\" = \"dbRegionID\" || '#' || \'") + dbRegionIDString + _T(" \' where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
-            CStringA csSqlCheckInexactANSI;
-            if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
+			CString csSqlInsertInexact2Comb = _T("INSERT into \"Inexact2Comb\" VALUES(");
+			csValues.Format(_T("%d, %d, %d, \'%s\', \'%s\', \'%s\')"), param.m_dbParamID, filteredFeatures.GetAt(i), filteredFeatures.GetAt(j), featAPresentString, featBPresentString, dbRegionIDString);
+			csSqlInsertInexact2Comb += csValues;	
+					
+            CStringA csSqlInsertInexactANSI;
+            if (!CBFStrHelper::convertCStringToCStringA(csSqlInsertInexact2Comb, csSqlInsertInexactANSI)) {
                 tcout << _T("Failed to convert UNICODE string: ") << region.m_dbRegionID << endl;
                 ASSERT(false);
                 return false;
             }
-            pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);
+            pgresult = PQexec(getPGDBConnection(), csSqlInsertInexactANSI);
             if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
                 tcout << _T("CSDataBaseMgr (fetchInexactScore): Failing to fetch inexact score of region: ") << region.m_dbRegionID << _T(" from data base") <<  endl;
 				ASSERT(false);
@@ -883,82 +883,54 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSI
 // fills the score vector for each target region from DB by finding the regions in "Inexact2Comb Table"which are store in the same row as target region
 //
 bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& param)
-{    
+{   	
+	for (int k = 0; k < m_scoreVector.size(); ++k) // clean up score vector 
+		m_scoreVector[k][1] = 0;
 	PGresult *pgresult;
     if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
         tcout << _T("CSDataBaseMgr (fetchInexactScore): Bad Connection with the Server") <<  endl;
         ASSERT(false);
         return false;
     }	
-	// get the first dbRegionID value 
-	CStringA parameterID; 
-	parameterID.Format("%d", param.m_dbParamID);
-	CString fetchFilteredFeatures = _T("Select * from \"Region\" where \"ParamIDFKey\"= ");
-	fetchFilteredFeatures += parameterID;
-	fetchFilteredFeatures += _T("order by \"dbRegionID\" ");
-    CStringA fetchFilteredFeaturesANSI;
-    if (!CBFStrHelper::convertCStringToCStringA(fetchFilteredFeatures, fetchFilteredFeaturesANSI)) {
-        tcout << _T("Failed to convert UNICODE string: ") << fetchFilteredFeaturesANSI << endl;
-        ASSERT(false);
-        return false;
-    }	
-	pgresult = PQexec(getPGDBConnection(), fetchFilteredFeaturesANSI);
-	int nTotalRegions =PQntuples(pgresult);
-	CStringA firstDBRegionIDANSI;
-	if (nTotalRegions =! 0)
-		firstDBRegionIDANSI =PQgetvalue(pgresult,0,0);
-
-	CString firstDBRegionID;
-	if(!CBFStrHelper::convertCStringAToCString(firstDBRegionIDANSI, firstDBRegionID)) {
-		tcout << _T("Failed to convert ANSI to Unicode string:") << endl; 
-		ASSERT(false);
-		return false;                     
-    }
-	int firstDBRegionIDInt = CBFStrHelper::strToInt((LPCTSTR) firstDBRegionID);
-	CString InexactRegions;
-    for (int i = 0; i < m_targetpRegionBinaryVector.GetSize()-1; ++i) {
-        for (int j = i + 1; j < m_targetpRegionBinaryVector.GetSize(); ++j) {
-            CString parameterIDString; 
+	CString InexactMatch;
+	int InexactMatchInt;
+	CString parameterIDString; 
+	parameterIDString.Format(_T("%d"), param.m_dbParamID);	
+	for (int i = 0; i < m_targetpRegionBinaryVector.GetSize()-1; ++i) {
+        for (int j = i + 1; j < m_targetpRegionBinaryVector.GetSize(); ++j) {            			
             CString featAIDFKeyString;
             CString featBIDFKeyString;
             CString featAPresentString;
-            CString featBPresentString;
-			CString dbRegionIDString;
-            parameterIDString.Format(_T("%d"), param.m_dbParamID);
+            CString featBPresentString;         
             featAIDFKeyString.Format(_T("%d"), m_filteredFeatures.GetAt(i));
             featBIDFKeyString.Format(_T("%d"), m_filteredFeatures.GetAt(j));
-			dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
             CBFStrHelper::boolToStr(m_targetpRegionBinaryVector[i], featAPresentString);
             CBFStrHelper::boolToStr(m_targetpRegionBinaryVector[j], featBPresentString);
 			CString csSqlCheckInexact = _T("Select * from \"Inexact2Comb\" where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
             CStringA csSqlCheckInexactANSI;
             if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
-                tcout << _T("Failed to convert UNICODE string: ") << csSqlCheckInexact << endl;
+                tcout << _T("Failed to convert UNICODE string for fetching in Inexact2Comb: ") << csSqlCheckInexact << endl;
                 ASSERT(false);
                 return false;
             }
-            pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);          
-			
-			int pos = 2;
-            CString singleRegionDBIDString;
-            int singleRegionDBIDInt;
-            InexactRegions = PQgetvalue(pgresult, 0, 5);
-			CString resInexactRegion = InexactRegions.Tokenize(_T("#"), pos);
-			while (!resInexactRegion.IsEmpty()) {
-                singleRegionDBIDInt = CBFStrHelper::strToInt(resInexactRegion);
-				if (singleRegionDBIDInt < firstDBRegionIDInt) {
-					tcout << _T("stored dbRegionID are not stored coorectly in DB, remove the regions from DB and restore the regions into DB") << endl;
-					ASSERT(false);
-					return false;
-				}
-                m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][0] = singleRegionDBIDInt;
-                int mytemp = m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][1];
-				++ m_scoreVector[singleRegionDBIDInt-firstDBRegionIDInt][1];        
-				resInexactRegion = InexactRegions.Tokenize(_T("#"), pos);
-            }
+            pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);         
+
+			if (PQntuples(pgresult)) {
+				for (int m = 0; m < PQntuples(pgresult); m++) {
+					InexactMatch = PQgetvalue(pgresult, m, 5);
+					InexactMatchInt = CBFStrHelper::strToInt(InexactMatch);
+					if (InexactMatchInt < m_firstDBRegionIDInt) {
+						tcout << _T("stored dbRegionID are not stored coorectly in DB, remove the regions from DB and restore the regions into DB") << endl;
+						ASSERT(false);
+						return false;
+					}
+					m_scoreVector[InexactMatchInt-m_firstDBRegionIDInt][0] = InexactMatchInt;
+					++ m_scoreVector[InexactMatchInt-m_firstDBRegionIDInt][1]; 
+				}	
+			}
         }
-    }
-    PQclear(pgresult); 
+      PQclear(pgresult); 
+	}  
     return true;
 }
 
@@ -975,20 +947,16 @@ bool CCSDatabaseMgr::fetchInexactRegions(const CCSRegion& region, const CCSParam
 		ASSERT(false);
 		return false;
 	}
-
 	double actualminCoOccThreshold = 0.0; 
 	actualminCoOccThreshold = m_minCoOccThreshold* m_targetpRegionBinaryVector.GetSize() * (m_targetpRegionBinaryVector.GetSize() -1) /2; 
 	int inexactRegionDBID;
-	int mytemp = m_scoreVector.size();
-
-	for (int m = 0; m < m_scoreVector.size(); ++m) {
-       if (m_scoreVector[m][1] >= (int) actualminCoOccThreshold) {
-		   inexactRegionDBID = m_scoreVector[m][0];
-		
+	for (int m = 0; m < m_scoreVector.size(); ++m) {		
+		if (m_scoreVector[m][1] >= (int) actualminCoOccThreshold) {
+			int mytemp = m_scoreVector[m][1];
+			inexactRegionDBID = m_scoreVector[m][0];
 			CString fetchInexactRegion;
 			// the following returns the tupples needed for the 2nd constructor of CCSRegion
 			fetchInexactRegion.Format(_T("SELECT \"R\".\"FcnIDFkey\", \"F\".\"FileIdFKey\", \"R\".\"startIdx\", \"R\".\"endIdx\", \"R\".\"rawStartIdx\", \"R\".\"rawEndIdx\" from \"Region\" \"R\" JOIN \"Function\" \"F\" on (\"R\".\"FcnIDFkey\"=\"F\".\"dbFcnID\") where \"R\".\"dbRegionID\"=%d AND \"R\".\"ParamIDFKey\"=%d"), inexactRegionDBID, param.m_dbParamID);
-
 			CStringA fetchInexactRegionANSI;
 			if (!CBFStrHelper::convertCStringToCStringA(fetchInexactRegion, fetchInexactRegionANSI)) {
 				tcout << _T("Failed to convert UNICODE string: ") << fetchInexactRegion.GetString() << endl;
@@ -1014,15 +982,15 @@ bool CCSDatabaseMgr::fetchInexactRegions(const CCSRegion& region, const CCSParam
 				tcout << _T("Failed to convert ANSI to Unicode strings:") << FcnIDFkeyAnsi.GetString() << _T(", ") << FileIdFKeyAnsi.GetString() << _T(", ") << startIdxAnsi.GetString() << _T(", ") << endIdxAnsi.GetString() << rawStartIdxAnsi.GetString() << _T(", ") << rawEndIdxAnsi.GetString() << _T(", ") <<  endl; 
 				ASSERT(false);
 				return false;                     
-			}
+			}			
 			pNewRegion = new CCSRegion(inexactRegionDBID, CBFStrHelper::strToInt(FcnIDFkey.GetString()), CBFStrHelper::strToInt(FileIdFKey.GetString()), CBFStrHelper::strToInt(startIdx.GetString()), CBFStrHelper::strToInt(endIdx.GetString()), CBFStrHelper::strToInt(rawStartIdx.GetString()), CBFStrHelper::strToInt(rawEndIdx.GetString()));
 			if (!cloneRegions.addRegion(pNewRegion)) {
 				ASSERT(false);
 				return false;
 			}		
+			 PQclear(pgresult);
 	   }
-	}
-    //PQclear(pgresult);
+	}   
     return true;
 }
 
@@ -1341,3 +1309,58 @@ bool CCSDatabaseMgr::fetchImports(LPCTSTR tokStr, CCSIndexedTokens& indexedToken
 	PQclear(pgresult);
     return true;
 }
+
+//
+// set basic variables for inexact detection
+//
+bool CCSDatabaseMgr::setInitialVariables(const CCSParam& param)
+{	
+	PGresult* pgresult; // result of the last query	
+    if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+		tcout << _T("CSDataBaseMgr (fetchImports): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
+		ASSERT(false);
+		return false;
+	}
+	// get the first dbRegionID value 
+	CStringA parameterID; 
+	parameterID.Format("%d", param.m_dbParamID);
+	CString fetchFirstDBRegionID = _T("Select * from \"Region\" where \"ParamIDFKey\"= ");
+	fetchFirstDBRegionID += parameterID;
+	fetchFirstDBRegionID += _T("order by \"dbRegionID\" ");
+    CStringA fetchFirstDBRegionIDANSI;
+    if (!CBFStrHelper::convertCStringToCStringA(fetchFirstDBRegionID, fetchFirstDBRegionIDANSI)) {
+        tcout << _T("Failed to convert UNICODE string: ") << fetchFirstDBRegionIDANSI << endl;
+        ASSERT(false);
+        return false;
+    }	
+	pgresult = PQexec(getPGDBConnection(), fetchFirstDBRegionIDANSI);
+	m_scoreVector.resize(PQntuples(pgresult)); // Total number of regions
+	CStringA firstDBRegionIDANSI;
+	CStringA LastDBRegionIDANSI;
+	if (PQntuples(pgresult)) {
+		firstDBRegionIDANSI = PQgetvalue(pgresult,0,0);
+		LastDBRegionIDANSI  = PQgetvalue(pgresult,PQntuples(pgresult)-1,0);
+	}
+	CString firstDBRegionID;
+	if(!CBFStrHelper::convertCStringAToCString(firstDBRegionIDANSI, firstDBRegionID)) {
+		tcout << _T("Failed to convert ANSI to Unicode string:") << endl; 
+		ASSERT(false);
+		return false;                     
+    }
+	CString LastDBRegionID;
+	if(!CBFStrHelper::convertCStringAToCString(LastDBRegionIDANSI, LastDBRegionID)) {
+		tcout << _T("Failed to convert ANSI to Unicode string:") << endl; 
+		ASSERT(false);
+		return false;                     
+    }
+	int firstDBRegionIDInt = CBFStrHelper::strToInt((LPCTSTR) firstDBRegionID);
+	m_firstDBRegionIDInt = firstDBRegionIDInt;
+	int LastDBRegionIDINT = CBFStrHelper::strToInt((LPCTSTR) LastDBRegionID);
+		
+	for (int m = 0; m < m_scoreVector.size(); ++m) 
+		m_scoreVector[m].resize(2); 
+	
+	PQclear(pgresult);
+	return true;
+}
+

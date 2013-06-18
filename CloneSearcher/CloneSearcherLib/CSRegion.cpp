@@ -258,7 +258,7 @@ bool CCSRegions::addIfNewWithSort(CCSRegion* pNewRegion)
 void CCSRegions::cleanup()
 {
     for (int i = 0; i < GetSize(); ++i)
-        delete GetAt(i);
+        delete GetAt(i);	
 
     RemoveAll();
 }

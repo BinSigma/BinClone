@@ -334,9 +334,9 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 				
 				if (!pDBMgr->createTargetRegionBinaryVector(region, param))
 					return false;
-
-				if(!pDBMgr->constructScoreVector(param))
-					return false;
+				//mm
+				//if(!pDBMgr->constructScoreVector(param))
+				//	return false;
 
 				if (!pDBMgr->fetchInexactScore(region, param))
 			        return false;

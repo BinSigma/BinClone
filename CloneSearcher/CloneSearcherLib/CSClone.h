@@ -44,7 +44,9 @@ public:
     bool appendClones(const CCSClones& clones);
     void cleanup();
 
-    bool makeClones(const CCSRegion& tarRegion, const CCSRegions& srcRegions);    
+    bool makeClones(const CCSRegion& tarRegion, const CCSRegions& srcRegion);    
+	//mm
+	bool mymakeClones(const CCSRegion& tarRegion, const CCSRegion* srcRegions);    
     void printClones() const;
     bool sortByTarRawStart();
     bool unifyToLargestClones();

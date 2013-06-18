@@ -120,6 +120,31 @@ bool CCSClones::makeClones(const CCSRegion& tarRegion, const CCSRegions& srcRegi
     return true;
 }
 
+//mm
+
+bool CCSClones::mymakeClones(const CCSRegion& tarRegion, const CCSRegion* srcRegion)
+{
+    CCSClone* pNewClone = NULL;
+   // CCSRegion* pSrcRegion = NULL;
+    pNewClone = new CCSClone(srcRegion->m_dbRegionID, 
+                            srcRegion->m_dbFcnID, 
+                            srcRegion->m_dbFileID, 
+                            _T(""),                    // do not know the path yet.
+                            srcRegion->m_startIdx, 
+                            srcRegion->m_endIdx, 
+                            srcRegion->m_rawStartIdx, 
+                            srcRegion->m_rawEndIdx, 
+                            tarRegion.m_startIdx,
+                            tarRegion.m_endIdx,
+                            tarRegion.m_rawStartIdx,
+                            tarRegion.m_rawEndIdx);
+	if (!addClone(pNewClone))
+		return false;
+    
+    return true;
+}
+
+
 //
 // Print clones on the screen.
 //
