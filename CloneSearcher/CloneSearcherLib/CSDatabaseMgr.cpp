@@ -2,6 +2,8 @@
 #include "CSDatabaseMgr.h"
 
 CCSDatabaseMgr::CCSDatabaseMgr(LPCTSTR dbName, LPCTSTR dbUser, LPCTSTR dbPwd)
+	:m_nDBTotalRegions(0),
+		m_firstDBRegionIDInt(0)
 {
     // initiate a connection object
     // better dynamically allocate a connection object with a pointer.
@@ -723,10 +725,10 @@ bool CCSDatabaseMgr::preInsertInexact2Comb (const CCSIntArray& filteredFeatures,
 
 //
 // fetch the number of regions from DB to be used for inexact detection. Score vector shows the co occurenece of regions with a target region 
-//
+// (This functiin is disable from v20130617)
 bool CCSDatabaseMgr::constructScoreVector(const CCSParam& param)
 {
-	m_scoreVector.clear(); 
+
 	PGresult *pgresult;
     if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
         tcout << _T("CSDataBaseMgr (constructScoreVector): Bad Connection with the Server") <<  endl; // we could use PQreset, for the moment we go with this. 
@@ -747,7 +749,7 @@ bool CCSDatabaseMgr::constructScoreVector(const CCSParam& param)
 	pgresult = PQexec(getPGDBConnection(), fetchNRegionsANSI);
 
 	CString InexactRegions;
-	m_scoreVector.resize(PQntuples(pgresult));
+	m_scoreVector.resize(m_scoreVector.size());
 	for (int m = 0; m < m_scoreVector.size(); ++m)
 		m_scoreVector[m].resize(2); // keep track of co occurence 
 	PQclear(pgresult); 
@@ -873,19 +875,21 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSI
 				ASSERT(false);
 				return false;  
             }
+			PQclear(pgresult); 
 		}
-    }
-    PQclear(pgresult); 
+	}
     return true;
 }
 
 //
 // fills the score vector for each target region from DB by finding the regions in "Inexact2Comb Table"which are store in the same row as target region
-//
+
 bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& param)
 {   	
-	for (int k = 0; k < m_scoreVector.size(); ++k) // clean up score vector 
-		m_scoreVector[k][1] = 0;
+	m_scoreVector.resize(m_nDBTotalRegions);
+	for (int k = 0; k < m_scoreVector.size(); ++k)
+		m_scoreVector[k].resize(2);
+
 	PGresult *pgresult;
     if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
         tcout << _T("CSDataBaseMgr (fetchInexactScore): Bad Connection with the Server") <<  endl;
@@ -893,7 +897,7 @@ bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& 
         return false;
     }	
 	CString InexactMatch;
-	int InexactMatchInt;
+	int InexactMatchInt = 0;
 	CString parameterIDString; 
 	parameterIDString.Format(_T("%d"), param.m_dbParamID);	
 	for (int i = 0; i < m_targetpRegionBinaryVector.GetSize()-1; ++i) {
@@ -925,11 +929,11 @@ bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& 
 						return false;
 					}
 					m_scoreVector[InexactMatchInt-m_firstDBRegionIDInt][0] = InexactMatchInt;
-					++ m_scoreVector[InexactMatchInt-m_firstDBRegionIDInt][1]; 
-				}	
-			}
-        }
-      PQclear(pgresult); 
+					++ m_scoreVector[InexactMatchInt-m_firstDBRegionIDInt][1];  // increase the score of the found regions with the same key
+				}				
+			} 
+			PQclear(pgresult); 
+		}     
 	}  
     return true;
 }
@@ -949,7 +953,7 @@ bool CCSDatabaseMgr::fetchInexactRegions(const CCSRegion& region, const CCSParam
 	}
 	double actualminCoOccThreshold = 0.0; 
 	actualminCoOccThreshold = m_minCoOccThreshold* m_targetpRegionBinaryVector.GetSize() * (m_targetpRegionBinaryVector.GetSize() -1) /2; 
-	int inexactRegionDBID;
+	int inexactRegionDBID = 0;
 	for (int m = 0; m < m_scoreVector.size(); ++m) {		
 		if (m_scoreVector[m][1] >= (int) actualminCoOccThreshold) {
 			int mytemp = m_scoreVector[m][1];
@@ -988,9 +992,17 @@ bool CCSDatabaseMgr::fetchInexactRegions(const CCSRegion& region, const CCSParam
 				ASSERT(false);
 				return false;
 			}		
-			 PQclear(pgresult);
-	   }
+			PQclear(pgresult);
+		}
 	}   
+	for (int k = 0; k < m_scoreVector.size(); ++k){ // clean up score vector 
+		std::vector<int>().swap(m_scoreVector[k]);
+		m_scoreVector[k].shrink_to_fit();   
+		m_scoreVector[k].clear();
+	}	
+	std::vector<std::vector<int>>().swap(m_scoreVector);
+	m_scoreVector.shrink_to_fit();
+	m_scoreVector.clear();
     return true;
 }
 
@@ -1334,28 +1346,21 @@ bool CCSDatabaseMgr::setInitialVariables(const CCSParam& param)
         return false;
     }	
 	pgresult = PQexec(getPGDBConnection(), fetchFirstDBRegionIDANSI);
-	m_scoreVector.resize(PQntuples(pgresult)); // Total number of regions
 	CStringA firstDBRegionIDANSI;
 	CStringA LastDBRegionIDANSI;
 	if (PQntuples(pgresult)) {
-		firstDBRegionIDANSI = PQgetvalue(pgresult,0,0);
-		LastDBRegionIDANSI  = PQgetvalue(pgresult,PQntuples(pgresult)-1,0);
+		m_nDBTotalRegions = PQntuples(pgresult);
+		m_scoreVector.resize(m_nDBTotalRegions); // Total number of regions
+		firstDBRegionIDANSI = PQgetvalue(pgresult,0,0);		
 	}
 	CString firstDBRegionID;
 	if(!CBFStrHelper::convertCStringAToCString(firstDBRegionIDANSI, firstDBRegionID)) {
 		tcout << _T("Failed to convert ANSI to Unicode string:") << endl; 
 		ASSERT(false);
 		return false;                     
-    }
-	CString LastDBRegionID;
-	if(!CBFStrHelper::convertCStringAToCString(LastDBRegionIDANSI, LastDBRegionID)) {
-		tcout << _T("Failed to convert ANSI to Unicode string:") << endl; 
-		ASSERT(false);
-		return false;                     
-    }
+    }	
 	int firstDBRegionIDInt = CBFStrHelper::strToInt((LPCTSTR) firstDBRegionID);
 	m_firstDBRegionIDInt = firstDBRegionIDInt;
-	int LastDBRegionIDINT = CBFStrHelper::strToInt((LPCTSTR) LastDBRegionID);
 		
 	for (int m = 0; m < m_scoreVector.size(); ++m) 
 		m_scoreVector[m].resize(2); 

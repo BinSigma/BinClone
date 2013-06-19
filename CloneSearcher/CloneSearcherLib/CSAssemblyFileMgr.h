@@ -33,7 +33,7 @@ public:
     inline CCSOperandsMap* getOpMems() { return &m_opMems; };
     inline CCSOperandsMap* getOpRegs() { return &m_opRegs; };
     inline CCSOperandsMap* getOpVals() { return &m_opVals; };
- 
+		 
     // functions for manipulating reading assembly files
     bool openRawAssemblyFile(LPCTSTR assemblyFilePath);
     bool getRawAssemblyFileLineStr(CString& str);

@@ -52,8 +52,8 @@ public:
     bool fetchImports(LPCTSTR tokStr, CCSIndexedTokens& indexedTokens);
 
 	inline void setMinCoOccThreshold (double minCoOccThreshold) {m_minCoOccThreshold = minCoOccThreshold;};
-
-	bool setInitialVariables(const CCSParam& param); //mm
+	inline Int64u getNDBTotalRegions() {return m_nDBTotalRegions; }; 
+	bool setInitialVariables(const CCSParam& param); 
 
 private:
 	std::vector<std::vector<int>> m_scoreVector;  
@@ -61,12 +61,11 @@ private:
 	CCSBoolArray m_targetpRegionBinaryVector;
 	CCSIntArray m_filteredFeatures;
 	double m_minCoOccThreshold;
-	//mm
+	
 	int m_firstDBRegionIDInt;
-	int m_nTotalRegions;
-	CCSIntArray m_scoreArray;
+	Int64u m_nDBTotalRegions;	
 	CCSClones m_clones;
 
 
-	CCSAssemblyFile* m_assemblyFile;
+	CCSAssemblyFile* m_assemblyFile;	
 };

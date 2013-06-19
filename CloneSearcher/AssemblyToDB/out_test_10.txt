@@ -1,0 +1,9 @@
+Usage: AssemblyToDB <dbName> <dbUser> <dbPwd> <assemblyFolder> <regNormLevel>  <window size> <stride>
+Format: <dbName:string>
+        <dbUser:string>
+        <dbPwd:string>
+        <assemblyFolder:string>:input folder of assembly files, e.g., C:\temp\sample
+        <regNormLevel:boolean>:register normalization level with 4 possible values: REG, TYPE, IDXPTR, or BITS
+        <windowSize:integer>:window size, e.g., 5
+        <stride:integer>:step size, e.g., 1
+Input Error: invalid arguments
