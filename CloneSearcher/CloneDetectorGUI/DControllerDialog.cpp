@@ -5,7 +5,11 @@
 #include "CloneDetectorGUI.h"
 #include "DControllerDialog.h"
 #include "afxdialogex.h"
+#include <iostream>
+#include <fstream>
 
+//farhadi
+using namespace std;
 
 // CDControllerDialog dialog
 
@@ -86,7 +90,19 @@ UINT RunCDControllerThread( LPVOID pParam )
    catch (...) {
 	   AfxMessageBox(_T("Caught unknown exception while running Clone Dectector"),MB_ICONSTOP,0);
    }
-   pcdControllerDlg->PostMessage(WM_STOPCDCONTROL);   
+   pcdControllerDlg->PostMessage(WM_STOPCDCONTROL);  
+   //farhadi
+  
+	ofstream myfile;
+	time_t now = time(0);
+	char* dt = ctime(&now);
+	myfile.open ("C:\\Users\\farhadi\\Desktop\\GuiTime.txt");
+	myfile << "The local date and time is: " << dt ;
+	myfile.close();
+
+ 
+
+
    return 1;
 }
 

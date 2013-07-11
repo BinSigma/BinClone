@@ -1061,8 +1061,7 @@ bool CCSDatabaseMgr::storeConstant(CCSIndexedToken& indexedToken)
         if(PQresultStatus(pgresult) != PGRES_COMMAND_OK) { // PGRES_COMMAND_OK for a command which does not return tuples
             tcout << _T("CSDataBaseMgr (storeConstant): Failing to re-insert ") << indexedToken.getTokStr().GetString() << _T(" in the database") <<  endl;
 		    tcout << _T("with the transformed SQL query ") << csSqlInsertModifConstantAnsi.GetString() << _T(" in the database") <<  endl;       
-            ASSERT(false);
-		    return false;
+            ASSERT(false);		 
         }
         else
             tcout << _T("Succesfully inserted with:") << csSqlInsertModifConstantAnsi.GetString() << _T(" (slightly modified query)") <<  endl;    
@@ -1163,8 +1162,7 @@ bool CCSDatabaseMgr::storeString(CCSIndexedToken& indexedToken)
 		tcout << _T("CSDataBaseMgr (storeString): Failing to insert the String ") << indexedToken.getTokStr().GetString() << _T(" in the database") <<  endl;
         tcout << _T("If the String has more than 600 chars, then stringToken column type must be changed...") << endl; 
         cout << "INSERT COMMAND IS : " << csSqlInsertStringAnsi.GetString() << " ;" << endl;
-		ASSERT(false);
-		return false;
+		ASSERT(false);		
 	} 
 	PQclear(pgresult);
     return true;
@@ -1259,8 +1257,7 @@ bool CCSDatabaseMgr::storeImport(CCSIndexedToken& indexedToken)
 		tcout << _T("CSDataBaseMgr (storeImport): Failing to insert the Import ") << indexedToken.getTokStr().GetString() << _T(" in the database") <<  endl;
         tcout << _T("If the Import has more than 600 chars, then importToken column type must be changed...") << endl; 
         cout << "INSERT COMMAND IS : " << csSqlInsertImportAnsi.GetString() << " ;" << endl;
-		ASSERT(false);
-		return false;
+		ASSERT(false);		
 	} 
 	PQclear(pgresult);
     return true;

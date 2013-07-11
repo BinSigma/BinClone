@@ -30,7 +30,7 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE "Constant" (
-    "constantToken" character varying(600),
+    "constantToken" text,
     "rawLineNum" integer,
     "dbFileID" integer
 );
@@ -58,7 +58,7 @@ ALTER TABLE public."Feature" OWNER TO postgres;
 
 CREATE TABLE "File" (
     "dbFileID" integer NOT NULL,
-    "filePath" character varying(60),
+    "filePath" character varying(120),
     "ParamIDFKey" integer
 );
 
@@ -158,7 +158,7 @@ SELECT pg_catalog.setval('"Function_dbFcnID_seq"', 2220, true);
 --
 
 CREATE TABLE "Import" (
-    "importToken" character varying(600),
+    "importToken" text,
     "rawLineNum" integer,
     "dbFileID" integer
 );
@@ -275,7 +275,7 @@ SELECT pg_catalog.setval('"Region_dbRegionID_seq"', 45496, true);
 --
 
 CREATE TABLE "String" (
-    "stringToken" character varying(600),
+    "stringToken" text,
     "rawLineNum" integer,
     "dbFileID" integer
 );
