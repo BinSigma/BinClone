@@ -130,14 +130,7 @@ BOOL CCloneDetectorGUIApp::InitInstance()
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
 	CMultiDocTemplate* pDocTemplate;
-	/* CLONEFIND
-    pDocTemplate = new CMultiDocTemplate(IDR_CloneDetectorGUTYPE,
-		RUNTIME_CLASS(CCloneDetectorGUIDoc),
-		RUNTIME_CLASS(CChildFrame), // custom MDI child frame
-		RUNTIME_CLASS(CCloneDetectorGUIView));
-	if (!pDocTemplate) 
-		return FALSE;
-		*/
+	
     pDocTemplate = new CMultiDocTemplate(IDR_MAINFRAME, //IDR_CloneDetectorGUTYPE,
 		RUNTIME_CLASS(ClonePairsAsmDoc),
 		RUNTIME_CLASS(ClonePairsAsmFrame), // custom MDI child frame
@@ -145,12 +138,7 @@ BOOL CCloneDetectorGUIApp::InitInstance()
 	if (!pDocTemplate) 
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
-	/* clonefind
-	m_pDocTemplateClonePairsAsm = new CMultiDocTemplate(IDR_CLONE_PAIR_MENU, //IDR_CloneDetectorGUTYPE,
-		RUNTIME_CLASS(ClonePairsAsmDoc),
-		RUNTIME_CLASS(ClonePairsAsmFrame), // custom MDI child frame
-		RUNTIME_CLASS(ClonePairsAsmView));
-		*/
+	
 	m_pDocTemplateTokenRef = new CMultiDocTemplate(IDR_MAINFRAME, //IDR_TOKEN_REF_MENU,
 		RUNTIME_CLASS(CTokenRefDoc),
 		RUNTIME_CLASS(CTokenRefFrm), // custom MDI child frame
@@ -167,10 +155,9 @@ BOOL CCloneDetectorGUIApp::InitInstance()
 	
 	// call DragAcceptFiles only if there's a suffix
 	//  In an MDI app, this should occur immediately after setting m_pMainWnd
-
 	
 	pMainFrame->ShowWindow(m_nCmdShow);
-	//pMainFrame->ShowWindow(SW_SHOWMAXIMIZED);
+	
 	pMainFrame->UpdateWindow();
 	
 	return TRUE;

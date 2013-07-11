@@ -91,3 +91,45 @@ protected:
 };
 
 
+
+
+// ClonePairsTreeView view
+
+class ClonePairsTreeView : public CTreeView
+{
+	DECLARE_DYNCREATE(ClonePairsTreeView)
+
+	typedef struct groupClonePair{
+		CString itemString;
+		int     clonePairsPos;
+	} groupClonePair;
+
+	typedef std::map<HTREEITEM,int>  hItemClonePairsRefMap_t;
+
+protected:
+	ClonePairsTreeView();           // protected constructor used by dynamic creation
+	virtual ~ClonePairsTreeView();
+
+public:
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+#ifndef _WIN32_WCE
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+#endif
+
+	ClonePairsAsmDoc* GetDocument() const;
+
+protected:
+	DECLARE_MESSAGE_MAP()
+public:
+	virtual void OnInitialUpdate();
+
+private:
+	hItemClonePairsRefMap_t   m_clonePairsLineMap;
+public:
+	afx_msg void OnTvnItemChanged(NMHDR *pNMHDR, LRESULT *pResult);
+	void selectedLine(unsigned int p_line);
+};
+
+

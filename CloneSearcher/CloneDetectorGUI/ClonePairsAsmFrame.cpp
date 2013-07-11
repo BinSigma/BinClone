@@ -81,7 +81,8 @@ BOOL ClonePairsAsmFrame::OnCreateClient(LPCREATESTRUCT /*lpcs*/, CCreateContext*
 	// now add the ClonePairsList at the buttom window
 	if (!m_wndSplitter.CreateView(1, 0,
 		// RUNTIME_CLASS(ClonePairsAsmView), CSize(0, 0), pContext))
-        RUNTIME_CLASS(ClonePairsListView), CSize(0, 0), pContext)) // v2.0
+        //RUNTIME_CLASS(ClonePairsListView), CSize(0, 0), pContext)) // v2.0
+		RUNTIME_CLASS(ClonePairsTreeView), CSize(0, 0), pContext)) // v2.1
 	{
 		TRACE0("Failed to create first pane\n");
 		return FALSE;
@@ -158,7 +159,7 @@ bool ClonePairsAsmFrame::init()
 			//dbName = "CSDataBase"; dbUser = "postgres"; dbPwd = "benfung";
 
 			CDControllerDialog cdControlDlg;
-			m_targetFilePathAndName = newDetectDlg.m_targetAsmFile; // "Z:\\Security20121108b\\exp\\Data02\\btwhidcs.asm";
+			m_targetFilePathAndName = newDetectDlg.m_targetAsmFile;
 			m_csController = new CCSController( dbName, dbUser, dbPwd);
 			cdControlDlg.init(m_csController, m_targetFilePathAndName,bfindExact,bfindInExact,occurrenceThrs,dbParamId,m_pClones);
 

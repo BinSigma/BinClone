@@ -187,15 +187,17 @@ void ClonePairsAsmView::OnLButtonDown(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 
 	CRichEditView::OnLButtonDown(nFlags, point);
-
+	
 	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
 	
 	if( m_isListView)
 	{
 	    int line = 0;
 	    line = GetRichEditCtrl().LineFromChar(-1);
+		/*
 		ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
 		pFrame->selectedParticularLine(line);
+		*/
 		CString frameText;
 		int id = pFrame->getCurId();
 		CString xml = pFrame->getXMLFile();
@@ -205,6 +207,7 @@ void ClonePairsAsmView::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 	
 	pFrame->SetWindowText(m_filename); 
+	
 }
 
 void ClonePairsAsmView::highLightLines(int p_begin, int p_end)
@@ -641,7 +644,7 @@ void ClonePairsAsmView::SyncScroll(UINT nSBCode, int pos)
 		else
 			pos = prev_pos - pos;
 		
-		SendMessage(WM_VSCROLL,MAKEWPARAM(nSBCode,pos,0));
+		SendMessage(WM_VSCROLL,MAKEWPARAM(nSBCode,pos),0);
 	}
 	else
 	{
@@ -698,4 +701,226 @@ void ClonePairsAsmView::KeySynchro( UINT nChar)
             CRichEditView::OnVScroll(SB_PAGEDOWN, 0, NULL);
             break;
 	}
+}
+
+// ClonePairsTreeView
+
+IMPLEMENT_DYNCREATE(ClonePairsTreeView, CTreeView)
+
+ClonePairsTreeView::ClonePairsTreeView()
+{
+
+}
+
+ClonePairsTreeView::~ClonePairsTreeView()
+{
+}
+
+ClonePairsAsmDoc* ClonePairsTreeView::GetDocument() const // non-debug version is inline
+{
+	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(ClonePairsAsmDoc)));
+	return (ClonePairsAsmDoc*)m_pDocument;
+}
+
+BEGIN_MESSAGE_MAP(ClonePairsTreeView, CTreeView)
+	ON_NOTIFY_REFLECT(TVN_ITEMCHANGED, &ClonePairsTreeView::OnTvnItemChanged)
+END_MESSAGE_MAP()
+
+
+// ClonePairsTreeView diagnostics
+
+#ifdef _DEBUG
+void ClonePairsTreeView::AssertValid() const
+{
+	CTreeView::AssertValid();
+}
+
+#ifndef _WIN32_WCE
+void ClonePairsTreeView::Dump(CDumpContext& dc) const
+{
+	CTreeView::Dump(dc);
+}
+#endif
+#endif //_DEBUG
+
+
+// ClonePairsTreeView message handlers
+
+
+void ClonePairsTreeView::OnInitialUpdate()
+{
+	CTreeView::OnInitialUpdate();
+
+	CTreeView::OnInitialUpdate();
+	CTreeCtrl & mytreectrl  = GetTreeCtrl();
+	mytreectrl.ModifyStyle ( 0, TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT);
+
+	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+	pFrame->ShowWindow(SW_SHOWMAXIMIZED);
+	pFrame->setCurSelLine(-1);
+
+	ClonePairsAsmDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	// group the items with the same src file
+	std::multimap<CString,groupClonePair> srcFileMap;
+
+	const CCSClones* pcsClones = pDoc->m_pClones;
+	for (int c = 0; c < pcsClones->GetSize(); ++c)
+	{
+		CString tmp(_T(""));
+		CString srcFile = pcsClones->GetAt(c)->m_srcFilePath; 
+		srcFile	= srcFile.Mid(srcFile.ReverseFind(_TCHAR('\\'))+1);
+		int iRow = srcFileMap.count(srcFile) + 1;
+
+		tmp.Format(_T(" [%2d] target  start=\"%6d\"   end=\"%6d\"          source: %s   start=\"%6d\"     end=\"%6d\""),
+		          iRow,
+				  pcsClones->GetAt(c)->m_tarRawStart,
+				  pcsClones->GetAt(c)->m_tarRawEnd,
+				  srcFile,
+				  pcsClones->GetAt(c)->m_srcRawStart,
+				  pcsClones->GetAt(c)->m_srcRawEnd);
+
+		groupClonePair item = {tmp,c};
+		srcFileMap.insert(std::make_pair(srcFile,item));
+	}
+
+	// Now populate the items to the tree view based on the files groups
+	auto mapIter = srcFileMap.begin();
+	auto endIter = srcFileMap.end();
+	std::multimap<CString,groupClonePair>::iterator mapIter_s;
+	for( ; mapIter != endIter; mapIter = mapIter_s)
+	{
+		CString thisFileGroup = (*mapIter).first;
+		std::pair<std::multimap<CString,groupClonePair>::iterator,
+			      std::multimap<CString,groupClonePair>::iterator> keyRange = 
+				                                 srcFileMap.equal_range(thisFileGroup);
+		CString groupFile(_T(""));
+	    groupFile.Format(_T("Clone Search Source file:      \"%s\""),thisFileGroup);
+	    HTREEITEM groupFileHitem = mytreectrl.InsertItem(groupFile);
+		for(mapIter_s = keyRange.first; mapIter_s != keyRange.second; ++mapIter_s)
+		{
+			//CString str = (*mapIter_s).second.itemString;
+			HTREEITEM refHitem = mytreectrl.InsertItem((*mapIter_s).second.itemString,groupFileHitem);
+			m_clonePairsLineMap.insert(std::make_pair(refHitem,(*mapIter_s).second.clonePairsPos));
+		}
+	}
+
+	pFrame->setNumOfClonePairs(pcsClones->GetSize());
+}
+
+
+void ClonePairsTreeView::OnTvnItemChanged(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	NMTVITEMCHANGE *pNMTVItemChange = reinterpret_cast<NMTVITEMCHANGE*>(pNMHDR);
+	
+	CTreeCtrl & mytreectrl  = GetTreeCtrl();
+	HTREEITEM hItem = mytreectrl.GetSelectedItem();
+	if ((hItem != NULL) && !mytreectrl.ItemHasChildren(hItem))
+	{
+		hItemClonePairsRefMap_t::iterator itr = m_clonePairsLineMap.find(hItem);
+		if( itr != m_clonePairsLineMap.end())
+		{
+			int line(itr->second);
+
+			ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+		
+			if( pFrame)
+			{
+				int curline = pFrame->getCurSelLine();
+				int numCP = pFrame->getNumOfClonePairs();
+				if( (line != curline) && 
+					(line < numCP))
+				{
+					selectedLine(line);
+					//highLightLines(line,line);
+					pFrame->setCurSelLine(line);
+				}
+				CString itemText(mytreectrl.GetItemText(hItem));	
+				pFrame->SetWindowText(itemText);			
+			}
+		}		
+	}
+
+	*pResult = 0;
+}
+
+void ClonePairsTreeView::selectedLine(unsigned int p_line)
+{
+	ClonePairsAsmDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	CCSController * pController = pDoc->m_csController; 
+	if( !pController)
+	{
+        AfxMessageBox(_T("CCSController is not valid."), MB_ICONSTOP, 0);					
+		return;
+    }
+
+	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+
+	const CCSClones* pcsClones = pDoc->m_pClones;
+	CString srcFile = pcsClones->GetAt(p_line)->m_srcFilePath; 
+    CString tarContent, srcContent;
+
+	if( pDoc->m_currentTarFilePathAndName != pDoc->m_targetFilePathAndName)
+	{
+		// Get the content of target file
+		if (!pController->openRawAssemblyFile(pDoc->m_targetFilePathAndName))
+		{
+			CString error;
+			error.Format(_T("%s is not found!"),pDoc->m_targetFilePathAndName);
+			AfxMessageBox(error, MB_ICONSTOP,0);
+			PostMessage(WM_CLOSE);
+			return;  // error
+		}
+
+		pDoc->m_currentTarFilePathAndName = pDoc->m_targetFilePathAndName;
+
+		int lineIdx = 0;
+		CString lineStr, lineText;
+		while (pController->getRawAssemblyFileLineStr(lineStr)) 
+		{
+			lineText.Format(_T("%5d: %s\n"), lineIdx++, lineStr);
+			tarContent += lineText;
+		}
+
+		pController->closeRawAssemblyFile();
+		pFrame->displayTarAsmContents(pDoc->m_targetFilePathAndName,tarContent);
+	}
+
+	if( pDoc->m_currentSrcFilePathAndName != srcFile)
+	{	
+		// Get the content of source file
+		if (!pController->openRawAssemblyFile(srcFile))
+		{
+			CString error;
+			error.Format(_T("%s is not found!"),srcFile);
+			AfxMessageBox(error, MB_ICONSTOP,0);
+			PostMessage(WM_CLOSE);
+			return;  // error
+		}
+
+		pDoc->m_currentSrcFilePathAndName = srcFile;
+
+		int lineIdx = 0;
+		CString lineStr, lineText;
+		while (pController->getRawAssemblyFileLineStr(lineStr)) 
+		{
+			lineText.Format(_T("%5d: %s\n"), lineIdx++, lineStr);
+			srcContent += lineText;
+		}
+        
+		pController->closeRawAssemblyFile();
+		pFrame->displaySrcAsmContents(srcFile,srcContent);
+	}
+
+	pFrame->fillSelectedClonePairsOnViews2(p_line, 
+		                                   pcsClones->GetAt(p_line)->m_tarRawStart,pcsClones->GetAt(p_line)->m_tarRawEnd,
+		                                   pcsClones->GetAt(p_line)->m_srcRawStart,pcsClones->GetAt(p_line)->m_srcRawEnd);
+	return;
 }
