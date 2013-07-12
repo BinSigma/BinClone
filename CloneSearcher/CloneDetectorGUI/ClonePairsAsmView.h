@@ -127,9 +127,12 @@ public:
 
 private:
 	hItemClonePairsRefMap_t   m_clonePairsLineMap;
+	HTREEITEM                 m_prevHItem;
+
 public:
 	afx_msg void OnTvnItemChanged(NMHDR *pNMHDR, LRESULT *pResult);
 	void selectedLine(unsigned int p_line);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
 
 

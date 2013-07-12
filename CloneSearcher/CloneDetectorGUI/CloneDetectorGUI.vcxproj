@@ -117,7 +117,6 @@
     <ClInclude Include="CloneDetectorGUIDoc.h" />
     <ClInclude Include="CloneDetectorGUIView.h" />
     <ClInclude Include="CloneFiles.h" />
-    <ClInclude Include="ClonePairListCtrl.h" />
     <ClInclude Include="ClonePairsAsmDoc.h" />
     <ClInclude Include="ClonePairsAsmFrame.h" />
     <ClInclude Include="ClonePairsAsmView.h" />
@@ -137,7 +136,6 @@
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="CloneDetectorGUI.cpp" />
     <ClCompile Include="CloneFiles.cpp" />
-    <ClCompile Include="ClonePairListCtrl.cpp" />
     <ClCompile Include="ClonePairsAsmDoc.cpp" />
     <ClCompile Include="ClonePairsAsmFrame.cpp" />
     <ClCompile Include="ClonePairsAsmView.cpp" />

@@ -66,9 +66,6 @@
     <ClInclude Include="CloneFiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ClonePairListCtrl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
@@ -117,9 +114,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CloneFiles.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ClonePairListCtrl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClonePairsAsmFrame.cpp">

@@ -724,6 +724,7 @@ ClonePairsAsmDoc* ClonePairsTreeView::GetDocument() const // non-debug version i
 
 BEGIN_MESSAGE_MAP(ClonePairsTreeView, CTreeView)
 	ON_NOTIFY_REFLECT(TVN_ITEMCHANGED, &ClonePairsTreeView::OnTvnItemChanged)
+	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -753,7 +754,7 @@ void ClonePairsTreeView::OnInitialUpdate()
 
 	CTreeView::OnInitialUpdate();
 	CTreeCtrl & mytreectrl  = GetTreeCtrl();
-	mytreectrl.ModifyStyle ( 0, TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT);
+	mytreectrl.ModifyStyle ( 0, TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS);
 
 	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
 	pFrame->ShowWindow(SW_SHOWMAXIMIZED);
@@ -809,13 +810,14 @@ void ClonePairsTreeView::OnInitialUpdate()
 	}
 
 	pFrame->setNumOfClonePairs(pcsClones->GetSize());
+	m_prevHItem = NULL;
 }
 
 
 void ClonePairsTreeView::OnTvnItemChanged(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	NMTVITEMCHANGE *pNMTVItemChange = reinterpret_cast<NMTVITEMCHANGE*>(pNMHDR);
-	
+	/*
 	CTreeCtrl & mytreectrl  = GetTreeCtrl();
 	HTREEITEM hItem = mytreectrl.GetSelectedItem();
 	if ((hItem != NULL) && !mytreectrl.ItemHasChildren(hItem))
@@ -834,8 +836,23 @@ void ClonePairsTreeView::OnTvnItemChanged(NMHDR *pNMHDR, LRESULT *pResult)
 				if( (line != curline) && 
 					(line < numCP))
 				{
-					selectedLine(line);
+					//selectedLine(line);
 					//highLightLines(line,line);
+
+					if( m_prevHItem != NULL)
+					{
+						mytreectrl.SetItemState(m_prevHItem,0,TVIS_BOLD);
+						//m_prevHItemState = mytreectrl.GetItemState(m_prevHItem,TVIS_BOLD);
+						//mytreectrl.Invalidate();
+					}
+					selectedLine(line);
+
+					m_prevHItem = hItem;
+					m_prevHItemState = mytreectrl.GetItemState(hItem,TVIS_BOLD);
+		
+					mytreectrl.SetItemState(hItem,TVIS_BOLD,TVIS_BOLD);
+					//mytreectrl.Invalidate();
+
 					pFrame->setCurSelLine(line);
 				}
 				CString itemText(mytreectrl.GetItemText(hItem));	
@@ -843,6 +860,7 @@ void ClonePairsTreeView::OnTvnItemChanged(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 		}		
 	}
+	*/
 
 	*pResult = 0;
 }
@@ -923,4 +941,45 @@ void ClonePairsTreeView::selectedLine(unsigned int p_line)
 		                                   pcsClones->GetAt(p_line)->m_tarRawStart,pcsClones->GetAt(p_line)->m_tarRawEnd,
 		                                   pcsClones->GetAt(p_line)->m_srcRawStart,pcsClones->GetAt(p_line)->m_srcRawEnd);
 	return;
+}
+
+
+void ClonePairsTreeView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CTreeView::OnLButtonDown(nFlags, point);
+
+	CTreeCtrl & mytreectrl  = GetTreeCtrl();
+	HTREEITEM hItem = mytreectrl.GetSelectedItem();
+	if ((hItem != NULL) && !mytreectrl.ItemHasChildren(hItem))
+	{
+		hItemClonePairsRefMap_t::iterator itr = m_clonePairsLineMap.find(hItem);
+		if( itr != m_clonePairsLineMap.end())
+		{
+			int line(itr->second);
+
+			ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+		
+			if( pFrame)
+			{
+				int curline = pFrame->getCurSelLine();
+				int numCP = pFrame->getNumOfClonePairs();
+				if( (line != curline) && 
+					(line < numCP))
+				{
+					selectedLine(line);					
+					if( m_prevHItem != NULL)
+					{
+						mytreectrl.SetItemState(m_prevHItem,0,TVIS_BOLD);
+					}				
+					m_prevHItem = hItem;		
+					mytreectrl.SetItemState(hItem,TVIS_BOLD,TVIS_BOLD);
+					pFrame->setCurSelLine(line);
+				}
+				CString itemText(mytreectrl.GetItemText(hItem));	
+				pFrame->SetWindowText(itemText);			
+			}
+		}		
+	}
 }

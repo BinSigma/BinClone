@@ -59,7 +59,7 @@ protected:
 
 protected:
 	CloneFiles         m_CloneFiles;
-	CClonePairListCtrl m_ListCtrl;
+	//CClonePairListCtrl m_ListCtrl;
 	SearchTokenDlg     m_searchTokenDlg;
 
 public:
