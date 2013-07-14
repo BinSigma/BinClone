@@ -151,6 +151,7 @@ BEGIN_MESSAGE_MAP(ClonePairsAsmView, CRichEditView)
 	ON_WM_MOUSEHWHEEL()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_KEYDOWN()
+	ON_MESSAGE(ID_MENU_RESYNC,OnMenuResync)
 END_MESSAGE_MAP()
 
 
@@ -703,6 +704,14 @@ void ClonePairsAsmView::KeySynchro( UINT nChar)
 	}
 }
 
+LRESULT ClonePairsAsmView::OnMenuResync(WPARAM, LPARAM)
+{
+	ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+	pFrame->ReSyncScroll();
+	return 1;
+}
+
+
 // ClonePairsTreeView
 
 IMPLEMENT_DYNCREATE(ClonePairsTreeView, CTreeView)
@@ -965,8 +974,8 @@ void ClonePairsTreeView::OnLButtonDown(UINT nFlags, CPoint point)
 			{
 				int curline = pFrame->getCurSelLine();
 				int numCP = pFrame->getNumOfClonePairs();
-				if( (line != curline) && 
-					(line < numCP))
+				//if( (line != curline) && 
+				if(line < numCP)
 				{
 					selectedLine(line);					
 					if( m_prevHItem != NULL)
@@ -983,3 +992,53 @@ void ClonePairsTreeView::OnLButtonDown(UINT nFlags, CPoint point)
 		}		
 	}
 }
+
+void ClonePairsTreeView::Next()
+{
+	/*
+	if (m_prevHItem != NULL)
+	{
+		ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+		if( pFrame)
+		{
+			auto itor = m_clonePairsLineMap.find(m_prevHItem);
+			if( itor != m_clonePairsLineMap.end())
+			{
+				CTreeCtrl & mytreectrl  = GetTreeCtrl();
+				itor++;
+				if( itor == m_clonePairsLineMap.end())
+				{
+					itor = m_clonePairsLineMap.begin();
+				}
+				
+				int line(itor->second);
+				if(line < (int)pFrame->getNumOfClonePairs())
+				{
+					selectedLine(line);										
+					mytreectrl.SetItemState(m_prevHItem,0,TVIS_BOLD);	
+					m_prevHItem = itor->first;		
+					mytreectrl.SetItemState(itor->first,TVIS_BOLD,TVIS_BOLD);
+					pFrame->setCurSelLine(line);
+				}				
+				CString itemText(mytreectrl.GetItemText(itor->first));	
+				pFrame->SetWindowText(itemText);
+			}
+		}
+	}
+	*/
+}
+
+void ClonePairsTreeView::ReSyncScroll(ClonePairsAsmFrame* pFrame)
+{
+	int curline = pFrame->getCurSelLine();
+	int numCP = pFrame->getNumOfClonePairs();
+	
+	if(curline < numCP)
+	{
+		selectedLine(curline);					
+	}				
+}
+
+
+
+

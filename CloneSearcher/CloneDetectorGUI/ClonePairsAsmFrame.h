@@ -34,6 +34,7 @@ public:
 	void SyncVWScroll(int fromView, UINT nFlags, short zDelta, CPoint pt);
 	void KeySynchro(int fromView, UINT nChar);
 	void KeySynchro(int fromView, UINT nChar, UINT nRepCnt, UINT nFlags);
+	void ReSyncScroll();
 		                                
 	bool selectedParticularLine(int p_line);
 	CString & getXMLFile(){ return m_xmlFile;}

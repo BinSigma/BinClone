@@ -275,6 +275,11 @@ bool ClonePairsAsmFrame::fillSelectedClonePairsOnViews2(int listLine, int tarSta
 	return true;
 }
 
+void ClonePairsAsmFrame::ReSyncScroll()
+{
+	ClonePairsTreeView* pViewList = (ClonePairsTreeView*)m_wndSplitter.GetPane(1,0);
+	pViewList->ReSyncScroll(this);
+}
 
 void ClonePairsAsmFrame::OnViewNext()
 {
@@ -282,6 +287,12 @@ void ClonePairsAsmFrame::OnViewNext()
 	if( m_numOfClonePairs <= 0)
 		return;
 
+	// version 2.1
+	ClonePairsTreeView* pViewList = (ClonePairsTreeView*)m_wndSplitter.GetPane(1,0);
+	pViewList->Next();
+
+
+#if 0
 	int tmp = m_currentLine;
 	//if( (tmp < 0) || ( tmp >= (int) m_pCurSelCloneFile.getNumberOfClonePairs()-1))
 	if( (tmp < 0) || ( tmp >= (int) m_numOfClonePairs-1))
@@ -307,7 +318,7 @@ void ClonePairsAsmFrame::OnViewNext()
 	    m_currentLine = tmp;
 	}
 	*/
-	
+#endif	
 }
 
 

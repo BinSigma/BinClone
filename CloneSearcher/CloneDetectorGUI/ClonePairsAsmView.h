@@ -3,6 +3,7 @@
 #include "..\..\CloneSearcher\CloneSearcherLib\CSController.h"
 #include "CloneFiles.h"
 #include "ClonePairsAsmDoc.h"
+#include "ClonePairsAsmFrame.h"
 
 
 // ClonePairsAsmView view
@@ -66,6 +67,7 @@ public:
 	afx_msg void OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	//afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	LRESULT OnMenuResync(WPARAM, LPARAM);
 };
 
 class ClonePairsListView :public ClonePairsAsmView
@@ -119,11 +121,13 @@ public:
 #endif
 
 	ClonePairsAsmDoc* GetDocument() const;
+	void ReSyncScroll(ClonePairsAsmFrame* pFrame);
 
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual void OnInitialUpdate();
+	void Next();
 
 private:
 	hItemClonePairsRefMap_t   m_clonePairsLineMap;
