@@ -327,8 +327,11 @@ void ClonePairsAsmFrame::OnViewPrevious()
 	if( m_numOfClonePairs <= 0)
 		return;
 
-	// TODO: Add your command handler code here
-		// get the current lines to display
+		// version 2.1
+	ClonePairsTreeView* pViewList = (ClonePairsTreeView*)m_wndSplitter.GetPane(1,0);
+	pViewList->Previous();
+
+#if 0
 	int tmp = m_currentLine;
 	if( tmp < 0) 
 	{
@@ -352,14 +355,13 @@ void ClonePairsAsmFrame::OnViewPrevious()
 	pViewList->highLightLines(tmp,tmp);
 	m_currentLine = tmp;
 
-
 	/*
 	if( fillSelectedClonePairsOnViews(tmp))
 	{
 	    m_currentLine = tmp;
 	}
 	*/
-
+#endif
 
 }
 

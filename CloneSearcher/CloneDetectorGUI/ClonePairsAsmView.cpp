@@ -810,12 +810,31 @@ void ClonePairsTreeView::OnInitialUpdate()
 		CString groupFile(_T(""));
 	    groupFile.Format(_T("Clone Search Source file:      \"%s\""),thisFileGroup);
 	    HTREEITEM groupFileHitem = mytreectrl.InsertItem(groupFile);
+		int prevLine = -1;
+		int firstLine = -1;
+		int lastLine = -1;
 		for(mapIter_s = keyRange.first; mapIter_s != keyRange.second; ++mapIter_s)
 		{
-			//CString str = (*mapIter_s).second.itemString;
+			int curLine = (*mapIter_s).second.clonePairsPos;
+
+			if(prevLine != -1 ) {
+				m_prevNextPairsMap[prevLine].next = curLine;
+			} else {
+				firstLine = curLine;
+			}
+
 			HTREEITEM refHitem = mytreectrl.InsertItem((*mapIter_s).second.itemString,groupFileHitem);
-			m_clonePairsLineMap.insert(std::make_pair(refHitem,(*mapIter_s).second.clonePairsPos));
+			m_clonePairsLineMap.insert(std::make_pair(refHitem,curLine));
+
+			// initialize the Previous/Next map
+			prevNextPair_t pn = { refHitem, prevLine, -1};
+			m_prevNextPairsMap[curLine] = pn;
+
+			prevLine = curLine;
 		}
+		// connect the first.prev to last and last.next to first 
+		m_prevNextPairsMap[firstLine].prev = prevLine;
+		m_prevNextPairsMap[prevLine].next = firstLine;
 	}
 
 	pFrame->setNumOfClonePairs(pcsClones->GetSize());
@@ -995,37 +1014,52 @@ void ClonePairsTreeView::OnLButtonDown(UINT nFlags, CPoint point)
 
 void ClonePairsTreeView::Next()
 {
-	/*
 	if (m_prevHItem != NULL)
 	{
 		ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
 		if( pFrame)
 		{
-			auto itor = m_clonePairsLineMap.find(m_prevHItem);
-			if( itor != m_clonePairsLineMap.end())
-			{
-				CTreeCtrl & mytreectrl  = GetTreeCtrl();
-				itor++;
-				if( itor == m_clonePairsLineMap.end())
-				{
-					itor = m_clonePairsLineMap.begin();
-				}
-				
-				int line(itor->second);
-				if(line < (int)pFrame->getNumOfClonePairs())
-				{
-					selectedLine(line);										
-					mytreectrl.SetItemState(m_prevHItem,0,TVIS_BOLD);	
-					m_prevHItem = itor->first;		
-					mytreectrl.SetItemState(itor->first,TVIS_BOLD,TVIS_BOLD);
-					pFrame->setCurSelLine(line);
-				}				
-				CString itemText(mytreectrl.GetItemText(itor->first));	
-				pFrame->SetWindowText(itemText);
-			}
+			CTreeCtrl & mytreectrl  = GetTreeCtrl();
+			int curline = pFrame->getCurSelLine();
+			int nextLine =	m_prevNextPairsMap[curline].next;	
+			selectedLine(nextLine);										
+					
+			mytreectrl.SetItemState(m_prevHItem,0,TVIS_BOLD);	
+			m_prevHItem = m_prevNextPairsMap[nextLine].pHitem;
+						
+			mytreectrl.SetItemState(m_prevHItem,TVIS_BOLD,TVIS_BOLD);
+			mytreectrl.SelectItem(m_prevHItem);
+			pFrame->setCurSelLine(nextLine);
+							
+			CString itemText(mytreectrl.GetItemText(m_prevHItem));	
+			pFrame->SetWindowText(itemText);		
 		}
-	}
-	*/
+	}	
+}
+
+void ClonePairsTreeView::Previous()
+{
+	if (m_prevHItem != NULL)
+	{
+		ClonePairsAsmFrame* pFrame = (ClonePairsAsmFrame*) GetParentFrame();
+		if( pFrame)
+		{
+			CTreeCtrl & mytreectrl  = GetTreeCtrl();
+			int curline = pFrame->getCurSelLine();
+			int prevLine =	m_prevNextPairsMap[curline].prev;	
+			selectedLine(prevLine);										
+					
+			mytreectrl.SetItemState(m_prevHItem,0,TVIS_BOLD);	
+			m_prevHItem = m_prevNextPairsMap[prevLine].pHitem;
+						
+			mytreectrl.SetItemState(m_prevHItem,TVIS_BOLD,TVIS_BOLD);
+			mytreectrl.SelectItem(m_prevHItem);
+			pFrame->setCurSelLine(prevLine);
+							
+			CString itemText(mytreectrl.GetItemText(m_prevHItem));	
+			pFrame->SetWindowText(itemText);		
+		}
+	}	
 }
 
 void ClonePairsTreeView::ReSyncScroll(ClonePairsAsmFrame* pFrame)

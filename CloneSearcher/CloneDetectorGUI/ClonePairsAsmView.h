@@ -106,7 +106,14 @@ class ClonePairsTreeView : public CTreeView
 		int     clonePairsPos;
 	} groupClonePair;
 
+	typedef struct prevNextPair{
+		HTREEITEM pHitem;
+		int       prev;
+	    int       next;
+	} prevNextPair_t;
+
 	typedef std::map<HTREEITEM,int>  hItemClonePairsRefMap_t;
+	typedef std::map<int, prevNextPair_t>  prevNextPairMap_t;
 
 protected:
 	ClonePairsTreeView();           // protected constructor used by dynamic creation
@@ -128,10 +135,12 @@ protected:
 public:
 	virtual void OnInitialUpdate();
 	void Next();
+	void Previous();
 
 private:
 	hItemClonePairsRefMap_t   m_clonePairsLineMap;
 	HTREEITEM                 m_prevHItem;
+	prevNextPairMap_t         m_prevNextPairsMap;   
 
 public:
 	afx_msg void OnTvnItemChanged(NMHDR *pNMHDR, LRESULT *pResult);
