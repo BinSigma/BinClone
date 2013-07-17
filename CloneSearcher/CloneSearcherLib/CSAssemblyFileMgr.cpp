@@ -374,8 +374,7 @@ bool CCSAssemblyFileMgr::addGlobalFeatureIfNew(LPCTSTR featureName)
 bool CCSAssemblyFileMgr::constructGlobalMedians()
 {
       m_globalMedians.SetSize(m_globalFeatures.GetSize());
-      return true;  
-    
+      return true;     
 }
 
 
@@ -388,7 +387,6 @@ bool CCSAssemblyFileMgr::constructRedundancyVector()
     m_redundancyVector.resize(m_globalMedians.GetSize()); // set a size for the redundancy vector 
     for (int i = 0; i < m_globalMedians.GetSize(); ++i)
     m_redundancyVector[i].resize(100);
-
     return true;
 }
 
@@ -398,10 +396,11 @@ bool CCSAssemblyFileMgr::filterOutFeatures(CCSIntArray& globalMedians) {
 		if (globalMedians.GetAt(i) != 0)
 			m_mediansNZ.Add(i);  // store the index of the features with median more than 0
 	}
-	    if (m_mediansNZ.GetSize() == 0) {
-			tcout << _T("CSAssemblyFileMgr:filterOutFeatures: All feature have 0 median.") << endl;
-			ASSERT(false);
-			return false;
+
+	if (m_mediansNZ.GetSize() == 0) {
+        tcout << _T("CSAssemblyFileMgr:filterOutFeatures: All feature have 0 median.") << endl;
+        ASSERT(false);
+        return false;
     }
 	return true;
 }
