@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "CSController.h"
 #include "CSParam.h"
-#include <iostream>
-#include <fstream>
-//farhadi
+
 CCSController::CCSController(LPCTSTR dbName, LPCTSTR dbUser, LPCTSTR dbPwd) 
     : m_dbMgr(dbName, dbUser, dbPwd),
       m_tokRefMgr(&m_dbMgr),
@@ -189,25 +187,7 @@ bool CCSController::findFileClones(LPCTSTR targetAssemblyFilePath,
     tcout << _T("Spent: ") << endPreprocessTime - startProgTime << _T("s on reading and preprocessing the target assembly file.") << endl;    
     tcout << _T("Spent: ") << startUnificationTime - startCloneTime << _T("s on finding clones.") << endl;
     tcout << _T("Spent: ") << endProgTime - startUnificationTime << _T("s on unifying and sorting clones.") << endl;
-    tcout << _T("Spent: ") << endProgTime - startProgTime << _T("s in total.") << std::endl; 
-    
-	
-	
-		//farhadi
-	ofstream myfile;
-	time_t now = time(0);
-	char* dt = ctime(&now);
-	myfile.open ("C:\\Users\\farhadi\\Desktop\\array.txt");
-	myfile << "Time\n";
-	myfile << "Spent: " << endPreprocessTime - startProgTime << "s on reading and preprocessing the target assembly file." << endl;    
-    myfile << "Spent: " << startUnificationTime - startCloneTime << "s on finding clones." << endl;
-    myfile << "Spent: " << endProgTime - startUnificationTime << "s on unifying and sorting clones." << endl;
-    myfile << "Spent: " << endProgTime - startProgTime << "s in total." << std::endl; 
-	myfile << "The local date and time is: " << dt << endl;
-
-	myfile.close();
-
-	
+    tcout << _T("Spent: ") << endProgTime - startProgTime << _T("s in total.") << std::endl; 	
 	return true;
 }
 
