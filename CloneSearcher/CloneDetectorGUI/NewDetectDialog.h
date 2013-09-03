@@ -12,7 +12,8 @@ class NewDetectDialog : public CDialogEx
 	DECLARE_DYNAMIC(NewDetectDialog)
 
 public:
-	NewDetectDialog(bool p_searchCode = false, CWnd* pParent = NULL);   // standard constructor
+	NewDetectDialog(bool p_searchCode, CString &initialStr, CWnd* pParent = NULL);   // standard constructor
+
 	virtual ~NewDetectDialog();
 
     // Dialog Data
@@ -56,6 +57,7 @@ protected:
 	CToolTipCtrl  m_ToolTip;
 	bool          m_withSearchCode;
 	CRichEditCtrl m_editSearchCodeFrag;
+	CString       m_initialFragStr;
 
 	DECLARE_MESSAGE_MAP()
 

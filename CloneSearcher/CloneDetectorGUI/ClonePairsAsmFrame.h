@@ -55,16 +55,12 @@ protected:
 	ClonePairsAsmFrame();           // protected constructor used by dynamic creation
 	virtual ~ClonePairsAsmFrame();
 
-	
-
-
 	CMFCToolBar  m_wndToolBar;
 	CSplitterWnd m_wndSplitter;
 	CSplitterWnd m_wndSplitter2;
 	bool         m_bInitSplitter;
 	
 	CloneFile    m_pCurSelCloneFile;
-	//int          m_numOfClonePairs;
 
 	CString      m_xmlFile;
 	int          m_idFromXmlFile;

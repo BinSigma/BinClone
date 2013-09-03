@@ -37,7 +37,7 @@ CString REG_NORM_LVL[4] = { _T("CD_NORM_REG_ROOT"),
 
 IMPLEMENT_DYNAMIC(NewDetectDialog, CDialogEx)
 
-NewDetectDialog::NewDetectDialog(bool p_searchCode, CWnd* pParent /*=NULL*/)
+NewDetectDialog::NewDetectDialog(bool p_searchCode, CString &p_initialStr, CWnd* pParent /*=NULL*/)
 	 : CDialogEx(NewDetectDialog::IDD, pParent)	 
 	 , m_withSearchCode(p_searchCode)
 	 , m_ok(false)
@@ -53,6 +53,7 @@ NewDetectDialog::NewDetectDialog(bool p_searchCode, CWnd* pParent /*=NULL*/)
 	 , m_dbUser(g_dbUser)
 	 , m_dbPwd(g_dbPwd)
 	 , m_paramsId(-1)
+	 , m_initialFragStr(p_initialStr)
 {
 	if (g_asmFilePath.GetLength() <= 0) {
 	    TCHAR temp[MAX_PATH]; 
@@ -60,6 +61,7 @@ NewDetectDialog::NewDetectDialog(bool p_searchCode, CWnd* pParent /*=NULL*/)
         m_asmFilePath = temp;
 		g_asmFilePath = temp;
 	}
+	
 }
 
 NewDetectDialog::~NewDetectDialog()
@@ -353,6 +355,12 @@ BOOL NewDetectDialog::OnInitDialog()
 
 	CWnd *  occThrs = GetDlgItem(IDC_EDIT_OCCTHRS);
 	occThrs->EnableWindow(m_bFindInexactClonesChk);
+
+	if( m_withSearchCode && !m_initialFragStr.IsEmpty())
+	{
+		m_editSearchCodeFrag.SetSel(0,1);
+		m_editSearchCodeFrag.ReplaceSel(m_initialFragStr);
+	}
 
 
 	return TRUE;  // return TRUE unless you set the focus to a control

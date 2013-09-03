@@ -121,7 +121,7 @@ bool CCSClones::makeClones(const CCSRegion& tarRegion, const CCSRegions& srcRegi
 }
 
 //mm
-
+/*
 bool CCSClones::mymakeClones(const CCSRegion& tarRegion, const CCSRegion* srcRegion)
 {
     CCSClone* pNewClone = NULL;
@@ -143,6 +143,7 @@ bool CCSClones::mymakeClones(const CCSRegion& tarRegion, const CCSRegion* srcReg
     
     return true;
 }
+*/
 
 
 //

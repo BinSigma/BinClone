@@ -47,6 +47,7 @@ END_MESSAGE_MAP()
 CCloneDetectorGUIApp::CCloneDetectorGUIApp()
 	: m_pDocTemplateClonePairsAsm(NULL),
 	  m_pDocTemplateTokenRef(NULL),
+	  m_initFragStr(""),
       m_newCDSearchFlag(false)
 {
 	m_bHiColorIcons = TRUE;
@@ -66,6 +67,7 @@ CCloneDetectorGUIApp::CCloneDetectorGUIApp()
 
 	// TODO: add construction code here,
 	// Place all significant initialization in InitInstance
+
 }
 
 // The one and only CCloneDetectorGUIApp object
@@ -74,6 +76,70 @@ CCloneDetectorGUIApp theApp;
 
 
 // CCloneDetectorGUIApp initialization
+void CCloneDetectorGUIApp::readFragFromFile(const CString &infile, CString &fragStr)
+{
+	fragStr = "";
+	/*
+	FILE *fStream;
+	errno_t err;
+	char *f = ( char *)(LPCTSTR)infile;
+	strcpy(f,(const char *)(LPCTSTR)infile);
+	
+	fStream = fopen("C:\\Users\\benfung\\AppData\\Local\\Temp\\temFrag.ext", "r");
+
+	if(fStream != NULL)
+	{
+		fseek(fStream,0,SEEK_END);
+		int size = ftell(fStream); 
+		fseek(fStream,0, SEEK_SET);
+		//char * buffer = (char*) malloc(size);
+		fread(fragStr.GetBuffer(size),1,size,fStream);
+		fragStr.ReleaseBuffer(size);
+		fclose(fStream);
+	}
+	else
+	{
+		CString err;
+		err.Format(_T("Error open framgment file %s"),f);
+		AfxMessageBox(err);
+	}
+	*/
+
+   CFile file;
+   CFileException ex;
+
+   if( !file.Open((LPCTSTR)infile,CFile::modeRead | CFile::shareDenyWrite, &ex))
+   {
+	   TCHAR szError[1024];
+	   ex.GetErrorMessage(szError, 1024);
+	   TRACE1("Couldn't open source file: %s\n", szError);
+	   return;
+   }
+   else
+   {
+	   file.SeekToBegin();
+	   bool done = false;
+       while(!done)
+	   {
+	       char buf[1025] = {0};
+		   UINT nRead = file.Read(buf,1024);
+		   if( nRead < 1024)
+		   {
+			   done = true;
+		   };
+		   buf[nRead] = '\0';
+	       fragStr += CString(buf);
+	   }
+	   /*
+	   UINT nBytes = (UINT)file.GetLength();
+	   int nChars = nBytes / sizeof(TCHAR);
+	   nBytes = file.Read(fragStr.GetBuffer(nChars), nBytes);
+	   fragStr.ReleaseBuffer(nChars);
+	   */
+   }
+   file.Close();
+   
+}
 
 BOOL CCloneDetectorGUIApp::InitInstance()
 {
@@ -159,7 +225,19 @@ BOOL CCloneDetectorGUIApp::InitInstance()
 	pMainFrame->ShowWindow(m_nCmdShow);
 	
 	pMainFrame->UpdateWindow();
-	
+
+	//m_initFragStr = "This is line one\r\nThis is line two\r\n";
+
+	CCmdLineInfo cmdInfo;
+    ParseCommandLine(cmdInfo);
+	if( cmdInfo.m_fragmentTmpFile && !cmdInfo.m_strFileName.IsEmpty())
+	//if(cmdInfo.m_fragmentTmpFile == true)
+	{
+		//TODO IDA PRO PLUGIN HERE
+		readFragFromFile(cmdInfo.m_strFileName,m_initFragStr);
+		//m_initFragStr = cmdInfo.m_strFileName; //"This is line one\r\nThis is line two\r\n";
+		OnFileNewSearchCodeFrag();
+	}
 	return TRUE;
 }
 
@@ -266,4 +344,46 @@ void CCloneDetectorGUIApp::OnFileNewSearchCodeFrag()
 	m_newCDSearchFlag = true;
 	// TODO: Add your command handler code here
 	OnFileNew();
+}
+
+CCmdLineInfo::CCmdLineInfo()
+	:m_fragmentTmpFile(false)
+	,m_bBoolParam(false)
+	,m_bHelpParam(false)
+	//,m_strFileParam("")
+{
+}
+ 
+void CCmdLineInfo::ParseParam(const TCHAR* pszParam, BOOL bFlag, BOOL bLast)
+{
+    bool bHandled = false;
+    const TCHAR *lpszParse = pszParam;
+    if (bFlag)
+    {
+        switch (*lpszParse)
+        {
+        case _T('f') :
+			m_fragmentTmpFile=true;
+			/*
+            ++lpszParse;
+            if (*lpszParse == _T('='))
+                ++lpszParse;
+            m_strFileParam = lpszParse;
+            bHandled = true;
+			*/
+            break;
+        }
+    }
+	else if( m_fragmentTmpFile)
+	{
+		//m_strFileParam = lpszParse;
+		m_strFileName = lpszParse;
+	}
+	
+    // If the last parameter has no flag, it is treated as the file name to be
+    //  opened and the string is stored in the m_strFileName member.
+	/*
+	if (!bHandled)
+        CCommandLineInfo::ParseParam(pszParam, bFlag, bLast);
+		*/
 }

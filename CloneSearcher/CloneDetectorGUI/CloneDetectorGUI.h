@@ -13,7 +13,17 @@
 // CCloneDetectorGUIApp:
 // See CloneDetectorGUI.cpp for the implementation of this class
 //
-
+class CCmdLineInfo : public CCommandLineInfo
+{
+public:
+    CCmdLineInfo(void);
+    virtual void ParseParam(const TCHAR* pszParam, BOOL bFlag, BOOL bLast);
+    bool m_bBoolParam;
+	bool m_fragmentTmpFile;
+    bool m_bHelpParam;
+    //CString m_strFileParam;
+};
+ 
 class CCloneDetectorGUIApp : public CWinAppEx
 {
 public:
@@ -43,12 +53,16 @@ public:
 	{
 		return m_newCDSearchFlag;
 	}
+
+	const CString & getInitalFragStr() { return m_initFragStr;}
 	
 	const CString & getCurrXMLFile();
 
 protected:
 	CString m_currXMLFile;
     bool    m_newCDSearchFlag;
+	CString m_initFragStr;
+	void readFragFromFile(const CString &infile, CString &fragStr);
 
 public:
 	CMultiDocTemplate * m_pDocTemplateClonePairsAsm;

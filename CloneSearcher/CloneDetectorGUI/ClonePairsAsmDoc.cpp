@@ -2,11 +2,7 @@
 //
 
 #include "stdafx.h"
-
-
-
 #include "CloneDetectorGUI.h"
-
 #include "MainFrm.h"
 #include "ClonePairsAsmDoc.h"
 #include "NewDetectDialog.h"
@@ -35,25 +31,23 @@ BOOL ClonePairsAsmDoc::OnNewDocument()
 	if (!CDocument::OnNewDocument())
 		return FALSE;
 
-	//return TRUE;
-
 	bool bSearchTargetFrag = theApp.getNewCDSearchFlag();
-	NewDetectDialog newDetectDlg(bSearchTargetFrag);
+	CString initialFragStr("");
+	if( bSearchTargetFrag)
+	{
+		initialFragStr = theApp.getInitalFragStr();
+	}
+	NewDetectDialog newDetectDlg(bSearchTargetFrag,initialFragStr);
+	//NewDetectDialog newDetectDlg(bSearchTargetFrag);
 	newDetectDlg.DoModal();
 	if( newDetectDlg.m_ok)
 	{
 		CBFStrHelper strHelper;
 		try
 		{
-			//int windSize                  = strHelper.strToInt(newDetectDlg.m_windSize);
-			//int stride                    = strHelper.strToInt(newDetectDlg.m_stride);
-			//int maxKOpLvl                 = strHelper.strToInt(newDetectDlg.m_maxKOP);
-			//double ovLap                  = strHelper.strToFloat(newDetectDlg.m_maxOVF);
 			bool bfindExact               = newDetectDlg.m_bFindExactClonesChk ? true : false;
-			bool bfindInExact             = newDetectDlg.m_bFindInexactClonesChk ? true : false;
-			//int keyVectorsSize            = strHelper.strToInt(newDetectDlg.m_keyVectorsSize);
+			bool bfindInExact             = newDetectDlg.m_bFindInexactClonesChk ? true : false;			
 			double occurrenceThrs         = strHelper.strToFloat(newDetectDlg.m_occurrenceThrs);
-			//int regNormLvl                = newDetectDlg.m_regNormalizedLevel;
             bool bNormalizeToken          = newDetectDlg.m_bNormalizeTokenChk ? true : false;
             int inexactMTD                = newDetectDlg.m_inexactMethodLevel; 
 			int dbParamId                 = newDetectDlg.m_db_param_id;
@@ -62,16 +56,11 @@ BOOL ClonePairsAsmDoc::OnNewDocument()
 			CString dbName                = newDetectDlg.m_dbName;
 			CString dbUser                = newDetectDlg.m_dbUser;
 			CString dbPwd                 = newDetectDlg.m_dbPwd;
-			//CString targetFilePathAndName;
 			
 			if( bSearchTargetFrag )
 			{
 				pSearchCodeFrag = newDetectDlg.m_searchCodeFragString;
 				keepTmpFile = newDetectDlg.m_keepTempFileChk ? true : false; 
-				/*
-				if( keepTmpFile) 
-					m_keepTmpFile = true;
-			*/
 			}
 			
 			CMainFrame* pFrame = (CMainFrame*) AfxGetMainWnd();
@@ -109,8 +98,6 @@ BOOL ClonePairsAsmDoc::OnNewDocument()
 	}
 
 	return FALSE;
-
-	//return TRUE;
 }
 
 ClonePairsAsmDoc::~ClonePairsAsmDoc()

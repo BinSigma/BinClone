@@ -116,7 +116,12 @@ void ClonePairsAsmFrame::OnSize(UINT nType, int cx, int cy)
 bool ClonePairsAsmFrame::init()
 {
 	bool bSearchTargetFrag = theApp.getNewCDSearchFlag();
-	NewDetectDialog newDetectDlg(bSearchTargetFrag);
+	CString initialFragStr("");
+	if( bSearchTargetFrag)
+	{
+		initialFragStr = theApp.getInitalFragStr();
+	}
+	NewDetectDialog newDetectDlg(bSearchTargetFrag,initialFragStr);
 	newDetectDlg.DoModal();
 	if( newDetectDlg.m_ok)
 	{
@@ -146,10 +151,6 @@ bool ClonePairsAsmFrame::init()
 			{
 				pSearchCodeFrag = newDetectDlg.m_searchCodeFragString;
 				keepTmpFile = newDetectDlg.m_keepTempFileChk ? true : false; 
-				/*
-				if( keepTmpFile) 
-					m_keepTmpFile = true;
-			*/
 			}
 			
 			CMainFrame* pFrame = (CMainFrame*) AfxGetMainWnd();
