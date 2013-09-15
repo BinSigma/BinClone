@@ -3,7 +3,8 @@
 3.Open the CloneSearcher plugin project from VS
 4.Update the project properties to reflect your IDA pro SDK installation directory:
 	a.Right click the CloneSearcher plugin project and select Properties;
-	b.Linker->General: Update the path to the SDK VC library “vc.w32” to Additional Library Directories. 
+	b.C/C++->General:: Change your SDK include path to the Additional Include Directories field. e.g. C:\IDA\SDK\Include
+	b.Linker->General: change the path to your SDK VC library “vc.w32” to Additional Library Directories. 
 		e.g.  “C:\idp pro\idasdk60a\idasdk60\lib\vc.w32” in my case.
 5.Build the project.
 6.Copy the CloneSearcher.plw from Release to your IDA Pro plugin directory as mentioned in #2.
