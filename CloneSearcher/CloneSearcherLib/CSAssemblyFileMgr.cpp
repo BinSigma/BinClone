@@ -394,6 +394,7 @@ bool CCSAssemblyFileMgr::filterOutFeatures(CCSIntArray& globalMedians) {
 
 	for (int i = 0; i < globalMedians.GetSize(); ++i) {
 		if (globalMedians.GetAt(i) != 0)
+			if (i != 91 && i!= 92 && i!= 93 && i!= 367 && i!=368 && i!=369 && i!=370 && i!=371 && i!=372 && i!=373 && i!=374 && i!=375) // These are operand's ids, which we do not need them for combination (we already consider them in feature extraction)!
 			m_mediansNZ.Add(i);  // store the index of the features with median more than 0
 	}
 

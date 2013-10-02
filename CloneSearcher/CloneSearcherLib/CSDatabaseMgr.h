@@ -55,12 +55,15 @@ public:
 	inline Int64u getNDBTotalRegions() {return m_nDBTotalRegions; }; 
 	bool setInitialVariables(const CCSParam& param); 
 
+	bool setTotalNCombination(const CCSParam& param);
+
 private:
 	std::vector<std::vector<int>> m_scoreVector;  
 	CCSFeatureVector m_targetRegionVector;	// Target region feature vector determined from DB
 	CCSBoolArray m_targetpRegionBinaryVector;
 	CCSIntArray m_filteredFeatures;
 	double m_minCoOccThreshold;
+	double m_actualminCoOccThreshold;
 	
 	int m_firstDBRegionIDInt;
 	Int64u m_nDBTotalRegions;	

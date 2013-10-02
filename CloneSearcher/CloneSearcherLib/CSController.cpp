@@ -130,6 +130,10 @@ bool CCSController::findFileClones(LPCTSTR targetAssemblyFilePath,
 	if (bFindInexactClones) {
 		m_dbMgr.setMinCoOccThreshold(minCoOccThreshold);
 		m_dbMgr.setInitialVariables(param);
+
+		// calculate the total number of combinations/clusters
+		m_dbMgr.setTotalNCombination(param);
+
 	}
 	// Parse the target assembly file.
     long startProgTime = getTime();

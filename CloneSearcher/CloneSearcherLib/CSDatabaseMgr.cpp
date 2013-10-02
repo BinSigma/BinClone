@@ -852,9 +852,14 @@ bool CCSDatabaseMgr::storeInexact2CombRegion(const CCSRegion& region, const CCSI
 	CString dbRegionIDString;
 	dbRegionIDString.Format(_T("%d"), region.m_dbRegionID);
 
-	const CCSBoolArray& binaryVector = region.getBinaryVector(); 
-	for (int i = 0; i < binaryVector.GetSize()-1; ++i) {
-        for (int j = i + 1; j < binaryVector.GetSize(); ++j) {
+	const CCSBoolArray& binaryVector = region.getBinaryVector();
+	int j = 0;
+	for (int i = 0; i < binaryVector.GetSize()-1; ++i) { // // 91 is the last Mnemonic's ID, the rest deals with operands which we do not want to have them alone! (exp:: mov,mov)
+		if (filteredFeatures.GetAt(i) < 91)
+			j = i;
+		else 
+			j = i+1;
+        for (j; j < binaryVector.GetSize(); ++j) { 
             CString featAPresentString;
             CString featBPresentString;
 			CBFStrHelper::boolToStr(region.getBinaryVector().GetAt(i), featAPresentString);
@@ -899,25 +904,30 @@ bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& 
 	CString InexactMatch;
 	int InexactMatchInt = 0;
 	CString parameterIDString; 
-	parameterIDString.Format(_T("%d"), param.m_dbParamID);	
-	for (int i = 0; i < m_targetpRegionBinaryVector.GetSize()-1; ++i) {
-        for (int j = i + 1; j < m_targetpRegionBinaryVector.GetSize(); ++j) {            			
+	parameterIDString.Format(_T("%d"), param.m_dbParamID);
+	int j = 0;
+	for (int i = 0; i < m_targetpRegionBinaryVector.GetSize()-1; ++i) {	
+		if (m_filteredFeatures.GetAt(i) < 91) // 91 is the last Mnemonic's ID, the rest deals with operands which we do not want to have them alone!
+			j = i;
+		else 
+			j = i+1;
+        for (j ; j < m_targetpRegionBinaryVector.GetSize(); ++j) { 	
             CString featAIDFKeyString;
             CString featBIDFKeyString;
             CString featAPresentString;
             CString featBPresentString;         
             featAIDFKeyString.Format(_T("%d"), m_filteredFeatures.GetAt(i));
-            featBIDFKeyString.Format(_T("%d"), m_filteredFeatures.GetAt(j));
+			featBIDFKeyString.Format(_T("%d"), m_filteredFeatures.GetAt(j));
             CBFStrHelper::boolToStr(m_targetpRegionBinaryVector[i], featAPresentString);
-            CBFStrHelper::boolToStr(m_targetpRegionBinaryVector[j], featBPresentString);
+            CBFStrHelper::boolToStr(m_targetpRegionBinaryVector[j], featBPresentString);		
 			CString csSqlCheckInexact = _T("Select * from \"Inexact2Comb\" where \"paramIDFKey\" =") + parameterIDString + _T(" and \"featAIDFKey\" =") + featAIDFKeyString + _T(" and \"featBIDFKey\" =") + featBIDFKeyString + _T(" and \"featAPresent\" =") + featAPresentString + _T(" and \"featBPresent\" =") + featBPresentString;
-            CStringA csSqlCheckInexactANSI;
-            if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
-                tcout << _T("Failed to convert UNICODE string for fetching in Inexact2Comb: ") << csSqlCheckInexact << endl;
-                ASSERT(false);
-                return false;
-            }
-            pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);         
+			CStringA csSqlCheckInexactANSI;
+			if (!CBFStrHelper::convertCStringToCStringA(csSqlCheckInexact, csSqlCheckInexactANSI)) {
+				tcout << _T("Failed to convert UNICODE string for fetching in Inexact2Comb: ") << csSqlCheckInexact << endl;
+				ASSERT(false);
+				return false;
+			}
+			pgresult = PQexec(getPGDBConnection(), csSqlCheckInexactANSI);         
 
 			if (PQntuples(pgresult)) {
 				for (int m = 0; m < PQntuples(pgresult); m++) {
@@ -932,7 +942,7 @@ bool CCSDatabaseMgr::fetchInexactScore(const CCSRegion& region, const CCSParam& 
 					++ m_scoreVector[InexactMatchInt-m_firstDBRegionIDInt][1];  // increase the score of the found regions with the same key
 				}				
 			} 
-			PQclear(pgresult); 
+				PQclear(pgresult);			
 		}     
 	}  
     return true;
@@ -951,11 +961,11 @@ bool CCSDatabaseMgr::fetchInexactRegions(const CCSRegion& region, const CCSParam
 		ASSERT(false);
 		return false;
 	}
-	double actualminCoOccThreshold = 0.0; 
-	actualminCoOccThreshold = m_minCoOccThreshold* m_targetpRegionBinaryVector.GetSize() * (m_targetpRegionBinaryVector.GetSize() -1) /2; 
+	//double actualminCoOccThreshold = 0.0; 
+	//actualminCoOccThreshold = m_minCoOccThreshold* m_targetpRegionBinaryVector.GetSize() * (m_targetpRegionBinaryVector.GetSize() -1) /2; 
 	int inexactRegionDBID = 0;
 	for (int m = 0; m < m_scoreVector.size(); ++m) {		
-		if (m_scoreVector[m][1] >= (int) actualminCoOccThreshold) {
+		if (m_scoreVector[m][1] >= (int) m_actualminCoOccThreshold) {
 			int mytemp = m_scoreVector[m][1];
 			inexactRegionDBID = m_scoreVector[m][0];
 			CString fetchInexactRegion;
@@ -1366,3 +1376,47 @@ bool CCSDatabaseMgr::setInitialVariables(const CCSParam& param)
 	return true;
 }
 
+bool CCSDatabaseMgr::setTotalNCombination(const CCSParam& param)
+{
+	PGresult *pgresult;
+	if (PQstatus(m_pPGDBconnection) == CONNECTION_BAD) {
+		tcout << _T("CSDataBaseMgr (fetchInexactRegion): Bad Connection with the Server") <<  endl; 
+		ASSERT(false);
+		return false;
+	}
+	CStringA parameterID; 
+	parameterID.Format("%d", param.m_dbParamID);
+	CString fetchFilteredFeature = _T("SELECT * from \"FilteredFeature\" where \"paramIDFKey\"=  ");
+	fetchFilteredFeature += parameterID;
+	CStringA fetchFilteredFeatureANSI;
+	if (!CBFStrHelper::convertCStringToCStringA(fetchFilteredFeature, fetchFilteredFeatureANSI)) {
+		tcout << _T("Failed to convert UNICODE string: ") << fetchFilteredFeature.GetString() << endl;
+		ASSERT(false);
+		return false;
+	}
+	pgresult = PQexec(getPGDBConnection(), (LPCSTR) fetchFilteredFeatureANSI);
+	if(PQresultStatus(pgresult) != PGRES_TUPLES_OK) { // PGRES_TUPLES_OK even if 0 tuples returned
+		tcout << _T("CSDataBaseMgr (fetchInexactRegion): Bad query to fetch the Inexact Regions from the database") <<  endl; 
+		ASSERT(false);
+		return false;
+	}
+	int TotalNFF= PQntuples(pgresult);
+	int nmemoniccnt = 0;
+	int mnemonicID;
+	for (int i = 0; i < TotalNFF; i++) {
+		CStringA ccsMnemonicIDAnsi(PQgetvalue(pgresult, i, 1));
+        CString csMnemonicID;
+        if(!CBFStrHelper::convertCStringAToCString(ccsMnemonicIDAnsi, csMnemonicID)) {
+	        tcout << _T("Failed to convert ANSI to Unicode string:") << ccsMnemonicIDAnsi.GetString() << endl; 
+		    ASSERT(false);
+		    return false;                     
+         }
+		 mnemonicID = CBFStrHelper::strToInt((LPCTSTR) csMnemonicID);
+        if (mnemonicID < 91)
+			++nmemoniccnt;
+	}        
+	PQclear(pgresult);
+	double actualminCoOccThreshold = 0.0; 
+	m_actualminCoOccThreshold = (m_minCoOccThreshold* TotalNFF * (TotalNFF -1) /2) + nmemoniccnt; 		
+    return true;
+}
