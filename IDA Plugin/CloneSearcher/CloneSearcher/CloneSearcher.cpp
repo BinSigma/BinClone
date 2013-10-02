@@ -1,5 +1,15 @@
-#define NO_OBSOLETE_FUNCS
 
+#ifdef USE_DANGEROUS_FUNCTIONS
+#undef USE_DANGEROUS_FUNCTIONS
+#endif
+
+#ifdef USE_STANDARD_FILE_FUNCTIONS
+#undef USE_STANDARD_FILE_FUNCTIONS
+#endif
+
+#define USE_STANDARD_FILE_FUNCTIONS
+
+#define NO_OBSOLETE_FUNCS
 
 #include <ida.hpp>
 #include <idp.hpp>
@@ -10,8 +20,6 @@
 #define BUFLEN 1024
 
 #include <windows.h>
-#include <stdio.h>
-#include <tchar.h>
 #include <string>
 
 static char help[] =
@@ -32,15 +40,10 @@ static const char form[] =
 "\n"
 "\n";
 
-
 std::string GetCurrentPath() {
     char buffer[MAX_PATH];
-    //GetModuleFileName( NULL, buffer, MAX_PATH );
-    //std::string::size_type pos = std::string( buffer ).find_last_of( "\\/" );
 	GetTempPath(MAX_PATH,buffer);
 	return std::string(buffer);
-
-    //return std::string( buffer ).substr( 0, pos);
 }
 
 char *get_asm_text (ea_t sEA) {
@@ -69,8 +72,6 @@ int idaapi init(void)
 
 void idaapi run(int)
 {
-  //warning("Hello, world!");
-  //system("C:\\CloneD\\CloneDetectorGUI.exe");
   char cs[MAXSTR] = "C:/CloneDetectorGUI.exe";  
   char buf[MAXSTR];
   qsnprintf(buf, sizeof(buf), form, help);
@@ -94,7 +95,8 @@ void idaapi run(int)
    msg("Current Path: %s\n",fileNameStr.c_str());
 
    FILE *tmpFile;
-   tmpFile = fopen(fileNameStr.c_str(),"w+");
+   tmpFile = qfopen(fileNameStr.c_str(),"w+");
+   
    if( tmpFile == NULL)
    {
 	    warning( "Failed to open temp file: %s (%d).\n", fileNameStr.c_str(), GetLastError() );
@@ -116,17 +118,14 @@ void idaapi run(int)
 		   auto itr = text[i];
 		   char full_buf[BUFLEN];                      // Full ASM text buffer
            char *full_ptr;                             // Full ASM text pointer
-           //int strlen = 0;
 		   full_ptr = &full_buf[0]; 
 		   tag_remove(itr.line, itr.line, BUFLEN);
 		   qstrncpy(full_ptr, &itr.line[8], BUFLEN);
-		   //full_ptr[strlen(full_ptr)] = '\r';
-		   //full_ptr[strlen(full_ptr)] = '\n';
 	       msg("%s : string len: %d\n",full_ptr,strlen(full_ptr));
-		   fwrite(full_ptr,sizeof(char), strlen(full_ptr),tmpFile);
-		   fwrite("\n",sizeof(char),1,tmpFile);
+		   qfwrite(tmpFile, full_ptr, strlen(full_ptr));
+		   qfwrite(tmpFile,"\n",1);
 	   }
-	   fclose(tmpFile);
+	   qfclose(tmpFile);
    }
    
    std::string command(cs); //"Z:\\CloneSearch\\CloneSearcher\\Debug\\CloneDetectorGUI.exe");
