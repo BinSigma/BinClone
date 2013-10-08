@@ -163,7 +163,7 @@ bool CCSController::findFileClones(LPCTSTR targetAssemblyFilePath,
     // unify the clones
     long startUnificationTime = getTime();
     tcout << _T("Number of clones before unification: ") << m_pTargetAssemblyFile->getClones()->GetSize() << endl;
-    if (!m_pTargetAssemblyFile->getClones()->unifyToLargestClones()) {
+	if (!m_pTargetAssemblyFile->getClones()->unifyToLargestClones(param.m_windowSize, minCoOccThreshold)) {
         tcout << _T("Error: failed to unify clones.") << endl;
         return false;
     }

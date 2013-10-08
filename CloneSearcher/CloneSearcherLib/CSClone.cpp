@@ -30,14 +30,16 @@ CCSClone::~CCSClone()
 //
 // Return true if two clones overlap; otherwise, false.
 //
-bool CCSClone::overlap(const CCSClone& theClone) const
+bool CCSClone::overlap(const CCSClone& theClone, int windowSize, double minCoOccThreshold) const
 {
 	int offset = 0; 
+	int acceptedOffeset = int ((1 - minCoOccThreshold) * windowSize + 0.5);
 	if (m_srcFileID !=theClone.m_srcFileID) // check to see if the clones are in the same file.
         return false;
 	
-	offset = m_tarStart - theClone.m_tarStart; //check the overlap offset. The offset should be the same.
-	if (abs(offset) != abs(m_srcStart - theClone.m_srcStart))
+	offset = m_tarStart - theClone.m_tarStart; //check the overlap offset. The (offset + acceptedOffeset) should be the same, if not, they do not have overlap.
+	int offsetsDiff = abs(offset) - abs(m_srcStart - theClone.m_srcStart);
+	if (offsetsDiff >  acceptedOffeset)
 		return false;
      
     return ((m_tarStart <= theClone.m_tarStart && m_tarEnd >= theClone.m_tarStart) || (theClone.m_tarStart <= m_tarStart && theClone.m_tarEnd >= m_tarStart)) &&
@@ -274,7 +276,7 @@ void CCSClones::swapEntry(int idxA, int idxB)
 //
 // Unify smaller clones to form larger clones
 //
-bool CCSClones::unifyToLargestClones()
+bool CCSClones::unifyToLargestClones(int windowSize, double minCoOccThreshold)
 {
     CCSClone* pCloneX = NULL;
     CCSClone* pCloneY = NULL;
@@ -286,7 +288,7 @@ bool CCSClones::unifyToLargestClones()
 
         for (int q = p + 1; q < GetSize(); ++q) {
             pCloneY = GetAt(q);
-            if (pCloneX->overlap(*pCloneY)) {
+            if (pCloneX->overlap(*pCloneY, windowSize, minCoOccThreshold)) {
                 // merge X and Y
 
                 // join tarX and tarY

@@ -15,7 +15,7 @@ public:
     CCSClone(int srcRegionID, int srcFcnID, int srcFileID, LPCTSTR srcFilePath, int srcStart, int srcEnd, int srcRawStart, int srcRawEnd, int tarStart, int tarEnd, int tarRawStart, int tarRawEnd);    // src is the file in DB. tar is the target comparison file.
     virtual ~CCSClone();
 
-    bool overlap(const CCSClone& theClone) const;
+    bool overlap(const CCSClone& theClone, int windowSize, double minCoOccThreshold) const;
     void print() const;
 
     // Note: tar is the new assembly file. src is the file in the database.
@@ -47,7 +47,7 @@ public:
     bool makeClones(const CCSRegion& tarRegion, const CCSRegions& srcRegion); 	
     void printClones() const;
     bool sortByTarRawStart();
-    bool unifyToLargestClones();
+    bool unifyToLargestClones(int windowSize, double minCoOccThreshold);
 
 protected:
     bool quickSort(int left, int right);
