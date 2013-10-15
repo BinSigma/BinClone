@@ -75,12 +75,55 @@ void idaapi run(int)
   char cs[MAXSTR] = "C:/CloneDetectorGUI.exe";  
   char buf[MAXSTR];
   qsnprintf(buf, sizeof(buf), form, help);
+
+  std::string tmpExeFile = GetCurrentPath();
+  tmpExeFile += "cstmp.txt";
+  FILE *exeFileH;
+  exeFileH = qfopen(tmpExeFile.c_str(),"r");   
+  if( exeFileH == NULL)
+  {
+	 msg("Try to create the file..."); 
+	 exeFileH = qfopen(tmpExeFile.c_str(),"w");
+	 if( exeFileH == NULL)
+     {
+	     warning( "Failed to open temp CS file %s (%d).\n", tmpExeFile.c_str(), GetLastError() );
+         return;
+	 }
+	 qfwrite(exeFileH,cs,strlen(cs));
+	 qfclose(exeFileH);
+	 exeFileH = qfopen(tmpExeFile.c_str(),"r");
+	 if( exeFileH == NULL)
+     {
+	     warning( "Failed to open temp CS file %s (%d).\n", tmpExeFile.c_str(), GetLastError() );
+         return;
+	 }
+  }
+  char csBuf[MAXSTR] = {0};
+  int numBytes = qfread(exeFileH,csBuf,MAXSTR);
+  if( numBytes > 0)
+  {
+	  memset(cs,0,MAXSTR);
+	  strcpy(cs,csBuf);
+  }
+  
   if ( AskUsingForm_c(buf, cs) == 0 )
   {
 	  msg("User selected Cancel");
 	  return;
   }
+  qfclose(exeFileH);
 
+  int nBytes = strlen(cs);
+  exeFileH = qfopen(tmpExeFile.c_str(),"w");
+  if( exeFileH == NULL)
+  {
+	 warning( "Failed to open temp CS file %s (%d).\n", tmpExeFile.c_str(), GetLastError() );
+     return;
+  }
+  qfseek(exeFileH,0,0);
+  qfwrite(exeFileH,cs,nBytes);
+  qfclose(exeFileH);
+  
   msg("Clone Searcher: %s\n",cs);
 
   STARTUPINFO si;
