@@ -65,67 +65,66 @@ char *get_asm_text (ea_t sEA) {
 
 }
 
-int idaapi init(void)
+bool getCloneSearcherExeFromUser( std::string & p_cs)
 {
-  return PLUGIN_OK;
+	char buf[MAXSTR];
+	char cs[MAXSTR] = "C:/CloneDetectorGUI.exe";
+	qsnprintf(buf, sizeof(buf), form, help);
+	p_cs = "";
+	if ( AskUsingForm_c(buf, cs) == 0 )
+	{
+		msg("User selected Cancel");
+		return false;
+	}
+	p_cs = cs;
+	return true;
 }
 
-void idaapi run(int)
+bool writeCloneSearcherExeToFile( std::string & p_cs)
 {
-  char cs[MAXSTR] = "C:/CloneDetectorGUI.exe";  
-  char buf[MAXSTR];
-  qsnprintf(buf, sizeof(buf), form, help);
+	std::string tmpExeFile = GetCurrentPath();
+	tmpExeFile += "cstmp.txt";
+	FILE *exeFileH;
+	exeFileH = qfopen(tmpExeFile.c_str(),"w");
+	if( exeFileH == NULL)
+    {
+		warning( "Failed to open temp CS file %s (%d).\n", tmpExeFile.c_str(), GetLastError() );
+		return false;
+	}
+	qfseek(exeFileH,0,0);
+	qfwrite(exeFileH,p_cs.c_str(),p_cs.size());
+	qfclose(exeFileH);
+	return true;
 
+}
+
+bool getCloneSearcherExeFromFile( std::string & p_cs)
+{
+  p_cs = "";
   std::string tmpExeFile = GetCurrentPath();
   tmpExeFile += "cstmp.txt";
   FILE *exeFileH;
   exeFileH = qfopen(tmpExeFile.c_str(),"r");   
   if( exeFileH == NULL)
   {
-	 msg("Try to create the file..."); 
-	 exeFileH = qfopen(tmpExeFile.c_str(),"w");
-	 if( exeFileH == NULL)
-     {
-	     warning( "Failed to open temp CS file %s (%d).\n", tmpExeFile.c_str(), GetLastError() );
-         return;
-	 }
-	 qfwrite(exeFileH,cs,strlen(cs));
-	 qfclose(exeFileH);
-	 exeFileH = qfopen(tmpExeFile.c_str(),"r");
-	 if( exeFileH == NULL)
-     {
-	     warning( "Failed to open temp CS file %s (%d).\n", tmpExeFile.c_str(), GetLastError() );
-         return;
-	 }
+ 	  msg( "Failed to open temp CS file %s (%d).\n", tmpExeFile.c_str(), GetLastError() );
+	  return false;
   }
   char csBuf[MAXSTR] = {0};
   int numBytes = qfread(exeFileH,csBuf,MAXSTR);
-  if( numBytes > 0)
-  {
-	  memset(cs,0,MAXSTR);
-	  strcpy(cs,csBuf);
-  }
-  
-  if ( AskUsingForm_c(buf, cs) == 0 )
-  {
-	  msg("User selected Cancel");
-	  return;
-  }
+  p_cs = csBuf;
   qfclose(exeFileH);
+  return true;
+}
 
-  int nBytes = strlen(cs);
-  exeFileH = qfopen(tmpExeFile.c_str(),"w");
-  if( exeFileH == NULL)
-  {
-	 warning( "Failed to open temp CS file %s (%d).\n", tmpExeFile.c_str(), GetLastError() );
-     return;
-  }
-  qfseek(exeFileH,0,0);
-  qfwrite(exeFileH,cs,nBytes);
-  qfclose(exeFileH);
-  
-  msg("Clone Searcher: %s\n",cs);
+int idaapi init(void)
+{
+  return PLUGIN_OK;
+}
 
+
+void idaapi run(int)
+{
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
 
@@ -171,35 +170,61 @@ void idaapi run(int)
 	   qfclose(tmpFile);
    }
    
-   std::string command(cs); //"Z:\\CloneSearch\\CloneSearcher\\Debug\\CloneDetectorGUI.exe");
-   command += " -f ";
-   command += fileNameStr;
-   if( !CreateProcess( NULL,   // No module name (use command line)
-	   (char *) command.c_str(), // "Z:\\CloneSearch\\CloneSearcher\\Debug\\CloneDetectorGUI.exe -f c:\\IDA\\tmp.txt\r\nabckde\r\n one two three\r\n",        // Command line
-		//"-f c:\\IDA\\tmp.txt",
-        NULL,           // Process handle not inheritable
-        NULL,           // Thread handle not inheritable
-        FALSE,          // Set handle inheritance to FALSE
-        0,              // No creation flags
-        NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory 
-        &si,            // Pointer to STARTUPINFO structure
-        &pi )           // Pointer to PROCESS_INFORMATION structure
-    ) 
-    {
-        warning( "CreateProcess failed (%d).\n", GetLastError() );
-        return;
-    }
+   std::string csPath(""); //"Z:\\CloneSearch\\CloneSearcher\\Debug\\CloneDetectorGUI.exe");
+   if( !getCloneSearcherExeFromFile(csPath))
+   {
+	   if( !getCloneSearcherExeFromUser(csPath))
+	   {
+			return;
+	   }
+   }
 
-    // Wait until child process exits.
-    WaitForSingleObject( pi.hProcess, INFINITE );
+   bool done=false;
+   while( !done)
+   {
+	   std::string command(csPath);
+	   command += " -f ";
+	   command += fileNameStr;
+	   if( !CreateProcess( NULL,   // No module name (use command line)
+			   (char *) command.c_str(), // "Z:\\CloneSearch\\CloneSearcher\\Debug\\CloneDetectorGUI.exe -f c:\\IDA\\tmp.txt\r\nabckde\r\n one two three\r\n",        // Command line
+				//"-f c:\\IDA\\tmp.txt",
+				NULL,           // Process handle not inheritable
+				NULL,           // Thread handle not inheritable
+				FALSE,          // Set handle inheritance to FALSE
+				0,              // No creation flags
+				NULL,           // Use parent's environment block
+				NULL,           // Use parent's starting directory 
+				&si,            // Pointer to STARTUPINFO structure
+				&pi )           // Pointer to PROCESS_INFORMATION structure
+		) 
+		{
+			int err = GetLastError();
+			if( err == ERROR_FILE_NOT_FOUND)
+			{
+			    warning( "CloneDetectorGUI.exe could not be located.\n");
+				if( getCloneSearcherExeFromUser(csPath))
+					continue;
+				else
+					break;
+			}
+			else
+			{
+				warning( "Failed to launch CloneSearcher.exe, error code = %d\n");
+			}
+			return;
+		}
+		writeCloneSearcherExeToFile(csPath);
+		done = true;
+		// Wait until child process exits.
+		WaitForSingleObject( pi.hProcess, INFINITE );
 
-    // Close process and thread handles. 
-    CloseHandle( pi.hProcess );
-    CloseHandle( pi.hThread );
-	
-	
+		// Close process and thread handles. 
+		CloseHandle( pi.hProcess );
+		CloseHandle( pi.hThread );
+   }
 }
+
+char wanted_hotkey[] = "Alt-F9";
 
 plugin_t PLUGIN =
 {
@@ -210,6 +235,6 @@ plugin_t PLUGIN =
   run,                  // invoke plugin
   NULL,                 // long comment about the plugin
   NULL,                 // multiline help about the plugin
-  "Clone Searcher",       // the preferred short name of the plugin
-  NULL                  // the preferred hotkey to run the plugin
+  "Clone Searcher",     // the preferred short name of the plugin
+  wanted_hotkey         // the preferred hotkey to run the plugin
 };
