@@ -31,8 +31,8 @@ protected:
 	CString m_filename;
 	int     m_beginLine;
 	int     m_endLine;
-	int     m_beginPos;
-	int     m_endPos;
+	long    m_beginPos;
+	long    m_endPos;
 	int     m_fileId;
 	int     m_viewId;
 	bool    m_popSyncScroll;

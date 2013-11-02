@@ -25,6 +25,9 @@ static int     g_windSize(-1);
 static int     g_stride(-1);
 static int     g_regNormLvl(-1);
 
+#define SEARCH_IN_ASM_FILE L"Search for clones in assembly file"
+#define SEARCH_IN_COD_FRAG L"Search for clones in code fragment"
+
 CString g_dbName(_T("CSDataBase"));
 CString g_dbUser(_T("postgres"));
 CString g_dbPwd(_T(""));
@@ -276,6 +279,8 @@ BOOL NewDetectDialog::OnInitDialog()
 
 		GetWindowRect(&rcWnd);
 
+		SetWindowText(SEARCH_IN_ASM_FILE);
+
 		SetWindowPos(NULL,0,0,
 			rcDefaultBox.right - rcWnd.left, 
 			rcDefaultBox.bottom - rcWnd.top,
@@ -303,6 +308,8 @@ BOOL NewDetectDialog::OnInitDialog()
 		CWnd * wndCANCEL = GetDlgItem(IDCANCEL);
 		wndOK->ShowWindow(SW_HIDE);
 		wndCANCEL->ShowWindow(SW_HIDE);
+
+		SetWindowText(SEARCH_IN_COD_FRAG);
 	}
 
 	CString text; 

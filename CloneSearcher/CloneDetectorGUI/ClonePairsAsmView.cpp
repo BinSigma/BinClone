@@ -113,13 +113,10 @@ void ClonePairsAsmView::SetColour(COLORREF color)
 	CHARFORMAT cf;
 	cf.cbSize = sizeof(CHARFORMAT);
 	cf.dwMask = CFM_COLOR | CFM_BOLD;
+	//cf.dwEffects = ~CFE_AUTOCOLOR;
 
-	GetRichEditCtrl().GetSelectionCharFormat(cf);
 	cf.crTextColor = color;
-	//if( cf.dwEffects & CFE_AUTOCOLOR )
-    { 
-		cf.dwEffects ^= CFE_AUTOCOLOR;
-	}
+	cf.dwEffects ^= CFE_AUTOCOLOR;
 	GetRichEditCtrl().SetSelectionCharFormat(cf);
 }
 
@@ -216,8 +213,6 @@ void ClonePairsAsmView::highLightLines(int p_begin, int p_end)
 	if( !m_binit)
 		return;
 
-	int nFirstVisible = GetRichEditCtrl().GetFirstVisibleLine();
-
 	if( (m_endLine >= 0) && (m_beginLine >= 0))
 	{
 		// reset the pervious selected
@@ -229,11 +224,8 @@ void ClonePairsAsmView::highLightLines(int p_begin, int p_end)
 		GetRichEditCtrl().SetSel(0, 0);	
 	}
 
-	// scroll the current selected line
-	//GetRichEditCtrl().LineScroll(-p_begin, 0);
-
-	int beginPos;
-	int endPos;
+	long beginPos;
+	long endPos;
 	if ( ((beginPos=GetRichEditCtrl().LineIndex(p_begin)) != -1) &&
 	     ((endPos=GetRichEditCtrl().LineIndex(p_end+1))   != -1) )
 	{
@@ -242,12 +234,10 @@ void ClonePairsAsmView::highLightLines(int p_begin, int p_end)
 		m_beginPos  = beginPos;
 		m_endPos    = endPos;
 
-		nFirstVisible = GetRichEditCtrl().GetFirstVisibleLine();
-		GetRichEditCtrl().SetSel(beginPos, endPos);
+		GetRichEditCtrl().SetSel(m_beginPos, m_endPos);
 		SetColour(RGB(255,0,0));		
-		GetRichEditCtrl().SetSel(beginPos, beginPos);
 		
-		nFirstVisible = GetRichEditCtrl().GetFirstVisibleLine();
+		int nFirstVisible = GetRichEditCtrl().GetFirstVisibleLine();
 		
 		if( m_viewId == 1 || m_viewId == 2)
 		{		
