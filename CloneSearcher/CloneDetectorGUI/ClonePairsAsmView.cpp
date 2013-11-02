@@ -17,6 +17,8 @@ ClonePairsAsmView::ClonePairsAsmView()
  m_isListView(false),
  m_beginLine(-1),
  m_endLine(-1),
+ m_beginPos(0),
+ m_endPos(0),
  m_fileId(-1),
  m_popSyncScroll(true)
 {
