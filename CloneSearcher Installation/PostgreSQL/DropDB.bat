@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\PostgreSQL\8.4\bin\dropdb" -U postgres CSDataBase

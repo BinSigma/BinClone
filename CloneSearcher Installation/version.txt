@@ -1,0 +1,2 @@
+Version 20131103 Fixed highlight bugs
+Version 20131028 Added DB

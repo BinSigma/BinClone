@@ -1,0 +1,20 @@
+push	esi
+push	edi
+push	3Ch		; Size
+mov	edi, ecx
+push	0		; Val
+push	edi		; Dst
+call	memset
+mov	esi, [esp+14h+arg_0]
+mov	eax, [esi]
+mov	[edi], eax
+push	dword ptr [esi+8] ; Src
+lea	eax, [edi+8]
+push	eax		; int
+call	sub_401EDE
+push	dword ptr [esi+0Ch] ; Src
+lea	eax, [edi+0Ch]
+push	eax		; int
+call	sub_401EDE
+push	dword ptr [esi+10h] ; Src
+lea	eax, [edi+10h]

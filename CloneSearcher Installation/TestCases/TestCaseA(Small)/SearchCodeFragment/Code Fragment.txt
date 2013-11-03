@@ -1,0 +1,20 @@
+mov	eax, [esi-1Ch]
+test	eax, eax
+jbe	short loc_10007753
+lea	eax, [esp+20h+arg_0]
+push	2		; nNumberOfBytesToWrite
+push	eax		; lpBuffer
+mov	ecx, ebx
+mov	[esp+28h+arg_0], 101h
+call	sub_10006370
+cmp	eax, 2
+jnz	loc_10007A7F
+mov	ecx, [esi-1Ch]
+mov	eax, [esi-20h]
+test	eax, eax
+lea	edi, [ecx+ecx+2]
+jnz	short loc_10007742
+mov	eax, offset NewFileName
+push	edi		; nNumberOfBytesToWrite
+push	eax		; lpBuffer
+mov	ecx, ebx
