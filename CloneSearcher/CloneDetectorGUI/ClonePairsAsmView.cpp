@@ -114,11 +114,9 @@ void ClonePairsAsmView::SetColour(COLORREF color)
 { 
 	CHARFORMAT cf;
 	cf.cbSize = sizeof(CHARFORMAT);
-	cf.dwMask = CFM_COLOR | CFM_BOLD;
-	//cf.dwEffects = ~CFE_AUTOCOLOR;
-
+	cf.dwMask = CFM_COLOR; 
+	cf.dwEffects = ~CFE_AUTOCOLOR;
 	cf.crTextColor = color;
-	cf.dwEffects ^= CFE_AUTOCOLOR;
 	GetRichEditCtrl().SetSelectionCharFormat(cf);
 }
 
