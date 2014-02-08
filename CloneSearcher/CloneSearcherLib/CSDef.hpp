@@ -117,6 +117,7 @@ static CString gMnemonics [] = {
 #define CS_ASSEMBLYTOKEN_OPMEM              _T("MEM")
 #define CS_ASSEMBLYTOKEN_OPREG              _T("REG")
 #define CS_ASSEMBLYTOKEN_OPVAL              _T("VAL")
+#define CS_ASSEMBLYTOKEN_OPLOC				_T("LOC")
 
 #define CS_NUM_OPTYPES                      3
 static CString gOpTypes [] = {

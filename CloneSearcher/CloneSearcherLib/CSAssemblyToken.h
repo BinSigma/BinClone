@@ -12,6 +12,7 @@ typedef enum {
     CSTOKEN_TYPE_OPMEM,       // operand: memory references, e.g., [0x805b634]
     CSTOKEN_TYPE_OPREG,       // operand: register references, e.g., eax
     CSTOKEN_TYPE_OPVAL,       // operand: constant values, e.g., 0x10
+	CSTOKEN_TYPE_CALLorJMP,  //CALLJMP
     CSTOKEN_TYPE_UNKNOWN
 } CCSAssemblyTokenType;
 
@@ -30,7 +31,8 @@ public:
     static bool isMnemonic(LPCTSTR str);
     static bool isMemoryReference(const CString& str);    
     static bool isConstantValue(const CString& str);
-    static bool isRegisterReference(const CString& str);    
+    static bool isRegisterReference(const CString& str); 
+	static bool isCallorJMPReference(const CString& str); // call or jmp
     static LPCTSTR normalizeRegister(const CString& str, TCSRegNormalizeLevel regNormLevel);
 
 private:    

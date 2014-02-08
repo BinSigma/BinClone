@@ -170,6 +170,17 @@ LPCTSTR CCSAssemblyToken::normalizeRegister(const CString& str, TCSRegNormalizeL
     return _T("");
 }
 
+// the operand after these mnemonics are location
+bool CCSAssemblyToken::isCallorJMPReference(const CString& str)
+{
+	return	str.CompareNoCase(_T("CALL")) == 0 || str.CompareNoCase(_T("JMP")) == 0 || str.CompareNoCase(_T("JE")) == 0 || str.CompareNoCase(_T("JZ")) == 0 
+			|| str.CompareNoCase(_T("JCXZ")) == 0 || str.CompareNoCase(_T("JP")) == 0 || str.CompareNoCase(_T("JPE")) == 0 || str.CompareNoCase(_T("JNE")) == 0
+			|| str.CompareNoCase(_T("JNZ")) == 0 || str.CompareNoCase(_T("JECXZ")) == 0 || str.CompareNoCase(_T("JNP")) == 0 || str.CompareNoCase(_T("JPO")) == 0;
+			
+}
+
+
+
 //********************
 // CCSAssemblyTokens *
 //********************

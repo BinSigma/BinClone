@@ -162,8 +162,9 @@ bool CCSAssemblyFile::normalizeCode(const CCSParam& param)
             // Get the index of the operand
             int opIdx = -1;
             CString newTokenStr;
-            if (pToken->getTokenType() == CSTOKEN_TYPE_MNEMONIC)
-                continue;   // do nothing for mnemonic
+			if (pToken->getTokenType() == CSTOKEN_TYPE_MNEMONIC) {
+					continue;   // do nothing for mnemonic (mnemonics expect Call and JMP)
+			}
             else if (pToken->getTokenType() == CSTOKEN_TYPE_OPMEM) {
                 opIdx = m_pAssemblyFileMgr->getOpMems()->getOperandIdx(pToken->getTokenStr());
                 newTokenStr = CS_ASSEMBLYTOKEN_OPMEM;

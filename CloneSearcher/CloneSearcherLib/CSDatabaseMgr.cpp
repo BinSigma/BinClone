@@ -723,6 +723,7 @@ bool CCSDatabaseMgr::preInsertInexact2Comb (const CCSIntArray& filteredFeatures,
     return true;
 }
 
+/*
 //
 // fetch the number of regions from DB to be used for inexact detection. Score vector shows the co occurenece of regions with a target region 
 // (This functiin is disable from v20130617)
@@ -755,7 +756,7 @@ bool CCSDatabaseMgr::constructScoreVector(const CCSParam& param)
 	PQclear(pgresult); 
 	return true;
 }
-
+*/
 
 bool CCSDatabaseMgr::fetchFeatureVector(const CCSRegion& region, const CCSParam& param)
 {   
@@ -1343,10 +1344,34 @@ bool CCSDatabaseMgr::setInitialVariables(const CCSParam& param)
 	// get the first dbRegionID value 
 	CStringA parameterID; 
 	parameterID.Format("%d", param.m_dbParamID);
-	CString fetchFirstDBRegionID = _T("Select * from \"Region\" where \"ParamIDFKey\"= ");
+	CString fetchnDBTotalRegions = _T("SELECT COUNT(\"ParamIDFKey\") from \"Region\" where \"ParamIDFKey\"= ");
+	fetchnDBTotalRegions += parameterID;
+	//fetchFirstDBRegionID += _T("order by \"dbRegionID\" ");
+    CStringA fetchnDBTotalRegionsANSI;
+    if (!CBFStrHelper::convertCStringToCStringA(fetchnDBTotalRegions, fetchnDBTotalRegionsANSI)) {
+        tcout << _T("Failed to convert UNICODE string: ") << fetchnDBTotalRegionsANSI << endl;
+        ASSERT(false);
+        return false;
+    }	
+	pgresult = PQexec(getPGDBConnection(), fetchnDBTotalRegionsANSI);
+	CStringA nDBTotalRegionsANSI;
+	if (PQntuples(pgresult)) 
+		nDBTotalRegionsANSI = PQgetvalue(pgresult,0,0);	
+	PQclear(pgresult);
+		
+	CString nDBTotalRegions;
+	if(!CBFStrHelper::convertCStringAToCString(nDBTotalRegionsANSI, nDBTotalRegions)) {
+		tcout << _T("Failed to convert ANSI to Unicode string:") << endl; 
+		ASSERT(false);
+		return false;                     
+    }
+	int nDBTotalRegionsINT = CBFStrHelper::strToInt((LPCTSTR) nDBTotalRegions);
+	m_nDBTotalRegions = nDBTotalRegionsINT;
+	m_scoreVector.resize(m_nDBTotalRegions); // Total number of regions
+
+	CString fetchFirstDBRegionID = _T("SELECT MIN(\"dbRegionID\") from \"Region\" where \"ParamIDFKey\"= ");
 	fetchFirstDBRegionID += parameterID;
-	fetchFirstDBRegionID += _T("order by \"dbRegionID\" ");
-    CStringA fetchFirstDBRegionIDANSI;
+	CStringA fetchFirstDBRegionIDANSI;
     if (!CBFStrHelper::convertCStringToCStringA(fetchFirstDBRegionID, fetchFirstDBRegionIDANSI)) {
         tcout << _T("Failed to convert UNICODE string: ") << fetchFirstDBRegionIDANSI << endl;
         ASSERT(false);
@@ -1354,20 +1379,18 @@ bool CCSDatabaseMgr::setInitialVariables(const CCSParam& param)
     }	
 	pgresult = PQexec(getPGDBConnection(), fetchFirstDBRegionIDANSI);
 	CStringA firstDBRegionIDANSI;
-	CStringA LastDBRegionIDANSI;
-	if (PQntuples(pgresult)) {
-		m_nDBTotalRegions = PQntuples(pgresult);
-		m_scoreVector.resize(m_nDBTotalRegions); // Total number of regions
-		firstDBRegionIDANSI = PQgetvalue(pgresult,0,0);		
-	}
+	if (PQntuples(pgresult)) 
+		firstDBRegionIDANSI = PQgetvalue(pgresult,0,0);	
+
 	CString firstDBRegionID;
 	if(!CBFStrHelper::convertCStringAToCString(firstDBRegionIDANSI, firstDBRegionID)) {
 		tcout << _T("Failed to convert ANSI to Unicode string:") << endl; 
 		ASSERT(false);
 		return false;                     
-    }	
+    }
+	
 	int firstDBRegionIDInt = CBFStrHelper::strToInt((LPCTSTR) firstDBRegionID);
-	m_firstDBRegionIDInt = firstDBRegionIDInt;
+	m_firstDBRegionIDInt = firstDBRegionIDInt;	
 		
 	for (int m = 0; m < m_scoreVector.size(); ++m) 
 		m_scoreVector[m].resize(2); 

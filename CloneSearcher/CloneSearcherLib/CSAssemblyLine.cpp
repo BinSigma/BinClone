@@ -25,7 +25,7 @@ bool CCSAssemblyLine::addTokens()
     CBFStrParser tokenParser(m_lineStr, CS_ASSEMBLYFILE_DELIMETER);
     
     CString tokenStr;
-    bool bFirstToken = true, bOffsetToken = false;
+    bool bFirstToken = true, bOffsetToken = false, CallorJMP = false;
     while (tokenParser.getNext(tokenStr)) {
         CBFStrHelper::trim(tokenStr);
         if (tokenStr.IsEmpty())
@@ -39,10 +39,18 @@ bool CCSAssemblyLine::addTokens()
         if (bFirstToken) {
             // Mnemonic
             tokenStr = tokenStr.MakeLower();
-            if (CCSAssemblyToken::isMnemonic(tokenStr.GetString())) 
+            if (CCSAssemblyToken::isMnemonic(tokenStr.GetString())) {
                 pNewToken = new CCSAssemblyToken(tokenStr, CSTOKEN_TYPE_MNEMONIC);
-            else
-                pNewToken = new CCSAssemblyToken(tokenStr, CSTOKEN_TYPE_UNKNOWN);
+					CallorJMP = false;
+				if (CCSAssemblyToken::isCallorJMPReference(tokenStr.GetString())) {
+					Add(pNewToken); // add the mnemonics but skip the operand
+					CallorJMP = true;
+				}
+			}
+            else {
+				 pNewToken = new CCSAssemblyToken(tokenStr, CSTOKEN_TYPE_UNKNOWN);
+				 CallorJMP = false;
+			}	
             bFirstToken = false;
         }
         else {
@@ -63,15 +71,16 @@ bool CCSAssemblyLine::addTokens()
             // Is offset string?
             bOffsetToken = tokenStr.CompareNoCase(CS_ASSEMBLYFILE_OFFSET) == 0;
         }
-
-        try {
-            Add(pNewToken);
-        }
-        catch (CMemoryException&) {
-            tcout << _T("CCSAssemblyLine: failed to add token from line: ") << m_lineStr.GetString() << endl;
-            ASSERT(false);
-            return false;
-        }
+		if (!CallorJMP) {
+			try {
+				Add(pNewToken);
+			}
+			catch (CMemoryException&) {
+				tcout << _T("CCSAssemblyLine: failed to add token from line: ") << m_lineStr.GetString() << endl;
+				ASSERT(false);
+				return false;
+			}
+		}
     }
     return true;
 }

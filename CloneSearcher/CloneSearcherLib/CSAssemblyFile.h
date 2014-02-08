@@ -46,6 +46,7 @@ public:
 
 private:    
     CCSAssemblyFileMgr* m_pAssemblyFileMgr;
+	CCSAssemblyToken* m_pAssemblyToken;
     CCSAssemblyFunctions m_functions;  
     CString m_filePath;
     CCSClones m_clones;
