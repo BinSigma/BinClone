@@ -33,6 +33,7 @@ public:
     bool constructVector(CStringArray& globaFeatures);
     bool constructBinaryVector(const CCSIntArray& mediansNZ  ,const CCSIntArray& globalMedians);
 	bool updateGlobalMedians(CCSIntArray& globalMedians, CCSAssemblyFileMgr* pAssemblyFileMgr); 
+	UINT hashGenerator(const char *str); // Generates djb2 hash 
 
     int m_dbRegionID;       // regionID in database
     int m_dbFcnID;          // fcnID in database

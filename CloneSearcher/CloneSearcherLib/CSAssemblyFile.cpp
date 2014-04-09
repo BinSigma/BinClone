@@ -307,7 +307,16 @@ bool CCSAssemblyFile::extractRegions(CCSDatabaseMgr* pDBMgr, const CCSParam& par
 				continue;
 
 			// the function contains at least one mnemonic statements.
-			region.m_hashValue = m_hashObject.HashKey((LPCTSTR) contentHashKey);
+
+			if (m_hashObject.GetHashTableSize()==17) // the default hash table size is 17. Hash table needs to be intilized once
+				m_hashObject.InitHashTable(15485863); // Intialized the hash table with a big prime number to reduce collision
+
+			//region.m_hashValue = m_hashObject.HashKey((LPCTSTR) contentHashKey);
+			// djb2 hash function:
+			string strContentHashKey = CT2A((LPCTSTR)contentHashKey);
+			const char * cstrContentHashKey = strContentHashKey.c_str() ;
+			region.m_hashValue = region.hashGenerator(cstrContentHashKey);
+
 
 			if (bFindExactClones) {
 				// find exact clones from DB
