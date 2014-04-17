@@ -80,7 +80,13 @@ bool CCSAssemblyToken::isRegisterReference(const CString& str)
            str.CompareNoCase(_T("CF")) == 0 || str.CompareNoCase(_T("PF")) == 0 || str.CompareNoCase(_T("AF")) == 0 || str.CompareNoCase(_T("ZF")) == 0 ||          // EFLAGS registers
            str.CompareNoCase(_T("SF")) == 0 || str.CompareNoCase(_T("TF")) == 0 || str.CompareNoCase(_T("IF")) == 0 || str.CompareNoCase(_T("DF")) == 0 ||          // EFLAGS registers
            str.CompareNoCase(_T("OF")) == 0 || str.CompareNoCase(_T("IOPL")) == 0 || str.CompareNoCase(_T("NT")) == 0 || str.CompareNoCase(_T("RF")) == 0 ||        // EFLAGS registers
-           str.CompareNoCase(_T("VM")) == 0 || str.CompareNoCase(_T("AC")) == 0 || str.CompareNoCase(_T("VIF")) == 0 || str.CompareNoCase(_T("VIP")) == 0 || str.CompareNoCase(_T("ID")) == 0;  // EFLAGS registers
+           str.CompareNoCase(_T("VM")) == 0 || str.CompareNoCase(_T("AC")) == 0 || str.CompareNoCase(_T("VIF")) == 0 || str.CompareNoCase(_T("VIP")) == 0 || str.CompareNoCase(_T("ID")) == 0 ||  // EFLAGS registers
+		   str.CompareNoCase(_T("RAX")) == 0 || str.CompareNoCase(_T("RBX")) == 0 || str.CompareNoCase(_T("RCX")) == 0 || str.CompareNoCase(_T("RDX")) == 0 || str.CompareNoCase(_T("RSI")) == 0 || str.CompareNoCase(_T("RDI")) == 0 || str.CompareNoCase(_T("RBP")) == 0 || str.CompareNoCase(_T("RSP")) == 0 || 
+		   str.CompareNoCase(_T("R8")) == 0 || str.CompareNoCase(_T("R9")) == 0 || str.CompareNoCase(_T("R10")) == 0 || str.CompareNoCase(_T("R11")) == 0 || str.CompareNoCase(_T("R12")) == 0 || str.CompareNoCase(_T("R13")) == 0 || str.CompareNoCase(_T("R14")) == 0 || str.CompareNoCase(_T("R15")) == 0 ||  // 64-bit registers
+		   str.CompareNoCase(_T("R8D")) == 0 || str.CompareNoCase(_T("R9D")) == 0 || str.CompareNoCase(_T("R10D")) == 0 || str.CompareNoCase(_T("R11D")) == 0 || str.CompareNoCase(_T("R12D")) == 0 || str.CompareNoCase(_T("R13D")) == 0 || str.CompareNoCase(_T("R14D")) == 0 || str.CompareNoCase(_T("R15D")) == 0 ||
+		   str.CompareNoCase(_T("R8W")) == 0 || str.CompareNoCase(_T("R9W")) == 0 || str.CompareNoCase(_T("R10W")) == 0 || str.CompareNoCase(_T("R11W")) == 0 || str.CompareNoCase(_T("R12W")) == 0 || str.CompareNoCase(_T("R13W")) == 0 || str.CompareNoCase(_T("R14W")) == 0 || str.CompareNoCase(_T("R15W")) == 0 ||
+		   str.CompareNoCase(_T("R8B")) == 0 || str.CompareNoCase(_T("R9B")) == 0 || str.CompareNoCase(_T("R10B")) == 0 || str.CompareNoCase(_T("R11B")) == 0 || str.CompareNoCase(_T("R12B")) == 0 || str.CompareNoCase(_T("R13B")) == 0 || str.CompareNoCase(_T("R14B")) == 0 || str.CompareNoCase(_T("R15B")) == 0 ;
+
 }
 
 
