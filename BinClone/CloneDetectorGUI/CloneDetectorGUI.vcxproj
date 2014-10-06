@@ -43,10 +43,12 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)\</IntDir>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;..\CloneSearcherLib;..\..\BFLib\include;..\..\PostgreSQL\include</IncludePath>
+    <TargetName>BinClone</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;..\CloneSearcherLib;..\..\BFLib\include;..\..\PostgreSQL\include</IncludePath>
+    <TargetName>BinClone</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

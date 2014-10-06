@@ -27,7 +27,7 @@
 #include "CloneFiles.h"
 #include "BFFileHelper.h"
 #include "CloneFiles.h"
-#include "..\..\CloneSearcher\CloneSearcherLib\CSController.h"
+#include "..\CloneSearcherLib\CSController.h"
 
 
 // ClonePairsAsmDoc

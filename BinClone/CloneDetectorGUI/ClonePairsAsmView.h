@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "..\..\CloneSearcher\CloneSearcherLib\CSController.h"
+#include "..\CloneSearcherLib\CSController.h"
 #include "CloneFiles.h"
 #include "ClonePairsAsmDoc.h"
 #include "ClonePairsAsmFrame.h"

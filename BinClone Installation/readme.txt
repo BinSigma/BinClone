@@ -1,4 +1,4 @@
-To use the Clone Searcher Program, follow these steps: 
+This procedure descrbies how to setup BinClone
 
 Step 1: Install PostgreSQL
 
@@ -14,9 +14,9 @@ Step 1: Install PostgreSQL
 
 Step 2: Populate assembly files into CSDataBase
 
-2.1 - Edit CloneSearcher\AssemblyToDB.bat. Replace "<DB_PWD>" with the database password specified in Step 1.1.
+2.1 - Edit BinClone\AssemblyToDB.bat. Replace "<DB_PWD>" with the database password specified in Step 1.1.
 
-2.2 - Execute CloneSearcher\AssemblyToDB.bat to run a test case. By default, it will run TestCaseA. Alternatively, you can change the parameters as follows.
+2.2 - Execute BinClone\AssemblyToDB.bat to run a test case. By default, it will run TestCaseA. Alternatively, you can change the parameters as follows.
 	
 	2.2.1: <DB_PWD>: database password
 
@@ -30,14 +30,14 @@ Step 2: Populate assembly files into CSDataBase
 
 
 -- Note that you can populate one and only one set of files (a folder) to the database, but you may populate the same set of files multiple times with different combinations of parameters.
--- The current implementation does not support incrementally updating the database. If you need to add new assembly files to the database, then you will need to drop the current database tables, rund DropDB.bat, run SetupDB.bat, and re-populate all the assembly files, together with the new files, into the database again.
+-- The current implementation does not support incrementally updating the database. If you need to add new assembly files to the database, then you will need to drop the current database tables, run DropDB.bat, run SetupDB.bat, and re-populate all the assembly files, together with the new files, into the database again.
 
 
 ---------------
 
-Step 3: Run Clone Searcher
+Step 3: Run BinClone
 
-3.1 - Run "CloneSearcher\CloneDetecorGUI.exe", which is the GUI of Clone Searcher. 
+3.1 - Run "BinClone\BinClone.exe", which is the GUI of Clone Searcher. 
 
 3.2 - You can choose one of the 3 modes from the File menu. 
 
