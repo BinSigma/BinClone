@@ -20,7 +20,7 @@ Step 2: Populate assembly files into CSDataBase
 	
 	2.2.1: <DB_PWD>: database password
 
-	2.2.2: <ASSEMBLY_FOLDER_PATH>: absolute path to the folder where you store your assembly files, e.g., "C:\CloneSearcher Installation\TestCases\TestCaseA(Small)\AssemblyFiles".
+	2.2.2: <ASSEMBLY_FOLDER_PATH>: absolute path to the folder where you store your assembly files, e.g., "C:\BinClone Installation\TestCases\TestCaseA(Small)\AssemblyFiles".
 
  	2.2.3: <NORMALIZATION_LEVEL>: Possible values are REG, TYPE, IDXPTR or BITS. Recommended value: REG, i.e., all the registers will be generalized to the symbol "REG". 
 
@@ -37,7 +37,7 @@ Step 2: Populate assembly files into CSDataBase
 
 Step 3: Run BinClone
 
-3.1 - Run "BinClone\BinClone.exe", which is the GUI of Clone Searcher. 
+3.1 - Run "BinClone\BinClone.exe", which is the GUI of BinClone. 
 
 3.2 - You can choose one of the 3 modes from the File menu. 
 
