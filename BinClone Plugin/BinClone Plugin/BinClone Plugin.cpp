@@ -235,6 +235,6 @@ plugin_t PLUGIN =
   run,                  // invoke plugin
   NULL,                 // long comment about the plugin
   NULL,                 // multiline help about the plugin
-  "Clone Searcher",     // the preferred short name of the plugin
+  "BinClone",           // the preferred short name of the plugin
   wanted_hotkey         // the preferred hotkey to run the plugin
 };
