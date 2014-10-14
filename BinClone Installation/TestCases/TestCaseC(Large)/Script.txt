@@ -1,6 +1,0 @@
-Default Paramteres:
-
-Window Size:						20	
-NORMALIZATION_LEVEL(REG, TYPE, IDXPTR or BITS)		REG
-Min. Co-occurrence Threshold:				0.8
-
