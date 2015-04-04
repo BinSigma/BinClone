@@ -6,4 +6,4 @@ M. R. Farhadi, B. C. M. Fung, P. Charland, and M. Debbabi. BinClone: detecting c
 
 Disclaimer:
 
-The software is provided as-is with no warranty or support. We do not take any responsibility for any damage, loss of income, or any problems you might experience from using our software. If you have questions, you are encouraged to consult the paper and the source code. If you find our software useful, please cite our paper above paper.
+The software is provided as-is with no warranty or support. We do not take any responsibility for any damage, loss of income, or any problems you might experience from using our software. If you have questions, you are encouraged to consult the paper and the source code. If you find our software useful, please cite the above paper.
